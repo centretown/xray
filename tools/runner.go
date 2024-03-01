@@ -72,8 +72,8 @@ func (runr *Runner) Run(control <-chan int) {
 			runRect = rl.RectangleInt32{
 				X:      leftMargin,
 				Y:      topMargin,
-				Width:  int32(rl.GetRenderWidth() - leftMargin),
-				Height: int32(rl.GetRenderHeight() - topMargin)}
+				Width:  int32(rl.GetRenderWidth() - leftMargin - rightMargin),
+				Height: int32(rl.GetRenderHeight() - topMargin - bottomMargin)}
 
 			for _, run := range runr.actors {
 				run.Resize(runRect, ballRadius, ballRadius, current)
@@ -82,8 +82,8 @@ func (runr *Runner) Run(control <-chan int) {
 
 		rl.BeginDrawing()
 
-		rl.DrawRectangleGradientV(0, 0, int32(rl.GetRenderWidth()), int32(rl.GetRenderHeight()), rl.Maroon, rl.Black)
-		rl.DrawRectangleGradientV(runRect.X, runRect.Y, runRect.Width, runRect.Height, rl.SkyBlue, rl.DarkBlue)
+		rl.DrawRectangleGradientV(0, 0, int32(rl.GetRenderWidth()), int32(rl.GetRenderHeight()), rl.DarkBlue, rl.Black)
+		rl.DrawRectangleGradientV(runRect.X, runRect.Y, runRect.Width, runRect.Height, rl.Black, rl.DarkBlue)
 		for _, run := range runr.actors {
 			run.Animate(can_move, current)
 		}
