@@ -7,7 +7,7 @@ import (
 func main() {
 	control := make(chan int)
 	runner := tools.NewRunner()
-	runner.Run(control)
+	runner.Run2d(control)
 	// time.Sleep(time.Second * 10)
 	// control <- 1
 }

@@ -5,16 +5,16 @@ import (
 )
 
 var colors = []rl.Color{
+	rl.White,
+	rl.Blue,
 	rl.Yellow,
 	rl.Red,
-	rl.DarkBlue,
-	rl.Magenta,
-	rl.Green,
-	rl.DarkBrown,
-	rl.LightGray,
-	rl.DarkGreen,
-	rl.DarkPurple,
+	rl.White,
+	rl.Red,
+	rl.White,
+	rl.Yellow,
 	rl.Lime,
+	rl.DarkGreen,
 }
 
 var _ Drawable = (*Ball)(nil)

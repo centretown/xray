@@ -36,10 +36,10 @@ func (runr *Runner) Add(d Drawable, a Animator, start float64, after float64) {
 	runr.actors = append(runr.actors, NewRunnable(d, a, start, after))
 }
 
-func (runr *Runner) Run(control <-chan int) {
+func (runr *Runner) Run2d(control <-chan int) {
 
 	rl.SetTraceLogLevel(rl.LogInfo)
-	rl.InitWindow(runr.width, runr.height, "Runner")
+	rl.InitWindow(runr.width, runr.height, "2d")
 	rl.SetTargetFPS(runr.fps)
 	rl.SetWindowState(rl.FlagWindowResizable)
 
@@ -59,8 +59,9 @@ func (runr *Runner) Run(control <-chan int) {
 	)
 
 	runr.Add(NewBall(60, colors), NewBouncer(runRect, ballRadius, ballRadius), current, 0)
-	runr.Add(NewBall(40, colors[2:]), NewBouncer(runRect, ballRadius, ballRadius), current, 1)
-	runr.Add(NewBall(20, colors[3:]), NewBouncer(runRect, ballRadius, ballRadius), current, 2)
+	runr.Add(NewBall(40, colors[6:]), NewBouncer(runRect, ballRadius, ballRadius), current, 1)
+	runr.Add(NewBall(30, colors[2:]), NewBouncer(runRect, ballRadius, ballRadius), current, 2)
+	runr.Add(NewBall(20, colors[4:]), NewBouncer(runRect, ballRadius, ballRadius), current, 3)
 
 	for !closeNow && !rl.WindowShouldClose() {
 		current = rl.GetTime()
@@ -99,4 +100,27 @@ func (runr *Runner) Run(control <-chan int) {
 	rl.CloseWindow()
 	fmt.Println("Were not done yet! Slowly but surely.")
 
+}
+
+func (runr *Runner) Run3d() {
+	rl.SetTraceLogLevel(rl.LogInfo)
+	rl.InitWindow(runr.width, runr.height, "3d")
+	rl.SetTargetFPS(runr.fps)
+	// rl.SetWindowState(rl.FlagWindowResizable)
+
+	for !rl.WindowShouldClose() {
+		rl.BeginDrawing()
+		rl.BeginMode3D(rl.NewCamera3D(
+			rl.Vector3{X: 2, Y: 2, Z: 2},
+			rl.Vector3{X: 0, Y: 0, Z: 0},
+			rl.Vector3{X: 0, Y: 1, Z: 0},
+			90, rl.CameraPerspective))
+
+		rl.DrawCube(rl.Vector3{X: 0, Y: 0, Z: 0},
+			2, 2, 2, rl.Red)
+		rl.EndMode3D()
+		rl.EndDrawing()
+	}
+	rl.CloseWindow()
+	fmt.Println("THREE D.")
 }
