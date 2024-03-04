@@ -19,43 +19,33 @@ static char *ERR_OPEN = "failed to open";
 typedef enum JOY_BUTTONS
 {
 	JOY_BUTTON_X,
-	JOY_BUTTON_CIRCLE,
-	JOY_BUTTON_TRIANGLE,
-	JOY_BUTTON_SQUARE,
-	JOY_BUTTON_LEFTTOP,
-	JOY_BUTTON_RIGHTTOP,
-	JOY_BUTTON_LEFTBOTTOM,
-	JOY_BUTTON_RIGHTBOTTOM,
-	JOY_BUTTON_SELECT,
+	JOY_BUTTON_A,
+	JOY_BUTTON_B,
+	JOY_BUTTON_Y,
+	JOY_BUTTON_LEFTSHOULDER,
+	JOY_BUTTON_RIGHTSHOULDER,
+	JOY_BUTTON_LEFTTRIGGER,
+	JOY_BUTTON_RIGHTTRIGGER,
+	JOY_BUTTON_BACK,
 	JOY_BUTTON_START,
-	JOY_BUTTON_HOME,
-	JOY_BUTTON_LEFTTHUMB,
-	JOY_BUTTON_RIGHTTHUMB,
-	JOY_BUTTON_UP,
-	JOY_BUTTON_DOWN,
-	JOY_BUTTON_LEFT,
-	JOY_BUTTON_RIGHT,
+	JOY_BUTTON_LEFTSTICK,
+	JOY_BUTTON_RIGHTSTICK,
 	JOY_BUTTONS_DEFINED,
 } JOY_BUTTONS;
 
-static const char *labels[JOYSTICK_BUTTON_MAX] = {
+static const char *button_labels[JOYSTICK_BUTTON_MAX] = {
 	"x",
-	"circle",
-	"triangle",
-	"square",
-	"lefttop",
-	"righttop",
-	"leftbottom",
-	"rightbottom",
-	"select",
+	"a",
+	"b",
+	"y",
+	"leftshoulder",
+	"rightshoulder",
+	"lefttrigger",
+	"righttrigger",
+	"back",
 	"start",
-	"home",
-	"leftthumb",
-	"rightthumb",
-	"up",
-	"down",
-	"left",
-	"right",
+	"leftstick",
+	"rightstick",
 };
 
 static char label_buffer[16];
@@ -67,8 +57,10 @@ static const char *button_label(size_t i)
 		snprintf(label_buffer, sizeof(label_buffer), "button%d", (int)i);
 		return label_buffer;
 	}
-	return labels[i];
+	return button_labels[i];
 }
+
+static const char *axis_labels[JOYSTICK_AXIS_MAX] = {};
 
 typedef struct joy_stick
 {
@@ -151,6 +143,16 @@ const char *GetJoystickName(int Joystick)
 		return "undefined";
 	}
 	return joy_sticks[Joystick].name;
+}
+
+const char *GetButtonName(int Joystick, int button)
+{
+	// if (not_in_range(Joystick))
+	// {
+	// 	return "undefined";
+	// }
+
+	return button_label(button);
 }
 
 bool IsJoystickButtonPressed(int Joystick, int button)

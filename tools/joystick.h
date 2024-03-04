@@ -13,5 +13,8 @@ int GetJoystickAxisCount(int Joystick);                  // Get Joystick axis co
 float GetJoystickAxisMovement(int Joystick, int axis);   // Get axis movement value for a Joystick axis
 int SetJoystickMappings(const char *mappings);           // Set internal Joystick mappings (SDL_GameControllerDB)
 void BeginJoystick(void);
+
 void Dump(void);
+const char *GetButtonName(int Joystick, int button);
+
 #endif // __JOY_H__
