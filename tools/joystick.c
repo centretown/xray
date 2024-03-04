@@ -217,7 +217,7 @@ bool IsJoystickButtonUp(int Joystick, int button)
 	{
 		return false;
 	}
-	return is_button_state_up(joy_sticks[Joystick].button_state, button);
+	return is_button_state_up(joy->button_state, button);
 }
 
 int GetJoystickButtonPressed(void)

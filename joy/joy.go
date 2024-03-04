@@ -21,17 +21,22 @@ func main() {
 		fmt.Println("duration", duration)
 	}
 
-	run(duration)
+	run(duration, []func(){
+		buttonPressed,
+		buttonUp,
+		buttonDown,
+	})
 
 	fmt.Println()
 	fmt.Println("done!")
 }
 
-func run(duration time.Duration) {
+func run(duration time.Duration, tests []func()) {
 	ch := make(chan int)
-	go test(ch, buttonPressed)
-	time.Sleep(duration)
-	ch <- 1
+	for _, f := range tests {
+		go test(ch, f)
+		time.Sleep(duration)
+	}
 }
 
 func test(ch <-chan int, f func()) {
@@ -56,7 +61,19 @@ func test(ch <-chan int, f func()) {
 
 func buttonPressed() {
 	button := tools.GetJoystickButtonPressed()
-	down := tools.IsJoystickButtonUp(0, button)
-	fmt.Printf("[%s:%d]",
-		tools.GetButtonName(0, button), tools.B2int(down))
+	up := tools.IsJoystickButtonUp(0, button)
+	fmt.Printf("P[%s:%d]",
+		tools.GetButtonName(0, button), tools.B2int(up))
+}
+
+func buttonUp() {
+	button := 3
+	up := tools.IsJoystickButtonUp(0, button)
+	fmt.Printf("U[%d:%d]", button, tools.B2int(up))
+}
+
+func buttonDown() {
+	button := 3
+	down := tools.IsJoystickButtonDown(0, button)
+	fmt.Printf("U[%d:%d]", button, tools.B2int(down))
 }
