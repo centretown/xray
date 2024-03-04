@@ -286,11 +286,12 @@ void BeginJoystick()
 				button = button_event_index(event);
 				if (is_button_event_down(event))
 				{
-					button_pressed_event = event;
 					set_button_state_down(joy->button_state, button);
 				}
 				else
 				{
+					// last button up
+					button_pressed_event = event;
 					set_button_state_up(joy->button_state, button);
 				}
 			}

@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+
 	duration := 10 * time.Second
 	flag.Parse()
 	if len(flag.Args()) > 0 {
@@ -17,21 +18,20 @@ func main() {
 		if err == nil && n == 1 {
 			duration = num * time.Second
 		}
-		fmt.Println("num", num, duration)
+		fmt.Println("duration", duration)
 	}
 
-	buttonPressed := func() {
-		button := tools.GetJoystickButtonPressed()
-		down := tools.IsJoystickButtonUp(0, button)
-		fmt.Printf("[%s:%d]",
-			tools.GetButtonName(0, button), tools.B2int(down))
-	}
+	run(duration)
 
+	fmt.Println()
+	fmt.Println("done!")
+}
+
+func run(duration time.Duration) {
 	ch := make(chan int)
 	go test(ch, buttonPressed)
 	time.Sleep(duration)
-	fmt.Println()
-	fmt.Println("done!")
+	ch <- 1
 }
 
 func test(ch <-chan int, f func()) {
@@ -52,4 +52,11 @@ func test(ch <-chan int, f func()) {
 			time.Sleep(time.Millisecond * 16)
 		}
 	}
+}
+
+func buttonPressed() {
+	button := tools.GetJoystickButtonPressed()
+	down := tools.IsJoystickButtonUp(0, button)
+	fmt.Printf("[%s:%d]",
+		tools.GetButtonName(0, button), tools.B2int(down))
 }
