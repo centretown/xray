@@ -3,7 +3,6 @@ package main
 import "xray/tools"
 
 func main() {
-
-	runner := tools.NewRunner()
-	runner.Run3d()
+	runr := tools.NewRunner(1280, 720, 60)
+	runr.Run3d()
 }

@@ -4,7 +4,7 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-var _ Animator = (*Bouncer)(nil)
+var _ CanAnimate = (*Bouncer)(nil)
 
 const (
 	max_velocity int32 = 34
@@ -50,7 +50,7 @@ func (anim *Bouncer) Resize(rect rl.RectangleInt32, boundsX, boundsY int32) {
 	anim.velocity = 1
 }
 
-func (anim *Bouncer) Animate(can_move int32, dr Drawable) {
+func (anim *Bouncer) Animate(can_move int32, dr CanDraw) {
 	dr.Draw(anim.rect.X+anim.x, anim.rect.Y+anim.y)
 
 	nextX := anim.x + anim.dx

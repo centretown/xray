@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "stdlib.h": "c",
+        "ctype.h": "c",
+        "stdbool.h": "c",
+        "algorithm": "c",
+        "assert.h": "c",
+        "random": "c",
+        "system_error": "c",
+        "array": "c",
+        "functional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "compare": "c",
+        "numbers": "c"
+    }
+}

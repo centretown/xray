@@ -1,23 +1,14 @@
 package tools
 
 import (
+	"fmt"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-var colors = []rl.Color{
-	rl.White,
-	rl.Blue,
-	rl.Yellow,
-	rl.Red,
-	rl.White,
-	rl.Red,
-	rl.White,
-	rl.Yellow,
-	rl.Lime,
-	rl.DarkGreen,
-}
+const min_ball_radius = 5
 
-var _ Drawable = (*Ball)(nil)
+var _ CanDraw = (*Ball)(nil)
 
 type Ball struct {
 	Radius int32
@@ -43,9 +34,22 @@ func NewBall(radius int32, colors []rl.Color) *Ball {
 	return b
 }
 
-func (b *Ball) Resize(radius int32) {
-	if radius <= 0 {
-		panic("ball zero radius")
+func (b *Ball) Width() int32 {
+	return b.Radius << 1
+}
+
+func (b *Ball) Height() int32 {
+	return b.Radius << 1
+}
+
+func (b *Ball) MinSize() (int32, int32) {
+	return min_ball_radius, min_ball_radius
+}
+
+func (b *Ball) Resize(width, height int32) {
+	radius := min(width, height)
+	if radius <= min_ball_radius {
+		panic(fmt.Sprintf("%d less than minimum radius", radius))
 	}
 	b.Radius = radius
 }
