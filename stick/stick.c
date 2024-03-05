@@ -10,11 +10,10 @@
 
 #define JOYSTICK_MAX 4
 #define JOYSTICK_AXIS_MAX 16
-#define JOYSTICK_BUTTON_MAX 64
+#define JOYSTICK_BUTTON_MAX 32
 
 static char *JOY_DEV = "/dev/input/js";
 static char *ERR_OUT_RANGE = "is out of range";
-static char *ERR_OPEN = "failed to open";
 
 typedef enum JOY_BUTTONS
 {
@@ -98,8 +97,8 @@ static const struct js_event zero_event = {0};
 #define is_button_event_down(e) ((e.value == 1))
 #define is_button_event_up(e) ((e.value == 0))
 
-#define set_button_state_up(s, b) ((s |= (1 << b)))
-#define set_button_state_down(s, b) ((s &= ~(1 << b)))
+#define set_button_state_down(s, b) ((s |= (1 << b)))
+#define set_button_state_up(s, b) ((s &= ~(1 << b)))
 #define is_button_state_down(s, b) ((s & (1 << b)))
 #define is_button_state_up(s, b) (!(s & (1 << b)))
 
@@ -300,9 +299,10 @@ void BeginJoystick()
 	last_button_pressed_event = button_pressed_event;
 }
 
-#define TEST_JOY
-#ifdef TEST_JOY
-void Dump()
+#ifndef STICK_EXTRA
+void Dump(void){}
+#else
+void Dump(void)
 {
 	for (size_t i = 0; i < joy_stick_count; i++)
 	{
@@ -320,4 +320,4 @@ void dump_event(struct js_event *p_event)
 		   p_event->type,
 		   p_event->number);
 }
-#endif
+#endif // STICK_EXTRA

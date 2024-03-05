@@ -14,7 +14,7 @@ package tools
 // use for branch free conditional
 // hopefully this gets inlined
 
-func B2int(b bool) int {
+func Bool2int(b bool) int {
 	var i int
 	if b {
 		i = 1
@@ -24,7 +24,7 @@ func B2int(b bool) int {
 	return i
 }
 
-func B2int32(b bool) int32 {
+func Bool2int32(b bool) int32 {
 	var i int
 	if b {
 		i = 1
@@ -34,7 +34,7 @@ func B2int32(b bool) int32 {
 	return int32(i)
 }
 
-func B2float32(b bool) float32 {
+func Bool2float32(b bool) float32 {
 	var i int
 	if b {
 		i = 1

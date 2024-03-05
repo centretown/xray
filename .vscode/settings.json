@@ -13,6 +13,11 @@
         "type_traits": "c",
         "utility": "c",
         "compare": "c",
-        "numbers": "c"
+        "numbers": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "ioctls.h": "c",
+        "string.h": "c",
+        "stdio.h": "c"
     }
 }

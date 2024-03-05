@@ -49,7 +49,7 @@ func (runr *Runner) Run2d() {
 
 	for !rl.WindowShouldClose() {
 		current = rl.GetTime()
-		can_move = B2int32(current > previous+interval)
+		can_move = Bool2int32(current > previous+interval)
 		previous = float64(can_move) * interval
 
 		if rl.IsWindowResized() {
@@ -134,16 +134,16 @@ func (runr *Runner) KeyPosXYZ(obj, pos *rl.Vector3) {
 	down := rl.IsKeyDown(rl.KeyDown) || rl.IsKeyDown(rl.KeyLeft)
 
 	vecs := []*rl.Vector3{obj, pos}
-	i := B2int(rl.IsKeyDown(rl.KeyLeftShift) || rl.IsKeyDown(rl.KeyRightShift))
+	i := Bool2int(rl.IsKeyDown(rl.KeyLeftShift) || rl.IsKeyDown(rl.KeyRightShift))
 	v := vecs[i]
 
 	const delta = .25
-	v.X -= B2float32(up && x) * delta
-	v.X += B2float32(down && x) * delta
-	v.Y += B2float32(up && y) * delta
-	v.Y -= B2float32(down && y) * delta
-	v.Z -= B2float32(up && z) * delta
-	v.Z += B2float32(down && z) * delta
+	v.X -= Bool2float32(up && x) * delta
+	v.X += Bool2float32(down && x) * delta
+	v.Y += Bool2float32(up && y) * delta
+	v.Y -= Bool2float32(down && y) * delta
+	v.Z -= Bool2float32(up && z) * delta
+	v.Z += Bool2float32(down && z) * delta
 }
 
 func (runr *Runner) GetViewPort() rl.RectangleInt32 {

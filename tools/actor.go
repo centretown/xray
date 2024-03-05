@@ -22,7 +22,7 @@ func NewActor(draw CanDraw, anim CanAnimate, after float64) *Actor {
 }
 
 func (act *Actor) Animate(can_move int32, current float64) {
-	can_move = can_move * B2int32(current >= act.next)
+	can_move = can_move * Bool2int32(current >= act.next)
 	act.anim.Animate(can_move, act.draw)
 }
 
