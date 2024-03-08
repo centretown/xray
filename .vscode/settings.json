@@ -18,6 +18,11 @@
         "initializer_list": "c",
         "ioctls.h": "c",
         "string.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "typeinfo": "c",
+        "joystick.h": "c",
+        "types.h": "c",
+        "posix_types.h": "c",
+        "stddef.h": "c"
     }
 }

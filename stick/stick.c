@@ -2,7 +2,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <assert.h>
@@ -12,25 +11,24 @@
 #define JOYSTICK_AXIS_MAX 16
 #define JOYSTICK_BUTTON_MAX 32
 
-static char *JOY_DEV = "/dev/input/js";
-static char *ERR_OUT_RANGE = "is out of range";
+#define JOY_DEV "/dev/input/js"
 
-typedef enum JOY_BUTTONS
-{
-	JOY_BUTTON_X,
-	JOY_BUTTON_A,
-	JOY_BUTTON_B,
-	JOY_BUTTON_Y,
-	JOY_BUTTON_LEFTSHOULDER,
-	JOY_BUTTON_RIGHTSHOULDER,
-	JOY_BUTTON_LEFTTRIGGER,
-	JOY_BUTTON_RIGHTTRIGGER,
-	JOY_BUTTON_BACK,
-	JOY_BUTTON_START,
-	JOY_BUTTON_LEFTSTICK,
-	JOY_BUTTON_RIGHTSTICK,
-	JOY_BUTTONS_DEFINED,
-} JOY_BUTTONS;
+// typedef enum JOY_BUTTONS
+// {
+// 	JOY_BUTTON_X,
+// 	JOY_BUTTON_A,
+// 	JOY_BUTTON_B,
+// 	JOY_BUTTON_Y,
+// 	JOY_BUTTON_LEFTSHOULDER,
+// 	JOY_BUTTON_RIGHTSHOULDER,
+// 	JOY_BUTTON_LEFTTRIGGER,
+// 	JOY_BUTTON_RIGHTTRIGGER,
+// 	JOY_BUTTON_BACK,
+// 	JOY_BUTTON_START,
+// 	JOY_BUTTON_LEFTSTICK,
+// 	JOY_BUTTON_RIGHTSTICK,
+// 	JOY_BUTTONS_DEFINED,
+// } JOY_BUTTONS;
 
 static const char *button_labels[JOYSTICK_BUTTON_MAX] = {
 	"x",
@@ -51,7 +49,7 @@ static char label_buffer[16];
 
 static const char *button_label(size_t i)
 {
-	if (i < 0 || i >= JOY_BUTTONS_DEFINED)
+	if (i < 0 || i >= JOYSTICK_BUTTON_MAX)
 	{
 		snprintf(label_buffer, sizeof(label_buffer), "button%d", (int)i);
 		return label_buffer;
@@ -73,6 +71,10 @@ typedef struct joy_stick
 
 	int16_t axis[JOYSTICK_AXIS_MAX];
 	int16_t axis_prev[JOYSTICK_AXIS_MAX];
+
+	struct js_corr corr;
+	__u16 btn_map[KEY_MAX - BTN_MISC + 1];
+	__u8 axis_map[ABS_CNT];
 } joy_stick;
 
 static bool initialized = false;
@@ -89,8 +91,8 @@ static const struct js_event zero_event = {0};
 
 #define is_axis_event(e) ((e.type & ~JS_EVENT_INIT) == JS_EVENT_AXIS)
 #define is_this_axis(e, a) ((e.number == a))
-#define axis_event_index(e) (e.number)
-#define axis_event_value(e) (e.value)
+// #define axis_event_index(e) (e.number)
+// #define axis_event_value(e) (e.value)
 
 #define is_button_event(e) ((e.type & ~JS_EVENT_INIT) == JS_EVENT_BUTTON)
 #define button_event_index(e) (e.number & 0x3f)
@@ -111,16 +113,19 @@ void initialize()
 	for (int i = 0; i < JOYSTICK_MAX; i++)
 	{
 		joy_stick *joy = &joy_sticks[joy_stick_count];
-		snprintf(device, sizeof(device), "%s%d", JOY_DEV, i);
+		snprintf(device, sizeof(device), JOY_DEV "%d", i);
 		joy->handle = open(device, O_RDONLY);
 		if (joy->handle == -1)
 		{
 			continue;
 		}
-
 		ioctl(joy->handle, JSIOCGAXES, &joy->axis_count);
 		ioctl(joy->handle, JSIOCGBUTTONS, &joy->button_count);
 		ioctl(joy->handle, JSIOCGNAME(sizeof(joy->name)), &joy->name);
+
+		ioctl(joy->handle, JSIOCGCORR, &joy->corr);
+		ioctl(joy->handle, JSIOCGBTNMAP, joy->btn_map);
+		ioctl(joy->handle, JSIOCGAXMAP, joy->axis_map);
 
 		// Set nonblocking
 		fcntl(joy->handle, F_SETFL, O_NONBLOCK);
@@ -128,6 +133,33 @@ void initialize()
 	}
 
 	initialized = true;
+}
+
+__u8 axis_custom[4][8] = {
+	{0x00, 0x01, 0x02, 0x05, 0x16, 0x17, 0x00, 0x00},
+	{0x00, 0x01, 0x02, 0x05, 0x16, 0x17, 0x00, 0x00},
+	{0x00, 0x01, 0x02, 0x05, 0x16, 0x17, 0x00, 0x00},
+	{0x00, 0x01, 0x02, 0x05, 0x16, 0x17, 0x00, 0x00},
+};
+
+__u8 axis_default[4][8] = {
+	{0x00, 0x01, 0x02, 0x05, 0x16, 0x17, 0x00, 0x00},
+	{0x00, 0x01, 0x02, 0x05, 0x16, 0x17, 0x00, 0x00},
+	{0x00, 0x01, 0x02, 0x05, 0x16, 0x17, 0x00, 0x00},
+	{0x00, 0x01, 0x02, 0x05, 0x16, 0x17, 0x00, 0x00},
+};
+
+bool UpdateAxisMap(int Joystick, __u8 *axis_map)
+{
+	if (not_in_range(Joystick))
+	{
+		return false;
+	}
+
+	// JSIOCSAXMAP
+	joy_stick *joy = &joy_sticks[Joystick];
+	ioctl(joy->handle, JSIOCGAXMAP, joy->axis_map);
+	return false;
 }
 
 bool IsJoystickAvailable(int Joystick)
@@ -224,6 +256,15 @@ int GetJoystickButtonPressed(void)
 	return button_event_index(last_button_pressed_event);
 }
 
+int GetJoystickButtonCount(int Joystick)
+{
+	if (not_in_range(Joystick))
+	{
+		return 0;
+	}
+	return joy_sticks[Joystick].button_count;
+}
+
 int GetJoystickAxisCount(int Joystick)
 {
 	if (not_in_range(Joystick))
@@ -233,8 +274,31 @@ int GetJoystickAxisCount(int Joystick)
 	return joy_sticks[Joystick].axis_count;
 }
 
+int16_t GetJoystickAxisValue(int Joystick, int axis)
+{
+	if (not_in_range(Joystick))
+	{
+		return 0;
+	}
+
+	joy_stick *joy = &joy_sticks[Joystick];
+	if (axis < 0 || axis >= joy->axis_count)
+	{
+		return 0;
+	}
+
+	return joy->axis[axis];
+}
+
 float GetJoystickAxisMovement(int Joystick, int axis)
 {
+	// #define DPLEFT 0
+	// #define DPDOWN 1
+	// #define DPRIGHT 2
+	// #define DPUP 3
+
+	// 	static float dpi[4] = {.4, .8, .2, .1};
+
 	if (not_in_range(Joystick))
 	{
 		return 0;
@@ -275,9 +339,9 @@ void BeginJoystick()
 		{
 			if (is_axis_event(event))
 			{
-				int index = axis_event_index(event);
+				int index = event.number;
 				joy->axis_prev[index] = joy->axis[index];
-				joy->axis[index] = axis_event_value(event);
+				joy->axis[index] = event.value;
 			}
 			else if (is_button_event(event))
 			{
@@ -299,19 +363,6 @@ void BeginJoystick()
 	last_button_pressed_event = button_pressed_event;
 }
 
-#ifndef STICK_EXTRA
-void Dump(void){}
-#else
-void Dump(void)
-{
-	for (size_t i = 0; i < joy_stick_count; i++)
-	{
-		joy_stick *joy = &joy_sticks[i];
-		printf("Joystick: %d, %s, %d axes, %d buttons\n",
-			   (int)i, joy->name, joy->axis_count, joy->button_count);
-	}
-}
-
 void dump_event(struct js_event *p_event)
 {
 	printf("time: %xms, value: %x, type: %x, number: %x\n",
@@ -320,4 +371,47 @@ void dump_event(struct js_event *p_event)
 		   p_event->type,
 		   p_event->number);
 }
-#endif // STICK_EXTRA
+
+void dump_corr(struct js_corr *p_corr)
+{
+	printf("correction values:\n");
+	printf("type:%d, prec:%d, coef: [%d:%d:%d:%d:%d:%d:%d:%d]\n",
+		   p_corr->type, p_corr->prec,
+		   p_corr->coef[0], p_corr->coef[1], p_corr->coef[2], p_corr->coef[3],
+		   p_corr->coef[4], p_corr->coef[5], p_corr->coef[6], p_corr->coef[7]);
+}
+
+void dump_axis_map(__u8 *map)
+{
+	printf("axis map:\n");
+	for (size_t i = 0; i < ABS_CNT; i += 16)
+	{
+		printf("[%d:%d:%d:%d:%d:%d:%d:%d]\n",
+			   map[0], map[1], map[2], map[3],
+			   map[4], map[5], map[6], map[7]);
+	}
+}
+
+void dump_button_map(__u16 *map)
+{
+	printf("button map:\n");
+	for (size_t i = 0; i < KEY_MAX - BTN_MISC + 1; i += 16)
+	{
+		printf("[%d:%d:%d:%d:%d:%d:%d:%d]\n",
+			   map[0], map[1], map[2], map[3],
+			   map[4], map[5], map[6], map[7]);
+	}
+}
+
+void DumpJoystick(void)
+{
+	for (size_t i = 0; i < joy_stick_count; i++)
+	{
+		joy_stick *joy = &joy_sticks[i];
+		printf("Joystick: %d, %s, %d axes, %d buttons\n",
+			   (int)i, joy->name, joy->axis_count, joy->button_count);
+		dump_corr(&joy->corr);
+		dump_axis_map(joy->axis_map);
+		dump_button_map(joy->btn_map);
+	}
+}

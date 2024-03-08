@@ -1,6 +1,7 @@
 #ifndef __STICK_H__
 #define __STICK_H__
 #include <stdbool.h>
+#include <sys/types.h>
 
 bool IsJoystickAvailable(int Joystick);                  
 
@@ -16,7 +17,11 @@ bool IsJoystickButtonUp(int Joystick, int button);
 
 int GetJoystickButtonPressed(void);                      
 
+int GetJoystickButtonCount(int Joystick);
+
 int GetJoystickAxisCount(int Joystick);                  
+
+int16_t GetJoystickAxisValue(int Joystick, int axis);   
 
 float GetJoystickAxisMovement(int Joystick, int axis);   
 
@@ -28,8 +33,8 @@ void BeginJoystick(void);
 // Get the button mapping name?
 const char *GetButtonName(int Joystick, int button);
 
-#define STICK_EXTRA
+// #define STICK_EXTRA
 // Dump state for analysis
-void Dump(void);
+void DumpJoystick(void);
 
 #endif // __STICK_H__

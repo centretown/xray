@@ -1,11 +1,15 @@
-package stick
+package jcmd
 
 import (
 	"flag"
 	"fmt"
 	"time"
+	"xray/jstick"
+	"xray/stick"
 	"xray/tools"
 )
+
+var js jstick.Jstick = stick.NewJoyStickC()
 
 var keys tools.StringSlice
 var joysticks tools.IntSlice
@@ -28,6 +32,8 @@ const (
 	Down
 	Press
 	Release
+	Move
+	Dump
 )
 
 var KeyList = []string{
@@ -36,6 +42,8 @@ var KeyList = []string{
 	"down",
 	"press",
 	"release",
+	"move",
+	"dump",
 }
 
 var KeyUsage = []string{
@@ -44,6 +52,8 @@ var KeyUsage = []string{
 	"indicate if selected button is down",
 	"indicate if selected button has been pressed",
 	"indicate if selected button has been released",
+	"indicate selected axis movement",
+	"dump maps and value corrections",
 }
 
 var JoyCmds = map[string]*JoyCmd{
@@ -52,6 +62,8 @@ var JoyCmds = map[string]*JoyCmd{
 	KeyList[Down]:    {Cmd: IsButtonDown, Title: KeyList[Down], Joystick: 0, Button: 0, Axis: 0, Delay: 0},
 	KeyList[Press]:   {Cmd: IsButtonPressed, Title: KeyList[Press], Joystick: 0, Button: 0, Axis: 0, Delay: 0},
 	KeyList[Release]: {Cmd: IsButtonReleased, Title: KeyList[Release], Joystick: 0, Button: 0, Axis: 0, Delay: 0},
+	KeyList[Move]:    {Cmd: GetAxisMovement, Title: KeyList[Move], Joystick: 0, Button: 0, Axis: 0, Delay: 0},
+	KeyList[Dump]:    {Cmd: GetDumpJoystick, Title: KeyList[Dump], Joystick: 0, Button: 0, Axis: 0, Delay: 0},
 }
 
 const keysText = "one or more commands eg: -c down -c up -c last"
@@ -106,11 +118,11 @@ func RunJoyCmds(cmds []*JoyCmd) {
 func (cmd *JoyCmd) RunCmd(ch <-chan int) {
 	const delay = 16 //ms
 
-	BeginJoystick()
+	js.BeginJoystick()
 	showStick(cmd.Joystick)
 	showCmd(cmd)
 	for {
-		BeginJoystick()
+		js.BeginJoystick()
 
 		cmd.Cmd(cmd)
 
@@ -124,42 +136,61 @@ func (cmd *JoyCmd) RunCmd(ch <-chan int) {
 }
 
 func LastButtonPressed(cmd *JoyCmd) {
-	button := GetJoystickButtonPressed()
-	up := IsJoystickButtonDown(cmd.Joystick, button)
-	fmt.Printf("[%d:%d]",
-		button, tools.Bool2int(up))
+	button := js.GetJoystickButtonPressed()
+	up := js.IsJoystickButtonDown(cmd.Joystick, button)
+	fmt.Printf("[%4d:%4d]\r", button, tools.Bool2int(up))
 }
 
 func IsButtonUp(cmd *JoyCmd) {
-	button := cmd.Button
-	up := IsJoystickButtonUp(cmd.Joystick, button)
+	up := js.IsJoystickButtonUp(cmd.Joystick, cmd.Button)
 	if up {
-		fmt.Printf("[%d:%d]", button, tools.Bool2int(!up))
+		fmt.Printf("[%d:%d]\r", cmd.Button, tools.Bool2int(!up))
 	}
 }
 
 func IsButtonDown(cmd *JoyCmd) {
-	button := cmd.Button
-	down := IsJoystickButtonDown(cmd.Joystick, button)
+	down := js.IsJoystickButtonDown(cmd.Joystick, cmd.Button)
 	if down {
-		fmt.Printf("[%d:%d]", button, tools.Bool2int(down))
+		fmt.Printf("[%d:%d]\r", cmd.Button, tools.Bool2int(down))
 	}
 }
 
 func IsButtonReleased(cmd *JoyCmd) {
-	button := cmd.Button
-	released := IsJoystickButtonReleased(cmd.Joystick, button)
+	released := js.IsJoystickButtonReleased(cmd.Joystick, cmd.Button)
 	if released {
-		fmt.Printf("[%d:%d]", button, tools.Bool2int(released))
+		fmt.Printf("[%d:%d]\r", cmd.Button, tools.Bool2int(released))
 	}
 }
 
 func IsButtonPressed(cmd *JoyCmd) {
-	button := cmd.Button
-	pressed := IsJoystickButtonPressed(cmd.Joystick, button)
+	pressed := js.IsJoystickButtonPressed(cmd.Joystick, cmd.Button)
 	if pressed {
-		fmt.Printf("[%d:%d]", button, tools.Bool2int(pressed))
+		fmt.Printf("[%d:%d]\r", cmd.Button, tools.Bool2int(pressed))
 	}
+}
+
+func GetAxisValues(cmd *JoyCmd) {
+	count := js.GetJoystickAxisCount(cmd.Joystick)
+	fmt.Print("axes:  ")
+	for i := range count {
+		value := js.GetJoystickAxisValue(cmd.Joystick, i)
+		fmt.Printf("[%d:%6d] ", i, value)
+	}
+	fmt.Print("\r")
+}
+
+func GetAxisMovement(cmd *JoyCmd) {
+	count := js.GetJoystickAxisCount(cmd.Joystick)
+	fmt.Print("axes:  ")
+	for i := range count {
+		move := js.GetJoystickAxisMovement(cmd.Joystick, i)
+		fmt.Printf("[%d:%6.0f] ", i, move)
+	}
+	fmt.Print("\r")
+}
+
+func GetDumpJoystick(cmd *JoyCmd) {
+	js.DumpJoystick()
 }
 
 func NewCmds() []*JoyCmd {
@@ -209,9 +240,10 @@ func showCmd(c *JoyCmd) {
 }
 
 func showStick(JoyStick int) {
-	fmt.Printf("%s, available:%v, axes:%d\n",
-		GetJoystickName(JoyStick),
-		IsJoystickAvailable(JoyStick),
-		GetJoystickAxisCount(JoyStick),
+	fmt.Printf("%s, available:%v, axes:%d, buttons:%d\n",
+		js.GetJoystickName(JoyStick),
+		js.IsJoystickAvailable(JoyStick),
+		js.GetJoystickAxisCount(JoyStick),
+		js.GetJoystickButtonCount(JoyStick),
 	)
 }
