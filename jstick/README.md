@@ -1,6 +1,9 @@
-# JStick is a go interface implemented by GameStick and JoyStickC
+# JStick
 
 My intent was to make it usable and familiar with Raylib Gamepad interface.
+
+[jstick.go](jstick.go)
+go interface implemented by GameStick and JoyStickC
 
 `BeginJoystick()`
 
