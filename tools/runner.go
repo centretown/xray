@@ -121,7 +121,7 @@ func (runr *Runner) Run3d() {
 
 func (runr *Runner) JoyStick(obj *rl.Vector3) {
 	fmt.Print("game pad ")
-	if rl.IsGamepadAvailable(1) {
+	if rl.IsGamepadAvailable(0) {
 		fmt.Println("available")
 	} else {
 		fmt.Println("un-available")

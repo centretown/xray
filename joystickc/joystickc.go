@@ -1,7 +1,7 @@
-package stick
+package joystickc
 
 /*
-#include "stick.h"
+#include "joystick.h"
 */
 import "C"
 

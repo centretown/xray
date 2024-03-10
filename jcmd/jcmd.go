@@ -4,12 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"time"
+	"xray/joystickc"
 	"xray/jstick"
-	"xray/stick"
 	"xray/tools"
 )
 
-var js jstick.Jstick = stick.NewJoyStickC()
+var js jstick.Jstick = joystickc.NewJoyStickC()
 
 var keys tools.StringSlice
 var joysticks tools.IntSlice
@@ -217,7 +217,7 @@ func NewCmds() []*JoyCmd {
 		}
 
 		cmd := *pCmd
-		cmd.Joystick = axes[joyNext]
+		cmd.Joystick = joysticks[joyNext]
 		cmd.Axis = axes[axisNext]
 		cmd.Button = buttons[btnNext]
 		cmd.Delay = time.Duration(seconds[secNext]) * time.Second
@@ -234,8 +234,8 @@ func NewCmds() []*JoyCmd {
 }
 
 func showCmd(c *JoyCmd) {
-	fmt.Printf("command: %s, axis: %d, button = %d, duration = %v\n",
-		c.Title, c.Axis, c.Button, c.Delay)
+	fmt.Printf("command: %s, joystick: %d axis: %d, button = %d, duration = %v\n",
+		c.Title, c.Joystick, c.Axis, c.Button, c.Delay)
 
 }
 
