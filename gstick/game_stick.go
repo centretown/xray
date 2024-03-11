@@ -42,7 +42,7 @@ func (js *GameStick) intialize() {
 
 	js.stickCount = 0
 	for _, p := range devicePaths {
-		stg, err := OpenStickG(p.Path)
+		stg, err := OpenGStick(p.Path)
 		if err != nil {
 			fmt.Printf("Open %s [%s] %v\n", p.Name, p.Path, err)
 			continue
@@ -56,6 +56,10 @@ func (js *GameStick) BeginJoystick() {
 	if !js.intialized {
 		js.intialize()
 	}
+
+	for i := range js.stickCount {
+		js.Sticks[i].ReadState()
+	}
 }
 
 func (js *GameStick) IsJoystickAvailable(Joystick int) bool {
@@ -64,6 +68,10 @@ func (js *GameStick) IsJoystickAvailable(Joystick int) bool {
 
 const undefined = "undefined"
 
+func (js *GameStick) GetStickCount() int {
+	return js.stickCount
+}
+
 func (js *GameStick) GetJoystickName(Joystick int) string {
 	if js.stickCount <= Joystick {
 		return undefined
@@ -71,20 +79,39 @@ func (js *GameStick) GetJoystickName(Joystick int) string {
 	return js.Sticks[Joystick].Name
 }
 
+func (js *GameStick) DumpState(Joystick int) {
+	if js.stickCount <= Joystick {
+		return
+	}
+	js.Sticks[Joystick].DumpState()
+}
+
 func (js *GameStick) IsJoystickButtonPressed(Joystick int, button int) bool {
-	return false
+	if js.stickCount <= Joystick || ButtonCount <= button {
+		return false
+	}
+	return js.Sticks[Joystick].ButtonPressed(button)
 }
 
 func (js *GameStick) IsJoystickButtonDown(Joystick int, button int) bool {
-	return false
+	if js.stickCount <= Joystick || button >= ButtonCount {
+		return false
+	}
+	return js.Sticks[Joystick].ButtonDown(button)
 }
 
 func (js *GameStick) IsJoystickButtonReleased(Joystick int, button int) bool {
-	return false
+	if js.stickCount <= Joystick || button >= ButtonCount {
+		return false
+	}
+	return js.Sticks[Joystick].ButtonReleased(button)
 }
 
 func (js *GameStick) IsJoystickButtonUp(Joystick int, button int) bool {
-	return false
+	if js.stickCount <= Joystick || button >= ButtonCount {
+		return false
+	}
+	return !js.Sticks[Joystick].ButtonDown(button)
 }
 
 func (js *GameStick) GetJoystickButtonPressed() int {
@@ -92,11 +119,17 @@ func (js *GameStick) GetJoystickButtonPressed() int {
 }
 
 func (js *GameStick) GetJoystickAxisCount(Joystick int) int {
-	return 0
+	if js.stickCount <= Joystick {
+		return 0
+	}
+	return len(js.Sticks[Joystick].curAxisState)
 }
 
 func (js *GameStick) GetJoystickButtonCount(Joystick int) int {
-	return 0
+	if js.stickCount <= Joystick {
+		return 0
+	}
+	return len(js.Sticks[Joystick].curButtonState)
 }
 
 func (js *GameStick) GetJoystickAxisMovement(Joystick int, axis int) float32 {

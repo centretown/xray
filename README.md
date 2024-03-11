@@ -15,4 +15,8 @@ Joystick/Gamepad interface for linux using old style joystick.h
 
 ## [gstick](./gstick/README.md)
 
-Pure Joystick/Gamepad interface for linux using evdev 
+Pure go Joystick/Gamepad interface for linux using evdev 
+
+## [shanwan ps/4 gamepad](./shanwan/README.md)
+
+Adventures with hardware.

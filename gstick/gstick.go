@@ -2,24 +2,10 @@ package gstick
 
 import (
 	"fmt"
+	"xray/tools"
 
 	"github.com/holoplot/go-evdev"
 )
-
-// dave@yeller:~$ echo -n "2563:0119:ig" | sudo tee /sys/module/usbcore/parameters/quirks
-// 2563:0119:ig
-// davdmesg | tail
-// [80024.818700] hid-generic 0003:2563:0119.0025: input,hiddev1,hidraw5: USB HID v1.11 Gamepad [shanwan Wired Controller] on usb-0000:00:1d.0-1.5/input3
-// [80025.571774] usb 2-1.5: USB disconnect, device number 30
-// [80026.024984] usb 2-1.5: new full-speed USB device number 31 using ehci-pci
-// [80026.134650] usb 2-1.5: New USB device found, idVendor=045e, idProduct=028e, bcdDevice= 1.10
-// [80026.134654] usb 2-1.5: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-// [80026.134656] usb 2-1.5: Product: Xbox360 For Windows
-// [80026.134657] usb 2-1.5: Manufacturer: shanwan
-// [80026.134657] usb 2-1.5: SerialNumber: Shanwan202107142050
-// [80026.175608] input: Microsoft X-Box 360 pad as /devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.5/2-1.5:1.0/input/input63
-// [80026.175748] usbcore: registered new interface driver xpad
-// dave@yeller:~$
 
 type GStick struct {
 	Device           *evdev.InputDevice
@@ -31,32 +17,34 @@ type GStick struct {
 	AxesInfo         AxisInfoMap
 	Properties       []evdev.EvProp
 
-	preAxisState   AxisStateMap
-	curAxisState   AxisStateMap
-	preButtonState evdev.StateMap
+	ButtonBase  evdev.EvCode
+	ButtonCodes []evdev.EvCode
+
+	preAxisState AxisStateMap
+	curAxisState AxisStateMap
+	// preButtonState evdev.StateMap
 	curButtonState evdev.StateMap
 
-	//joy or game
-	ButtonEvent ButtonEvent
+	PressedOnce  uint64 // 1<<(evdev.EvCode - ButtonBase)
+	ReleasedOnce uint64 // 1<<(evdev.EvCode - ButtonBase)
 
-	Buttons []Button
-	Axes    []Axis
+	LastPressed evdev.EvCode // Button number
 
-	spinning bool
+	// spinning bool
 }
 
 func newStickG(device *evdev.InputDevice) (stg *GStick) {
 	stg = &GStick{
-		Device:         device,
-		preAxisState:   make(AxisStateMap),
-		curAxisState:   make(AxisStateMap),
-		preButtonState: make(evdev.StateMap),
+		Device:       device,
+		preAxisState: make(AxisStateMap),
+		curAxisState: make(AxisStateMap),
+		// preButtonState: make(evdev.StateMap),
 		curButtonState: make(evdev.StateMap),
 	}
 	return stg
 }
 
-func OpenStickG(path string) (*GStick, error) {
+func OpenGStick(path string) (*GStick, error) {
 	device, err := evdev.Open(path)
 	if err != nil {
 		fmt.Println("OpenStickG", path, err)
@@ -95,9 +83,8 @@ func OpenStickG(path string) (*GStick, error) {
 			if err != nil {
 				fmt.Println("device.State: ", err, t)
 			} else {
-				for k, v := range state {
-					stg.preButtonState[k] = false
-					stg.curButtonState[k] = v
+				for code, nowDown := range state {
+					stg.curButtonState[code] = nowDown
 				}
 			}
 		}
@@ -110,15 +97,47 @@ func OpenStickG(path string) (*GStick, error) {
 		}
 	}
 	stg.Properties = device.Properties()
+
+	_, ok := stg.curButtonState[BTN_JOYSTICK]
+	if ok {
+		stg.ButtonBase = BTN_JOYSTICK
+		stg.ButtonCodes = JoyButtons
+	} else {
+		stg.ButtonBase = BTN_GAMEPAD
+		stg.ButtonCodes = GameButtons
+	}
+
 	return stg, nil
+}
+
+func (stg *GStick) ButtonDown(button int) bool {
+	code, ok := stg.curButtonState[stg.ButtonCodes[button]]
+	return ok && code
+}
+func (stg *GStick) ButtonPressed(button int) bool {
+	offset := uint64(stg.ButtonCodes[button] - stg.ButtonBase)
+	return stg.PressedOnce&(1<<offset) != 0
+}
+
+func (stg *GStick) ButtonReleased(button int) bool {
+	offset := uint64(stg.ButtonCodes[button] - stg.ButtonBase)
+	return stg.ReleasedOnce&(1<<offset) != 0
 }
 
 func (stg *GStick) ReadState() {
 	state, err := stg.Device.State(evdev.EV_KEY)
 	if err == nil {
-		for k, v := range state {
-			stg.preButtonState[k] = stg.curButtonState[k]
-			stg.curButtonState[k] = v
+		var (
+			wasDown bool
+			offset  uint64
+		)
+
+		for code, nowDown := range state {
+			wasDown = stg.curButtonState[code]
+			offset = uint64(code - stg.ButtonBase)
+			stg.PressedOnce |= tools.Bool2uint64(!wasDown && nowDown) << offset
+			stg.ReleasedOnce |= tools.Bool2uint64(wasDown && !nowDown) << offset
+			stg.curButtonState[code] = nowDown
 		}
 	}
 
@@ -129,7 +148,26 @@ func (stg *GStick) ReadState() {
 			stg.curAxisState[k] = v.Value
 		}
 	}
+}
 
+func CheckOne[T comparable](pre, cur map[evdev.EvCode]T, k evdev.EvCode) {
+	v := cur[k]
+	if pre[k] != v {
+		fmt.Printf("[%v:%v]\n", k, v)
+	}
+}
+
+func CheckAll[T comparable](pre, cur map[evdev.EvCode]T) {
+	for k, v := range cur {
+		if pre[k] != v {
+			fmt.Printf("[%v:%v]\n", k, v)
+		}
+	}
+}
+
+func (stg *GStick) DumpState() {
+	// CheckAll(stg.preButtonState, stg.curButtonState)
+	CheckAll(stg.preAxisState, stg.curAxisState)
 }
 
 func (stg *GStick) Dump() {
@@ -167,7 +205,6 @@ func (stg *GStick) Dump() {
 }
 
 func (stg *GStick) Close() {
-	stg.spinning = false
 	stg.Device.Close()
 	fmt.Println("stg.Stop closed")
 }

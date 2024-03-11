@@ -2,7 +2,6 @@ package gstick
 
 import (
 	"fmt"
-	"os"
 	"testing"
 	"time"
 
@@ -84,22 +83,23 @@ func dumpEvent(device *evdev.InputDevice, ch chan int) {
 	}
 }
 
-func TestCodes(t *testing.T) {
-	for button := BTN_WEST; button < BTN_COUNT; button++ {
-		fmt.Printf("%x:%s\n\t%x:%s\n\t%x:%s\n",
-			int(button), button,
-			GameButtons[button], evdev.KEYNames[GameButtons[button]],
-			JoyButtons[button], evdev.KEYNames[JoyButtons[button]])
+func TestKeyChange(t *testing.T) {
+	j := NewGameStick()
+	j.BeginJoystick()
+	fmt.Println("Count", j.GetStickCount())
+	fmt.Printf("Selecting %s\n", j.GetJoystickName(0))
+	time.Sleep(time.Second)
+	count := j.GetStickCount()
+	x := 0
+	for {
+		j.BeginJoystick()
+		for i := range count {
+			if j.IsJoystickButtonDown(i, 0) {
+				fmt.Println("DOWN", i, x)
+				x++
+			}
+		}
+		time.Sleep(time.Millisecond << 4)
 	}
-}
 
-func TestOpen(t *testing.T) {
-	path := "/dev/input/event19"
-	d, err := evdev.Open(path)
-	if err != nil {
-		fmt.Printf("Cannot read %s: %v\n", os.Args[1], err)
-		return
-	}
-	vMajor, vMinor, vMicro := d.DriverVersion()
-	fmt.Printf("Input driver version is %d.%d.%d\n", vMajor, vMinor, vMicro)
 }

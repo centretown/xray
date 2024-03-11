@@ -34,6 +34,16 @@ func Bool2int32(b bool) int32 {
 	return int32(i)
 }
 
+func Bool2uint64(b bool) uint64 {
+	var i int
+	if b {
+		i = 1
+	} else {
+		i = 0
+	}
+	return uint64(i)
+}
+
 func Bool2float32(b bool) float32 {
 	var i int
 	if b {
