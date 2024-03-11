@@ -1,4 +1,4 @@
-package gstick
+package gpads
 
 // Event code 299 (BTN_BASE6) state false
 // Event code 288 (BTN_JOYSTICK/BTN_TRIGGER) state false

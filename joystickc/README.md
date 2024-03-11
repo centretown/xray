@@ -4,55 +4,55 @@ My gamepad didn't work with raylib, so I naively built a joystick controller wit
 
 ## [joystickc.go](joystickc.go)
 
-Implements [jstick](../jstick/README.md) interface.
+Implements [pad](../pad/README.md) interface.
 
 ## [joystick.c](joystick.c)/[joystick.h](joystick.h)
 
-Joystick/Gamepad interface for linux using old style joystick.h
+Pad/Gamepad interface for linux using old style joystick.h
 
-`bool IsJoystickAvailable(int Joystick)`
+`bool IsPadAvailable(int Pad)`
 
-Check if a Joystick number is available.
+Check if a Pad number is available.
 
-`const char *GetJoystickName(int Joystick)`
+`const char *GetPadName(int Pad)`
 
-Get Joystick internal name id.
+Get Pad internal name id.
 
-`bool IsJoystickButtonPressed(int Joystick, int button)`
+`bool IsPadButtonPressed(int Pad, int button)`
 
-Check if a Joystick button has been pressed once.
+Check if a Pad button has been pressed once.
 
-`bool IsJoystickButtonDown(int Joystick, int button)`
+`bool IsPadButtonDown(int Pad, int button)`
 
-Check if a Joystick button is being down.
+Check if a Pad button is being down.
 
-`bool IsJoystickButtonReleased(int Joystick, int button)`
+`bool IsPadButtonReleased(int Pad, int button)`
 
-Check if a Joystick button has been released once.
+Check if a Pad button has been released once.
 
-`bool IsJoystickButtonUp(int Joystick, int button)`
+`bool IsPadButtonUp(int Pad, int button)`
 
-Check if a Joystick button is NOT down.
+Check if a Pad button is NOT down.
 
-`int GetJoystickButtonPressed(void)`
+`int GetPadButtonPressed(void)`
 
-Get the last Joystick button pressed.
+Get the last Pad button pressed.
 
-`int GetJoystickAxisCount(int Joystick)`
+`int GetPadAxisCount(int Pad)`
 
-Get Joystick axis count for a Joystick
+Get Pad axis count for a Pad
 
-`float GetJoystickAxisMovement(int Joystick, int axis)`
+`float GetPadAxisMovement(int Pad, int axis)`
 
-Get axis movement value for a Joystick axis
+Get axis movement value for a Pad axis
 
-`int SetJoystickMappings(const char *mappings)`
+`int SetPadMappings(const char *mappings)`
 
-Set internal Joystick mappings (SDL_GameControllerDB).
+Set internal Pad mappings (SDL_GameControllerDB).
 
 **not yet implemented.**
 
-`void BeginJoystick(void)`
+`void BeginPad(void)`
  
 Updates the joystick state. 
 This must be called once per frame at the *BeginDrawing* step.

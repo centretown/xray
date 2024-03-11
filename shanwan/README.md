@@ -1,5 +1,5 @@
 # Shanwan PS/4 Gamepad
-I bought a cheap PS/4 clone Gamepad and while the system recognized the device `evtest` did not respond to buttons. An authentic PS/4 gamepad works both wired and wirelessly via Bluetooth. The quirks solution below restarts the gamepad in "Xbox360 For Windows" mode and it responds to `evtest`. Still not a PS/4 pad but a working improvement. May try modprobe next.
+I bought a PS/4 "compatible" Gamepad and while the system recognized the device `evtest` did not respond to buttons. An authentic PS/4 gamepad works both wired and wirelessly via Bluetooth. The quirks solution below restarts the gamepad in "Xbox360 For Windows" mode and it responds to `evtest`. Still not a PS/4 pad but a working improvement. May try modprobe next.
 
          shanwan
                |    ps/4 type

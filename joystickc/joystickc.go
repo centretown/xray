@@ -5,9 +5,9 @@ package joystickc
 */
 import "C"
 
-import "xray/jstick"
+import "xray/pad"
 
-var _ jstick.Jstick = NewJoyStickC()
+var _ pad.Pad = NewJoyStickC()
 
 type JoystickC struct {
 }
@@ -17,59 +17,59 @@ func NewJoyStickC() *JoystickC {
 	return js
 }
 
-func (js *JoystickC) BeginJoystick() {
+func (js *JoystickC) BeginPad() {
 	C.BeginJoystick()
 }
 
-func (js *JoystickC) IsJoystickAvailable(Joystick int) bool {
+func (js *JoystickC) IsPadAvailable(Joystick int) bool {
 	return bool(C.IsJoystickAvailable(C.int(Joystick)))
 }
 
-func (js *JoystickC) GetJoystickName(Joystick int) string {
+func (js *JoystickC) GetPadName(Joystick int) string {
 	return C.GoString(C.GetJoystickName(C.int(Joystick)))
 }
 
-func (js *JoystickC) IsJoystickButtonPressed(Joystick int, button int) bool {
+func (js *JoystickC) IsPadButtonPressed(Joystick int, button int) bool {
 	return bool(C.IsJoystickButtonPressed(C.int(Joystick), C.int(button)))
 }
 
-func (js *JoystickC) IsJoystickButtonDown(Joystick int, button int) bool {
+func (js *JoystickC) IsPadButtonDown(Joystick int, button int) bool {
 	return bool(C.IsJoystickButtonDown(C.int(Joystick), C.int(button)))
 }
 
-func (js *JoystickC) IsJoystickButtonReleased(Joystick int, button int) bool {
+func (js *JoystickC) IsPadButtonReleased(Joystick int, button int) bool {
 	return bool(C.IsJoystickButtonReleased(C.int(Joystick), C.int(button)))
 }
 
-func (js *JoystickC) IsJoystickButtonUp(Joystick int, button int) bool {
+func (js *JoystickC) IsPadButtonUp(Joystick int, button int) bool {
 	return bool(C.IsJoystickButtonUp(C.int(Joystick), C.int(button)))
 }
 
-func (js *JoystickC) GetJoystickButtonPressed() int {
+func (js *JoystickC) GetPadButtonPressed() int {
 	return int(C.GetJoystickButtonPressed())
 }
 
-func (js *JoystickC) GetJoystickAxisCount(Joystick int) int {
+func (js *JoystickC) GetPadAxisCount(Joystick int) int {
 	return int(C.GetJoystickAxisCount(C.int(Joystick)))
 }
 
-func (js *JoystickC) GetJoystickButtonCount(Joystick int) int {
+func (js *JoystickC) GetPadButtonCount(Joystick int) int {
 	return int(C.GetJoystickButtonCount(C.int(Joystick)))
 }
 
-func (js *JoystickC) GetJoystickAxisMovement(Joystick int, axis int) float32 {
+func (js *JoystickC) GetPadAxisMovement(Joystick int, axis int) float32 {
 	return float32(C.GetJoystickAxisMovement(C.int(Joystick), C.int(axis)))
 }
 
-func (js *JoystickC) GetJoystickAxisValue(Joystick int, axis int) int32 {
+func (js *JoystickC) GetPadAxisValue(Joystick int, axis int) int32 {
 	return int32(C.GetJoystickAxisValue(C.int(Joystick), C.int(axis)))
 }
 
-func (js *JoystickC) SetJoystickMappings(mappings string) int {
+func (js *JoystickC) SetPadMappings(mappings string) int {
 	return 0
 }
 
-func (js *JoystickC) DumpJoystick() {
+func (js *JoystickC) DumpPad() {
 	C.DumpJoystick()
 }
 

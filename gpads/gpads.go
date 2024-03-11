@@ -1,30 +1,29 @@
-package gstick
+package gpads
 
 import (
 	"fmt"
-	"xray/jstick"
+	"xray/pad"
 
 	"github.com/holoplot/go-evdev"
 )
 
-var _ jstick.Jstick = NewGameStick()
+var _ pad.Pad = NewGPads()
 
-const JOYSTICK_MAX = 4
+const PAD_MAX = 4
 
-type GameStick struct {
-	Sticks     [JOYSTICK_MAX]*GStick
+type GPads struct {
+	Pads       [PAD_MAX]*GPad
 	Err        error
 	stickCount int
 	intialized bool
 }
 
-func NewGameStick() *GameStick {
-	js := &GameStick{}
+func NewGPads() *GPads {
+	js := &GPads{}
 	return js
 }
 
-func (js *GameStick) intialize() {
-	fmt.Println("intialize")
+func (js *GPads) intialize() {
 	var (
 		devicePaths []evdev.InputPath
 		err         error
@@ -35,10 +34,8 @@ func (js *GameStick) intialize() {
 	devicePaths, err = evdev.ListDevicePaths()
 	if err != nil {
 		fmt.Println("ListDevicePaths", err)
-		return
+		devicePaths = make([]evdev.InputPath, 0)
 	}
-
-	// fmt.Println("ListDevicePaths", devicePaths)
 
 	js.stickCount = 0
 	for _, p := range devicePaths {
@@ -47,100 +44,100 @@ func (js *GameStick) intialize() {
 			fmt.Printf("Open %s [%s] %v\n", p.Name, p.Path, err)
 			continue
 		}
-		js.Sticks[js.stickCount] = stg
+		js.Pads[js.stickCount] = stg
 		js.stickCount++
 	}
 }
 
-func (js *GameStick) BeginJoystick() {
+func (js *GPads) BeginPad() {
 	if !js.intialized {
 		js.intialize()
 	}
 
 	for i := range js.stickCount {
-		js.Sticks[i].ReadState()
+		js.Pads[i].ReadState()
 	}
 }
 
-func (js *GameStick) IsJoystickAvailable(Joystick int) bool {
+func (js *GPads) IsPadAvailable(Joystick int) bool {
 	return js.stickCount > Joystick
 }
 
-const undefined = "undefined"
+const UNDEFINED = "UNDEFINED"
 
-func (js *GameStick) GetStickCount() int {
+func (js *GPads) GetStickCount() int {
 	return js.stickCount
 }
 
-func (js *GameStick) GetJoystickName(Joystick int) string {
+func (js *GPads) GetPadName(Joystick int) string {
 	if js.stickCount <= Joystick {
-		return undefined
+		return UNDEFINED
 	}
-	return js.Sticks[Joystick].Name
+	return js.Pads[Joystick].Name
 }
 
-func (js *GameStick) DumpState(Joystick int) {
+func (js *GPads) DumpState(Joystick int) {
 	if js.stickCount <= Joystick {
 		return
 	}
-	js.Sticks[Joystick].DumpState()
+	js.Pads[Joystick].DumpState()
 }
 
-func (js *GameStick) IsJoystickButtonPressed(Joystick int, button int) bool {
+func (js *GPads) IsPadButtonPressed(Joystick int, button int) bool {
 	if js.stickCount <= Joystick || ButtonCount <= button {
 		return false
 	}
-	return js.Sticks[Joystick].ButtonPressed(button)
+	return js.Pads[Joystick].ButtonPressed(button)
 }
 
-func (js *GameStick) IsJoystickButtonDown(Joystick int, button int) bool {
+func (js *GPads) IsPadButtonDown(Joystick int, button int) bool {
 	if js.stickCount <= Joystick || button >= ButtonCount {
 		return false
 	}
-	return js.Sticks[Joystick].ButtonDown(button)
+	return js.Pads[Joystick].ButtonDown(button)
 }
 
-func (js *GameStick) IsJoystickButtonReleased(Joystick int, button int) bool {
+func (js *GPads) IsPadButtonReleased(Joystick int, button int) bool {
 	if js.stickCount <= Joystick || button >= ButtonCount {
 		return false
 	}
-	return js.Sticks[Joystick].ButtonReleased(button)
+	return js.Pads[Joystick].ButtonReleased(button)
 }
 
-func (js *GameStick) IsJoystickButtonUp(Joystick int, button int) bool {
+func (js *GPads) IsPadButtonUp(Joystick int, button int) bool {
 	if js.stickCount <= Joystick || button >= ButtonCount {
 		return false
 	}
-	return !js.Sticks[Joystick].ButtonDown(button)
+	return !js.Pads[Joystick].ButtonDown(button)
 }
 
-func (js *GameStick) GetJoystickButtonPressed() int {
+func (js *GPads) GetPadButtonPressed() int {
 	return 0
 }
 
-func (js *GameStick) GetJoystickAxisCount(Joystick int) int {
+func (js *GPads) GetPadAxisCount(Joystick int) int {
 	if js.stickCount <= Joystick {
 		return 0
 	}
-	return len(js.Sticks[Joystick].curAxisState)
+	return len(js.Pads[Joystick].curAxisState)
 }
 
-func (js *GameStick) GetJoystickButtonCount(Joystick int) int {
+func (js *GPads) GetPadButtonCount(Joystick int) int {
 	if js.stickCount <= Joystick {
 		return 0
 	}
-	return len(js.Sticks[Joystick].curButtonState)
+	return len(js.Pads[Joystick].curButtonState)
 }
 
-func (js *GameStick) GetJoystickAxisMovement(Joystick int, axis int) float32 {
+func (js *GPads) GetPadAxisMovement(Joystick int, axis int) float32 {
 	return 0
 }
 
-func (js *GameStick) GetJoystickAxisValue(Joystick int, axis int) int32 {
+func (js *GPads) GetPadAxisValue(Joystick int, axis int) int32 {
 	return 0
 }
 
-func (js *GameStick) SetJoystickMappings(mappings string) int {
+func (js *GPads) SetPadMappings(mappings string) int {
 	return 0
 }
 
@@ -220,12 +217,12 @@ func (js *GameStick) SetJoystickMappings(mappings string) int {
 
 // }
 
-func (js *GameStick) DumpJoystick() {
+func (js *GPads) DumpPad() {
 	for i := 0; i < js.stickCount; i++ {
-		js.Sticks[i].Dump()
+		js.Pads[i].Dump()
 	}
 }
 
-func (js *GameStick) GetButtonName(Joystick int, button int) string {
+func (js *GPads) GetButtonName(Joystick int, button int) string {
 	return ""
 }

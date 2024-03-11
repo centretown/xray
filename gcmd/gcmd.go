@@ -1,15 +1,17 @@
-package jcmd
+package gcmd
 
 import (
 	"flag"
 	"fmt"
 	"time"
-	"xray/joystickc"
-	"xray/jstick"
+	"xray/gpads"
+	"xray/pad"
 	"xray/tools"
 )
 
-var js jstick.Jstick = joystickc.NewJoyStickC()
+var js pad.Pad = gpads.NewGPads()
+
+// var js jstick.Jstick = joystickc.NewJoyStickC()
 
 var keys tools.StringSlice
 var joysticks tools.IntSlice
@@ -118,11 +120,11 @@ func RunJoyCmds(cmds []*JoyCmd) {
 func (cmd *JoyCmd) RunCmd(ch <-chan int) {
 	const delay = 16 //ms
 
-	js.BeginJoystick()
+	js.BeginPad()
 	showStick(cmd.Joystick)
 	showCmd(cmd)
 	for {
-		js.BeginJoystick()
+		js.BeginPad()
 
 		cmd.Cmd(cmd)
 
@@ -136,61 +138,61 @@ func (cmd *JoyCmd) RunCmd(ch <-chan int) {
 }
 
 func LastButtonPressed(cmd *JoyCmd) {
-	button := js.GetJoystickButtonPressed()
-	up := js.IsJoystickButtonDown(cmd.Joystick, button)
+	button := js.GetPadButtonPressed()
+	up := js.IsPadButtonDown(cmd.Joystick, button)
 	fmt.Printf("[%4d:%4d]\r", button, tools.Bool2int(up))
 }
 
 func IsButtonUp(cmd *JoyCmd) {
-	up := js.IsJoystickButtonUp(cmd.Joystick, cmd.Button)
+	up := js.IsPadButtonUp(cmd.Joystick, cmd.Button)
 	if up {
 		fmt.Printf("[%d:%d]\r", cmd.Button, tools.Bool2int(!up))
 	}
 }
 
 func IsButtonDown(cmd *JoyCmd) {
-	down := js.IsJoystickButtonDown(cmd.Joystick, cmd.Button)
+	down := js.IsPadButtonDown(cmd.Joystick, cmd.Button)
 	if down {
 		fmt.Printf("[%d:%d]\r", cmd.Button, tools.Bool2int(down))
 	}
 }
 
 func IsButtonReleased(cmd *JoyCmd) {
-	released := js.IsJoystickButtonReleased(cmd.Joystick, cmd.Button)
+	released := js.IsPadButtonReleased(cmd.Joystick, cmd.Button)
 	if released {
 		fmt.Printf("[%d:%d]\r", cmd.Button, tools.Bool2int(released))
 	}
 }
 
 func IsButtonPressed(cmd *JoyCmd) {
-	pressed := js.IsJoystickButtonPressed(cmd.Joystick, cmd.Button)
+	pressed := js.IsPadButtonPressed(cmd.Joystick, cmd.Button)
 	if pressed {
 		fmt.Printf("[%d:%d]\r", cmd.Button, tools.Bool2int(pressed))
 	}
 }
 
 func GetAxisValues(cmd *JoyCmd) {
-	count := js.GetJoystickAxisCount(cmd.Joystick)
+	count := js.GetPadAxisCount(cmd.Joystick)
 	fmt.Print("axes:  ")
 	for i := range count {
-		value := js.GetJoystickAxisValue(cmd.Joystick, i)
+		value := js.GetPadAxisValue(cmd.Joystick, i)
 		fmt.Printf("[%d:%6d] ", i, value)
 	}
 	fmt.Print("\r")
 }
 
 func GetAxisMovement(cmd *JoyCmd) {
-	count := js.GetJoystickAxisCount(cmd.Joystick)
+	count := js.GetPadAxisCount(cmd.Joystick)
 	fmt.Print("axes:  ")
 	for i := range count {
-		move := js.GetJoystickAxisMovement(cmd.Joystick, i)
+		move := js.GetPadAxisMovement(cmd.Joystick, i)
 		fmt.Printf("[%d:%6.0f] ", i, move)
 	}
 	fmt.Print("\r")
 }
 
 func GetDumpJoystick(cmd *JoyCmd) {
-	js.DumpJoystick()
+	js.DumpPad()
 }
 
 func NewCmds() []*JoyCmd {
@@ -241,9 +243,9 @@ func showCmd(c *JoyCmd) {
 
 func showStick(JoyStick int) {
 	fmt.Printf("%s, available:%v, axes:%d, buttons:%d\n",
-		js.GetJoystickName(JoyStick),
-		js.IsJoystickAvailable(JoyStick),
-		js.GetJoystickAxisCount(JoyStick),
-		js.GetJoystickButtonCount(JoyStick),
+		js.GetPadName(JoyStick),
+		js.IsPadAvailable(JoyStick),
+		js.GetPadAxisCount(JoyStick),
+		js.GetPadButtonCount(JoyStick),
 	)
 }

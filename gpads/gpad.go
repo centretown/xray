@@ -1,4 +1,4 @@
-package gstick
+package gpads
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/holoplot/go-evdev"
 )
 
-type GStick struct {
+type GPad struct {
 	Device           *evdev.InputDevice
 	InputID          evdev.InputID
 	Version          [3]int
@@ -20,9 +20,8 @@ type GStick struct {
 	ButtonBase  evdev.EvCode
 	ButtonCodes []evdev.EvCode
 
-	preAxisState AxisStateMap
-	curAxisState AxisStateMap
-	// preButtonState evdev.StateMap
+	preAxisState   AxisStateMap
+	curAxisState   AxisStateMap
 	curButtonState evdev.StateMap
 
 	PressedOnce  uint64 // 1<<(evdev.EvCode - ButtonBase)
@@ -33,8 +32,8 @@ type GStick struct {
 	// spinning bool
 }
 
-func newStickG(device *evdev.InputDevice) (stg *GStick) {
-	stg = &GStick{
+func newStickG(device *evdev.InputDevice) (stg *GPad) {
+	stg = &GPad{
 		Device:       device,
 		preAxisState: make(AxisStateMap),
 		curAxisState: make(AxisStateMap),
@@ -44,44 +43,46 @@ func newStickG(device *evdev.InputDevice) (stg *GStick) {
 	return stg
 }
 
-func OpenGStick(path string) (*GStick, error) {
+func OpenGStick(path string) (*GPad, error) {
 	device, err := evdev.Open(path)
 	if err != nil {
 		fmt.Println("OpenStickG", path, err)
 		return nil, err
 	}
-	// defer device.NonBlock()
 
 	stg := newStickG(device)
-
 	stg.Version[0], stg.Version[1], stg.Version[2] = device.DriverVersion()
 	stg.InputID, err = device.InputID()
 	if err != nil {
-		fmt.Println("InputID", err)
+		stg.InputID = evdev.InputID{}
+		// fmt.Println("InputID", err)
 	}
 	stg.Name, err = device.Name()
 	if err != nil {
-		fmt.Println("Name", err)
+		stg.Name = UNDEFINED
+		// fmt.Println("Name", err)
 	}
 	stg.PhysicalLocation, err = device.PhysicalLocation()
 	if err != nil {
-		fmt.Println("PhysicalLocation", err)
+		stg.PhysicalLocation = UNDEFINED
+		// fmt.Println("PhysicalLocation", err)
 	}
 	stg.UniqueID, err = device.UniqueID()
 	if err != nil {
-		fmt.Println("UniqueID", err)
+		stg.UniqueID = UNDEFINED
+		// fmt.Println("UniqueID", err)
 	}
 
-	for _, t := range device.CapableTypes() {
+	for _, eventType := range device.CapableTypes() {
 		var (
 			state evdev.StateMap
 			err   error
 		)
 
-		if t == evdev.EV_KEY {
-			state, err = device.State(t)
+		if eventType == evdev.EV_KEY {
+			state, err = device.State(eventType)
 			if err != nil {
-				fmt.Println("device.State: ", err, t)
+				fmt.Println("device.State: ", err, eventType)
 			} else {
 				for code, nowDown := range state {
 					stg.curButtonState[code] = nowDown
@@ -89,14 +90,13 @@ func OpenGStick(path string) (*GStick, error) {
 			}
 		}
 
-		if t == evdev.EV_ABS {
+		if eventType == evdev.EV_ABS {
 			stg.AxesInfo, err = device.AbsInfos()
 			if err != nil {
 				fmt.Println("device.AbsInfos(): ", err)
 			}
 		}
 	}
-	stg.Properties = device.Properties()
 
 	_, ok := stg.curButtonState[BTN_JOYSTICK]
 	if ok {
@@ -107,24 +107,12 @@ func OpenGStick(path string) (*GStick, error) {
 		stg.ButtonCodes = GameButtons
 	}
 
+	stg.Properties = device.Properties()
+
 	return stg, nil
 }
 
-func (stg *GStick) ButtonDown(button int) bool {
-	code, ok := stg.curButtonState[stg.ButtonCodes[button]]
-	return ok && code
-}
-func (stg *GStick) ButtonPressed(button int) bool {
-	offset := uint64(stg.ButtonCodes[button] - stg.ButtonBase)
-	return stg.PressedOnce&(1<<offset) != 0
-}
-
-func (stg *GStick) ButtonReleased(button int) bool {
-	offset := uint64(stg.ButtonCodes[button] - stg.ButtonBase)
-	return stg.ReleasedOnce&(1<<offset) != 0
-}
-
-func (stg *GStick) ReadState() {
+func (stg *GPad) ReadState() {
 	state, err := stg.Device.State(evdev.EV_KEY)
 	if err == nil {
 		var (
@@ -150,6 +138,20 @@ func (stg *GStick) ReadState() {
 	}
 }
 
+func (stg *GPad) ButtonDown(button int) bool {
+	code, ok := stg.curButtonState[stg.ButtonCodes[button]]
+	return ok && code
+}
+func (stg *GPad) ButtonPressed(button int) bool {
+	offset := uint64(stg.ButtonCodes[button] - stg.ButtonBase)
+	return stg.PressedOnce&(1<<offset) != 0
+}
+
+func (stg *GPad) ButtonReleased(button int) bool {
+	offset := uint64(stg.ButtonCodes[button] - stg.ButtonBase)
+	return stg.ReleasedOnce&(1<<offset) != 0
+}
+
 func CheckOne[T comparable](pre, cur map[evdev.EvCode]T, k evdev.EvCode) {
 	v := cur[k]
 	if pre[k] != v {
@@ -165,12 +167,12 @@ func CheckAll[T comparable](pre, cur map[evdev.EvCode]T) {
 	}
 }
 
-func (stg *GStick) DumpState() {
+func (stg *GPad) DumpState() {
 	// CheckAll(stg.preButtonState, stg.curButtonState)
 	CheckAll(stg.preAxisState, stg.curAxisState)
 }
 
-func (stg *GStick) Dump() {
+func (stg *GPad) Dump() {
 	fmt.Printf("Input driver version is %d.%d.%d\n",
 		stg.Version[0],
 		stg.Version[1],
@@ -184,7 +186,7 @@ func (stg *GStick) Dump() {
 	fmt.Printf("Input device physical location: %s\n", stg.PhysicalLocation)
 	fmt.Printf("Input device unique ID: %s\n", stg.UniqueID)
 
-	fmt.Println("Axes")
+	fmt.Println("Axes:")
 	for code, absInfo := range stg.AxesInfo {
 		fmt.Printf("    Event code %d (%s) Value: %d Min: %d Max: %d Fuzz: %d Flat: %d Resolution: %d\n",
 			code, evdev.CodeName(evdev.EV_ABS, code), absInfo.Value, absInfo.Minimum, absInfo.Maximum,
@@ -204,7 +206,7 @@ func (stg *GStick) Dump() {
 	}
 }
 
-func (stg *GStick) Close() {
+func (stg *GPad) Close() {
 	stg.Device.Close()
 	fmt.Println("stg.Stop closed")
 }

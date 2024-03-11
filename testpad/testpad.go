@@ -3,17 +3,17 @@ package main
 import (
 	"flag"
 	"fmt"
-	"xray/jcmd"
+	"xray/gcmd"
 )
 
 func init() {
-	jcmd.SetFlagsVars()
+	gcmd.SetFlagsVars()
 }
 
 func main() {
 	flag.Parse()
-	cmds := jcmd.NewCmds()
-	jcmd.RunJoyCmds(cmds)
+	cmds := gcmd.NewCmds()
+	gcmd.RunJoyCmds(cmds)
 	fmt.Println("done!")
 
 }

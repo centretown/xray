@@ -1,4 +1,4 @@
-package gstick
+package gpads
 
 import (
 	"fmt"
@@ -9,15 +9,15 @@ import (
 )
 
 func TestJoy(t *testing.T) {
-	j := NewGameStick()
-	j.BeginJoystick()
+	j := NewGPads()
+	j.BeginPad()
 
-	if !j.IsJoystickAvailable(0) {
+	if !j.IsPadAvailable(0) {
 		t.Log("NOTHING TO TEST!")
 		return
 	}
 
-	j.DumpJoystick()
+	j.DumpPad()
 
 	// fmt.Println("start and stop after 5 seconds")
 	// // j.Sticks[0].Start()
@@ -84,18 +84,43 @@ func dumpEvent(device *evdev.InputDevice, ch chan int) {
 }
 
 func TestKeyChange(t *testing.T) {
-	j := NewGameStick()
-	j.BeginJoystick()
+	j := NewGPads()
+	j.BeginPad()
 	fmt.Println("Count", j.GetStickCount())
-	fmt.Printf("Selecting %s\n", j.GetJoystickName(0))
+	fmt.Printf("Selecting %s\n", j.GetPadName(0))
 	time.Sleep(time.Second)
 	count := j.GetStickCount()
 	x := 0
 	for {
-		j.BeginJoystick()
+		j.BeginPad()
 		for i := range count {
-			if j.IsJoystickButtonDown(i, 0) {
-				fmt.Println("DOWN", i, x)
+			stg := j.Pads[i]
+			if j.IsPadButtonDown(i, 0) {
+				code := stg.ButtonBase + 0
+				fmt.Println(evdev.KEYToString[code], "DOWN", i, x)
+				x++
+			}
+		}
+		time.Sleep(time.Millisecond << 4)
+	}
+
+}
+
+func TestPressed(t *testing.T) {
+	j := NewGPads()
+	j.BeginPad()
+	fmt.Println("Count", j.GetStickCount())
+	fmt.Printf("Selecting %s\n", j.GetPadName(0))
+	time.Sleep(time.Second)
+	count := j.GetStickCount()
+	x := 0
+	for {
+		j.BeginPad()
+		for i := range count {
+			stg := j.Pads[i]
+			if j.IsPadButtonDown(i, 0) {
+				code := stg.ButtonBase + 0
+				fmt.Println(evdev.KEYToString[code], "DOWN", i, x)
 				x++
 			}
 		}

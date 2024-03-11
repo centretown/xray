@@ -13,7 +13,7 @@ eXperiments with go and raylib 3d
 Joystick/Gamepad interface for linux using old style joystick.h
 
 
-## [gstick](./gstick/README.md)
+## [gpads](./gpads/README.md)
 
 Pure go Joystick/Gamepad interface for linux using evdev 
 
