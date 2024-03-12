@@ -1,17 +1,22 @@
 # How To Write An `if` Statement in Go
-### Notes on branchless programming
+#### Issue #6011: branchless programming
 
-Issue #6011: can be found here.
-[https://github.com/golang/go/issues/6011](https://github.com/golang/go/issues/6011)
+> by sjbogdan: on Aug 1, 2013
 
+> Need a compiler level support for fast bool to numeric types ( int, 
+> byte, float ) conversion.
 
 > robpike commented on Aug 2, 2013
+
 > Comment 1:
 > 
 > The compiler could provide speed without new syntax just by generating better code.
 > Labels changed: added priority-later, performance, removed priority-triage.
 > 
 > Status changed to Accepted.
+
+Issue #6011: can be found here.
+[https://github.com/golang/go/issues/6011](https://github.com/golang/go/issues/6011)
 
 
 After reading this, I decided to see if it had been implemented. It has and proven to be useful. The following code represents the most efficient form.
@@ -43,7 +48,7 @@ func B2N[T int | uint | int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 |
 ```
 
 ## b2 build script
-Builds to the code and create an object dump the functions B2N and Inspect.
+Builds and creates object dumps for the functions B2N and Inspect.
 ```
 #! /bin/bash
 go build -gcflags='-l -v' b2.go

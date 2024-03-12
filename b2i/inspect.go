@@ -46,7 +46,7 @@ func Inspect() {
 	bui64 = B2N[uint64](ui64 > 0)
 	bf32 = B2N[float32](f32 > 0)
 	bf64 = B2N[float64](f64 > 0)
-	// END BLOCK
+	//
 
 	fmt.Printf(""+
 		"f32=%f "+
