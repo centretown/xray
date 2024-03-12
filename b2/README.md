@@ -68,11 +68,15 @@ The code [inspect.go](../b2i/inspect.go) and the output [inspect.txt](inspect.tx
 
 No conditional branches!
 
+#### signed integers
+
 ```
 bi = B2N[int](i > 0)
   0x4821f9		48833daf3f0a0000	CMPQ xray/b2i.i(SB), $0x0	
   0x482201		0f9fc1			    SETG CL				
 	return T(i)
+  0x482204		0fb6c9				MOVZX CL, CX		
+  0x482207		48894c2450			MOVQ CX, 0x50(SP)	
 ```
 
 ```
@@ -96,4 +100,51 @@ bi64 = B2N[int64](i64 > 0)
 	return T(i)
   0x482261		450fb6c9		    MOVZX R9, R9		
   0x482265		4c894c2468		    MOVQ R9, 0x68(SP)	
+```
+
+#### unsigned integers
+
+```
+bui = B2N[uint](ui > 0)
+  0x48226a		48833d4e3f0a0000	CMPQ xray/b2i.ui(SB), $0x0	
+  0x482272		410f97c2		SETA R10			
+	return T(i)
+  0x482276		450fb6d2		MOVZX R10, R10		
+  0x48227a		4c89542460		MOVQ R10, 0x60(SP)	
+```
+```
+bui8 = B2N[uint8](ui8 > 0)
+  0x48227f		803ddb3e0a0000		CMPB xray/b2i.ui8(SB), $0x0	
+  0x482286		410f97c3		SETA R11			
+		bui8,
+  0x48228a		450fb6db		MOVZX R11, R11		
+  0x48228e		4e8d1cdb		LEAQ 0(BX)(R11*8), R11	
+  0x482292		4c899c24f8010000	MOVQ R11, 0x1f8(SP)	
+bui16 = B2N[uint16](ui16 > 0)
+  0x48229a		66833dc43e0a0000	CMPW xray/b2i.ui16(SB), $0x0	
+  0x4822a2		410f97c4		SETA R12			
+	return T(i)
+  0x4822a6		450fb6e4		MOVZX R12, R12		
+  0x4822aa		664489642440		MOVW R12, 0x40(SP)	
+bui32 = B2N[uint32](ui32 > 0)
+  0x4822b0		833db53e0a0000		CMPL xray/b2i.ui32(SB), $0x0	
+  0x4822b7		410f97c5		SETA R13			
+	return T(i)
+  0x4822bb		450fb6ed		MOVZX R13, R13		
+  0x4822bf		44896c2444		MOVL R13, 0x44(SP)	
+	bui64 = B2N[uint64](ui64 > 0)
+  0x4822c4		48833dfc3e0a0000	CMPQ xray/b2i.ui64(SB), $0x0	
+  0x4822cc		410f97c7		SETA R15			
+  0x4822d0		44887c243f		MOVB R15, 0x3f(SP)		
+```
+
+#### floats
+
+```
+bf32 = B2N[float32](f32 > 0)
+  0x4821dd		f30f10058b3f0a00	MOVSS xray/b2i.f32(SB), X0	
+  0x4821e5		f30f1144244c		MOVSS X0, 0x4c(SP)		
+bf64 = B2N[float64](f64 > 0)
+  0x4821eb		f20f100ddd3f0a00	MOVSD_XMM xray/b2i.f64(SB), X1	
+  0x4821f3		f20f114c2470		MOVSD_XMM X1, 0x70(SP)		
 ```
