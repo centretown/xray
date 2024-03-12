@@ -8,6 +8,22 @@ var ButtonCount = len(GameButtons)
 
 const BTN_GAMEPAD = evdev.BTN_GAMEPAD
 
+const (
+	BTN_WEST int = iota
+	BTN_SOUTH
+	BTN_EAST
+	BTN_NORTH
+	BTN_TL
+	BTN_TR
+	BTN_TL2
+	BTN_TR2
+	BTN_SELECT
+	BTN_START
+	BTN_THUMBL
+	BTN_THUMBR
+	BTN_MODE
+)
+
 var GameButtons = []evdev.EvCode{
 	evdev.BTN_WEST,
 	evdev.BTN_SOUTH,

@@ -110,16 +110,16 @@ func (runr *Runner) Run3d() {
 
 	for !rl.WindowShouldClose() {
 		runr.gpads.BeginPad()
-		// runr.KeyPosXYZ(&cubeV, &camPos)
 		runr.PadPosXYZ(&cubeV, &camPos)
+		runr.KeyPosXYZ(&cubeV, &camPos)
 
 		camera.Position = camPos
 		rl.BeginDrawing()
 
 		runr.setupBackground() //runRect)
 		rl.BeginMode3D(camera)
-		rl.DrawGrid(4, 3)
-		rl.DrawCubeWires(cubeV, 3, 4, 5, rl.Magenta)
+		// rl.DrawGrid(8, 2)
+		rl.DrawCubeWires(cubeV, 4, 4, 4, rl.Green)
 		rl.EndMode3D()
 
 		rl.EndDrawing()
@@ -137,9 +137,14 @@ func (runr *Runner) PadPosXYZ(obj, pos *rl.Vector3) {
 			p.GetPadAxisMovement(pi, gpads.ABS_Z)
 
 		const delta float32 = 1.0 / 16.0
-		obj.X += delta * x
-		obj.Y += delta * y
-		obj.Z += delta * z
+		pos.X += delta * x
+		pos.Y += delta * y
+		pos.Z += delta * z
+
+		px, py := p.GetPadAxisValue(pi, gpads.ABS_HAT0X),
+			p.GetPadAxisValue(pi, gpads.ABS_HAT0Y)
+		pos.X += float32(px)
+		pos.Y += float32(py)
 	}
 }
 

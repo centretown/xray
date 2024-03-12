@@ -1,0 +1,4 @@
+#! /bin/bash
+go build -gcflags='-l -v' b2.go
+go tool objdump -S -s B2N b2 >b2n.txt
+go tool objdump -S -s Inspect b2 >inspect.txt
