@@ -3,6 +3,9 @@ package tools
 import (
 	"fmt"
 
+	"xray/b2i"
+	"xray/gpads"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -19,6 +22,7 @@ type Runner struct {
 	fps    int32
 
 	actors []*Actor
+	gpads  *gpads.GPads
 }
 
 func NewRunner(width int32, height int32, fps int32) *Runner {
@@ -28,6 +32,9 @@ func NewRunner(width int32, height int32, fps int32) *Runner {
 		fps:    fps,
 		actors: make([]*Actor, 0),
 	}
+
+	runr.gpads = gpads.NewGPads()
+
 	return runr
 }
 
@@ -49,7 +56,7 @@ func (runr *Runner) Run2d() {
 
 	for !rl.WindowShouldClose() {
 		current = rl.GetTime()
-		can_move = Bool2int32(current > previous+interval)
+		can_move = b2i.Bool2int32(current > previous+interval)
 		previous = float64(can_move) * interval
 
 		if rl.IsWindowResized() {
@@ -92,7 +99,7 @@ func (runr *Runner) setupBackground() {
 
 func (runr *Runner) Run3d() {
 	runr.setupWindow("3d")
-	runr.JoyStick(nil)
+	runr.gpads.BeginPad()
 
 	camPos := rl.Vector3{X: 10, Y: 10, Z: 10}
 	camTar := rl.Vector3{X: 0, Y: 0, Z: 0}
@@ -102,7 +109,9 @@ func (runr *Runner) Run3d() {
 	cubeV := rl.Vector3{X: 0, Y: 0, Z: 0}
 
 	for !rl.WindowShouldClose() {
-		runr.KeyPosXYZ(&cubeV, &camPos)
+		runr.gpads.BeginPad()
+		// runr.KeyPosXYZ(&cubeV, &camPos)
+		runr.PadPosXYZ(&cubeV, &camPos)
 
 		camera.Position = camPos
 		rl.BeginDrawing()
@@ -119,12 +128,18 @@ func (runr *Runner) Run3d() {
 	fmt.Println("THREE D.")
 }
 
-func (runr *Runner) JoyStick(obj *rl.Vector3) {
-	fmt.Print("game pad ")
-	if rl.IsGamepadAvailable(0) {
-		fmt.Println("available")
-	} else {
-		fmt.Println("un-available")
+func (runr *Runner) PadPosXYZ(obj, pos *rl.Vector3) {
+	p := runr.gpads
+	count := p.GetStickCount()
+	for pi := range count {
+		x, y, z := p.GetPadAxisMovement(pi, gpads.ABS_X),
+			p.GetPadAxisMovement(pi, gpads.ABS_Y),
+			p.GetPadAxisMovement(pi, gpads.ABS_Z)
+
+		const delta float32 = 1.0 / 16.0
+		obj.X += delta * x
+		obj.Y += delta * y
+		obj.Z += delta * z
 	}
 }
 
@@ -134,16 +149,16 @@ func (runr *Runner) KeyPosXYZ(obj, pos *rl.Vector3) {
 	down := rl.IsKeyDown(rl.KeyDown) || rl.IsKeyDown(rl.KeyLeft)
 
 	vecs := []*rl.Vector3{obj, pos}
-	i := Bool2int(rl.IsKeyDown(rl.KeyLeftShift) || rl.IsKeyDown(rl.KeyRightShift))
+	i := b2i.Bool2int(rl.IsKeyDown(rl.KeyLeftShift) || rl.IsKeyDown(rl.KeyRightShift))
 	v := vecs[i]
 
 	const delta = .25
-	v.X -= Bool2float32(up && x) * delta
-	v.X += Bool2float32(down && x) * delta
-	v.Y += Bool2float32(up && y) * delta
-	v.Y -= Bool2float32(down && y) * delta
-	v.Z -= Bool2float32(up && z) * delta
-	v.Z += Bool2float32(down && z) * delta
+	v.X -= b2i.Bool2float32(up && x) * delta
+	v.X += b2i.Bool2float32(down && x) * delta
+	v.Y += b2i.Bool2float32(up && y) * delta
+	v.Y -= b2i.Bool2float32(down && y) * delta
+	v.Z -= b2i.Bool2float32(up && z) * delta
+	v.Z += b2i.Bool2float32(down && z) * delta
 }
 
 func (runr *Runner) GetViewPort() rl.RectangleInt32 {

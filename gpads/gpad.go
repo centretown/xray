@@ -2,7 +2,7 @@ package gpads
 
 import (
 	"fmt"
-	"xray/tools"
+	"xray/b2i"
 
 	"github.com/holoplot/go-evdev"
 )
@@ -20,81 +20,55 @@ type GPad struct {
 	ButtonBase  evdev.EvCode
 	ButtonCodes []evdev.EvCode
 
-	preAxisState   AxisStateMap
-	curAxisState   AxisStateMap
+	preAxisState AxisStateMap
+	curAxisState AxisStateMap
+	axisAdjust   map[evdev.EvCode]int32
+
 	curButtonState evdev.StateMap
+	PressedOnce    uint64       // 1<<(evdev.EvCode - ButtonBase)
+	ReleasedOnce   uint64       // 1<<(evdev.EvCode - ButtonBase)
+	LastPressed    evdev.EvCode // Button number
 
-	PressedOnce  uint64 // 1<<(evdev.EvCode - ButtonBase)
-	ReleasedOnce uint64 // 1<<(evdev.EvCode - ButtonBase)
-
-	LastPressed evdev.EvCode // Button number
-
-	// spinning bool
+	intialized bool
 }
 
-func newStickG(device *evdev.InputDevice) (stg *GPad) {
+func newPadG(device *evdev.InputDevice) (stg *GPad) {
 	stg = &GPad{
-		Device:       device,
-		preAxisState: make(AxisStateMap),
-		curAxisState: make(AxisStateMap),
-		// preButtonState: make(evdev.StateMap),
+		Device:         device,
+		preAxisState:   make(AxisStateMap),
+		curAxisState:   make(AxisStateMap),
+		axisAdjust:     make(map[evdev.EvCode]int32),
 		curButtonState: make(evdev.StateMap),
 	}
 	return stg
 }
 
-func OpenGStick(path string) (*GPad, error) {
-	device, err := evdev.Open(path)
+func OpenGPad(path string) (*GPad, error) {
+	var (
+		state  evdev.StateMap
+		err    error
+		device *evdev.InputDevice
+	)
+
+	device, err = evdev.Open(path)
 	if err != nil {
 		fmt.Println("OpenStickG", path, err)
 		return nil, err
 	}
 
-	stg := newStickG(device)
+	stg := newPadG(device)
 	stg.Version[0], stg.Version[1], stg.Version[2] = device.DriverVersion()
-	stg.InputID, err = device.InputID()
-	if err != nil {
-		stg.InputID = evdev.InputID{}
-		// fmt.Println("InputID", err)
-	}
-	stg.Name, err = device.Name()
-	if err != nil {
-		stg.Name = UNDEFINED
-		// fmt.Println("Name", err)
-	}
-	stg.PhysicalLocation, err = device.PhysicalLocation()
-	if err != nil {
-		stg.PhysicalLocation = UNDEFINED
-		// fmt.Println("PhysicalLocation", err)
-	}
-	stg.UniqueID, err = device.UniqueID()
-	if err != nil {
-		stg.UniqueID = UNDEFINED
-		// fmt.Println("UniqueID", err)
-	}
+	stg.InputID, _ = device.InputID()
+	stg.Name, _ = device.Name()
+	stg.PhysicalLocation, _ = device.PhysicalLocation()
+	stg.UniqueID, _ = device.UniqueID()
 
-	for _, eventType := range device.CapableTypes() {
-		var (
-			state evdev.StateMap
-			err   error
-		)
-
-		if eventType == evdev.EV_KEY {
-			state, err = device.State(eventType)
-			if err != nil {
-				fmt.Println("device.State: ", err, eventType)
-			} else {
-				for code, nowDown := range state {
-					stg.curButtonState[code] = nowDown
-				}
-			}
-		}
-
-		if eventType == evdev.EV_ABS {
-			stg.AxesInfo, err = device.AbsInfos()
-			if err != nil {
-				fmt.Println("device.AbsInfos(): ", err)
-			}
+	state, err = device.State(evdev.EV_KEY)
+	if err != nil {
+		fmt.Println("EV_KEY.State: ", err)
+	} else {
+		for code, nowDown := range state {
+			stg.curButtonState[code] = nowDown
 		}
 	}
 
@@ -105,6 +79,20 @@ func OpenGStick(path string) (*GPad, error) {
 	} else {
 		stg.ButtonBase = BTN_GAMEPAD
 		stg.ButtonCodes = GameButtons
+	}
+
+	stg.AxesInfo, err = device.AbsInfos()
+	if err != nil {
+		fmt.Println("device.AbsInfos(): ", err)
+	} else {
+		for code, info := range stg.AxesInfo {
+			var adj int32 = 1
+			diff := info.Maximum - info.Minimum
+			if diff > 255 {
+				adj = diff / 256
+			}
+			stg.axisAdjust[code] = adj
+		}
 	}
 
 	stg.Properties = device.Properties()
@@ -123,8 +111,8 @@ func (stg *GPad) ReadState() {
 		for code, nowDown := range state {
 			wasDown = stg.curButtonState[code]
 			offset = uint64(code - stg.ButtonBase)
-			stg.PressedOnce |= tools.Bool2uint64(!wasDown && nowDown) << offset
-			stg.ReleasedOnce |= tools.Bool2uint64(wasDown && !nowDown) << offset
+			stg.PressedOnce |= b2i.Bool2uint64(!wasDown && nowDown) << offset
+			stg.ReleasedOnce |= b2i.Bool2uint64(wasDown && !nowDown) << offset
 			stg.curButtonState[code] = nowDown
 		}
 	}
@@ -133,9 +121,19 @@ func (stg *GPad) ReadState() {
 	if err == nil {
 		for k, v := range absInfos {
 			stg.preAxisState[k] = stg.curAxisState[k]
-			stg.curAxisState[k] = v.Value
+			stg.curAxisState[k] = v.Value / stg.axisAdjust[k]
 		}
 	}
+}
+
+func (stg *GPad) AxisValue(axis int) int32 {
+	k := AxisEvents[axis]
+	return stg.curAxisState[k]
+}
+
+func (stg *GPad) AxisMove(axis int) float32 {
+	k := AxisEvents[axis]
+	return float32(stg.curAxisState[k] - stg.preAxisState[k])
 }
 
 func (stg *GPad) ButtonDown(button int) bool {
@@ -201,12 +199,15 @@ func (stg *GPad) Dump() {
 
 	fmt.Println("Properties:")
 	props := stg.Properties
+	if len(props) < 1 {
+		fmt.Println("    none")
+	}
 	for _, p := range props {
-		fmt.Printf("  Property type %d (%s)\n", p, evdev.PropName(p))
+		fmt.Printf("   Property type %d (%s)\n", p, evdev.PropName(p))
 	}
 }
 
 func (stg *GPad) Close() {
 	stg.Device.Close()
-	fmt.Println("stg.Stop closed")
+	stg.intialized = false
 }

@@ -1,4 +1,4 @@
-package tools
+package b2i
 
 // The compiler currently only optimizes this form.
 //

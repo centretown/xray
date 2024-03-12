@@ -56,15 +56,26 @@ var JoyToGame = map[evdev.EvCode]evdev.EvCode{
 	evdev.BTN_BASE6:    evdev.BTN_THUMBR,
 }
 
+const (
+	ABS_X int = iota
+	ABS_Y
+	ABS_Z
+	ABS_RZ
+	ABS_HAT0X
+	ABS_HAT0Y
+	ABS_RY
+	ABS_RX
+)
+
 var AxisEvents = []evdev.EvCode{
 	evdev.ABS_X,
 	evdev.ABS_Y,
 	evdev.ABS_Z,
-	evdev.ABS_RX,
-	evdev.ABS_RY,
 	evdev.ABS_RZ,
 	evdev.ABS_HAT0X,
 	evdev.ABS_HAT0Y,
+	evdev.ABS_RY,
+	evdev.ABS_RX,
 }
 
 type AxisInfoMap map[evdev.EvCode]evdev.AbsInfo
