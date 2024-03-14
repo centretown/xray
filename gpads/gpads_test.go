@@ -83,48 +83,48 @@ func dumpEvent(device *evdev.InputDevice, ch chan int) {
 	}
 }
 
-func TestKeyChange(t *testing.T) {
-	j := NewGPads()
-	j.BeginPad()
-	fmt.Println("Count", j.GetStickCount())
-	fmt.Printf("Selecting %s\n", j.GetPadName(0))
-	time.Sleep(time.Second)
-	count := j.GetStickCount()
-	x := 0
-	for {
-		j.BeginPad()
-		for i := range count {
-			stg := j.Pads[i]
-			if j.IsPadButtonDown(i, 0) {
-				code := stg.ButtonBase + 0
-				fmt.Println(evdev.KEYToString[code], "DOWN", i, x)
-				x++
-			}
-		}
-		time.Sleep(time.Millisecond << 4)
-	}
+// func TestKeyChange(t *testing.T) {
+// 	j := NewGPads()
+// 	j.BeginPad()
+// 	fmt.Println("Count", j.GetStickCount())
+// 	fmt.Printf("Selecting %s\n", j.GetPadName(0))
+// 	time.Sleep(time.Second)
+// 	count := j.GetStickCount()
+// 	x := 0
+// 	for {
+// 		j.BeginPad()
+// 		for i := range count {
+// 			stg := j.Pads[i]
+// 			if j.IsPadButtonDown(i, 0) {
+// 				code := stg.ButtonBase + 0
+// 				fmt.Println(evdev.KEYToString[code], "DOWN", i, x)
+// 				x++
+// 			}
+// 		}
+// 		time.Sleep(time.Millisecond << 4)
+// 	}
 
-}
+// }
 
-func TestPressed(t *testing.T) {
-	j := NewGPads()
-	j.BeginPad()
-	fmt.Println("Count", j.GetStickCount())
-	fmt.Printf("Selecting %s\n", j.GetPadName(0))
-	time.Sleep(time.Second)
-	count := j.GetStickCount()
-	x := 0
-	for {
-		j.BeginPad()
-		for i := range count {
-			stg := j.Pads[i]
-			if j.IsPadButtonDown(i, 0) {
-				code := stg.ButtonBase + 0
-				fmt.Println(evdev.KEYToString[code], "DOWN", i, x)
-				x++
-			}
-		}
-		time.Sleep(time.Millisecond << 4)
-	}
+// func TestPressed(t *testing.T) {
+// 	j := NewGPads()
+// 	j.BeginPad()
+// 	fmt.Println("Count", j.GetStickCount())
+// 	fmt.Printf("Selecting %s\n", j.GetPadName(0))
+// 	time.Sleep(time.Second)
+// 	count := j.GetStickCount()
+// 	x := 0
+// 	for {
+// 		j.BeginPad()
+// 		for i := range count {
+// 			stg := j.Pads[i]
+// 			if j.IsPadButtonDown(i, 0) {
+// 				code := stg.ButtonBase + 0
+// 				fmt.Println(evdev.KEYToString[code], "DOWN", i, x)
+// 				x++
+// 			}
+// 		}
+// 		time.Sleep(time.Millisecond << 4)
+// 	}
 
-}
+// }

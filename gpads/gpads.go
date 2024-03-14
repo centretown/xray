@@ -87,7 +87,7 @@ func (js *GPads) GetButtonName(pad int, button int) string {
 	if js.padCount <= pad || button >= ButtonCount {
 		return UNDEFINED
 	}
-	return evdev.KEYNames[GameButtons[button]]
+	return evdev.KEYNames[PS3Buttons[button]]
 }
 
 func (js *GPads) IsPadButtonPressed(pad int, button int) bool {

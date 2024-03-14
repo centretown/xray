@@ -37,6 +37,7 @@ const (
 	Release
 	Move
 	Keys
+	Axes
 	Dump
 )
 
@@ -48,6 +49,7 @@ var KeyList = []string{
 	"release",
 	"move",
 	"keys",
+	"axes",
 	"dump",
 }
 
@@ -59,6 +61,7 @@ var KeyUsage = []string{
 	"indicate if selected button has been released",
 	"indicate selected axis movement",
 	"indicate any key pressed",
+	"indicate any axis changes",
 	"dump maps and value corrections",
 }
 
@@ -70,6 +73,7 @@ var GCmds = map[string]*GCmd{
 	KeyList[Release]: {Cmd: IsButtonReleased, Title: KeyList[Release], Pad: 0, Button: 0, Axis: 0, Delay: 0},
 	KeyList[Move]:    {Cmd: GetAxisMovement, Title: KeyList[Move], Pad: 0, Button: 0, Axis: 0, Delay: 0},
 	KeyList[Keys]:    {Cmd: TestKeys, Title: KeyList[Keys], Pad: 0, Button: 0, Axis: 0, Delay: 0},
+	KeyList[Axes]:    {Cmd: TestAxes, Title: KeyList[Axes], Pad: 0, Button: 0, Axis: 0, Delay: 0},
 	KeyList[Dump]:    {Cmd: DumpPad, Title: KeyList[Dump], Pad: 0, Button: 0, Axis: 0, Delay: 0},
 }
 

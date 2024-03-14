@@ -132,7 +132,7 @@ bui32 = B2N[uint32](ui32 > 0)
 	return T(i)
   0x4822bb		450fb6ed		MOVZX R13, R13		
   0x4822bf		44896c2444		MOVL R13, 0x44(SP)	
-	bui64 = B2N[uint64](ui64 > 0)
+bui64 = B2N[uint64](ui64 > 0)
   0x4822c4		48833dfc3e0a0000	CMPQ xray/b2i.ui64(SB), $0x0	
   0x4822cc		410f97c7		SETA R15			
   0x4822d0		44887c243f		MOVB R15, 0x3f(SP)		

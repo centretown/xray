@@ -3,6 +3,7 @@ package gcmd
 import (
 	"fmt"
 	"xray/b2i"
+	"xray/gpads"
 )
 
 func LastButtonPressed(cmd *GCmd) {
@@ -57,26 +58,21 @@ func DumpPad(cmd *GCmd) {
 
 const MAX_BUTTONS = 64
 
-func TestKeys1(cmd *GCmd) {
-	count := js.GetPadButtonCount(cmd.Pad)
+func TestKeys(cmd *GCmd) {
+	count := gpads.BTN_THUMBR - gpads.BTN_RESERVED + 1
 	for i := range count {
 		down := js.IsPadButtonDown(cmd.Pad, i)
 		fmt.Printf("[%x:%2d]", i, b2i.Bool2int(down))
 	}
-	count = js.GetPadAxisCount(cmd.Pad)
-	for i := range count {
-		val := js.GetPadAxisValue(cmd.Pad, i)
-		fmt.Printf("[%x:%3x]", i, val)
-	}
 	fmt.Print("\r")
 }
 
-func TestKeys(cmd *GCmd) {
+func TestAxes(cmd *GCmd) {
 	count := js.GetPadAxisCount(cmd.Pad)
 	for i := range count {
 		val := js.GetPadAxisValue(cmd.Pad, i)
 		mov := js.GetPadAxisMovement(cmd.Pad, i)
 		fmt.Printf("[%x:%03x:%3.0f]", i, val, mov)
 	}
-	fmt.Print("             \r")
+	fmt.Print("  \r")
 }
