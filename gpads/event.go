@@ -30,25 +30,45 @@ func (t PadType) String() string {
 	return PadTypes[t]
 }
 
+// GamepadButtonUnknown        = iota // Unknown button, just for error checking
+// GamepadButtonLeftFaceUp            // Gamepad left DPAD up button
+// GamepadButtonLeftFaceRight         // Gamepad left DPAD right button
+// GamepadButtonLeftFaceDown          // Gamepad left DPAD down button
+// GamepadButtonLeftFaceLeft          // Gamepad left DPAD left button
+// GamepadButtonRightFaceUp           // Gamepad right button up (i.e. PS3: Triangle, Xbox: Y)
+// GamepadButtonRightFaceRight        // Gamepad right button right (i.e. PS3: Square, Xbox: X)
+// GamepadButtonRightFaceDown         // Gamepad right button down (i.e. PS3: Cross, Xbox: A)
+// GamepadButtonRightFaceLeft         // Gamepad right button left (i.e. PS3: Circle, Xbox: B)
+// GamepadButtonLeftTrigger1          // Gamepad top/back trigger left (first), it could be a trailing button
+// GamepadButtonLeftTrigger2          // Gamepad top/back trigger left (second), it could be a trailing button
+// GamepadButtonRightTrigger1         // Gamepad top/back trigger right (one), it could be a trailing button
+// GamepadButtonRightTrigger2         // Gamepad top/back trigger right (second), it could be a trailing button
+// GamepadButtonMiddleLeft            // Gamepad center buttons, left one (i.e. PS3: Select)
+// GamepadButtonMiddle                // Gamepad center buttons, middle one (i.e. PS3: PS, Xbox: XBOX)
+// GamepadButtonMiddleRight           // Gamepad center buttons, right one (i.e. PS3: Start)
+// GamepadButtonLeftThumb             // Gamepad joystick pressed button left
+// GamepadButtonRightThumb            // Gamepad joystick pressed button right
+
 const (
-	BTN_RESERVED int = iota
-	BTN_DPAD_UP
-	BTN_DPAD_RIGHT
-	BTN_DPAD_DOWN
-	BTN_DPAD_LEFT
-	BTN_NORTH
-	BTN_WEST
-	BTN_SOUTH
-	BTN_EAST
-	BTN_TL
-	BTN_TL2
-	BTN_TR
-	BTN_TR2
-	BTN_SELECT
-	BTN_MODE
-	BTN_START
-	BTN_THUMBL
-	BTN_THUMBR
+	RL_Unknown int = iota
+	RL_LeftFaceUp
+	RL_LeftFaceRight
+	RL_LeftFaceDown
+	RL_LeftFaceLeft
+	RL_RightFaceUp
+	RL_RightFaceRight
+	RL_RightFaceDown
+	RL_RightFaceLeft
+	RL_LeftTrigger1
+	RL_LeftTrigger2
+	RL_RightTrigger1
+	RL_RightTrigger2
+	RL_MiddleLeft
+	RL_Middle
+	RL_MiddleRight
+	RL_LeftThumb
+	RL_RightThumb
+	RL_BUTTON_COUNT
 )
 
 var XBoxButtons = []evdev.EvCode{
@@ -136,25 +156,35 @@ var JoyToGame = map[evdev.EvCode]evdev.EvCode{
 }
 
 const (
-	ABS_X int = iota
-	ABS_Y
-	ABS_Z
-	ABS_RZ
-	ABS_HAT0X
-	ABS_HAT0Y
-	ABS_RY
-	ABS_RX
+	RL_AxisLeftX int = iota
+	RL_AxisLeftY
+	RL_AxisRightX
+	RL_AxisRightY
+	RL_LeftTrigger
+	RL_RightTrigger
+	RL_HatX
+	RL_HatY
+	RL_AXIS_COUNT
 )
+
+// const (
+// 	GamepadAxisLeftX        = iota // Gamepad left stick X axis
+// 	GamepadAxisLeftY               // Gamepad left stick Y axis
+// 	GamepadAxisRightX              // Gamepad right stick X axis
+// 	GamepadAxisRightY              // Gamepad right stick Y axis
+// 	GamepadAxisLeftTrigger         // Gamepad back trigger left, pressure level: [1..-1]
+// 	GamepadAxisRightTrigger        // Gamepad back trigger right, pressure level: [1..-1]
+// )
 
 var AxisEvents = []evdev.EvCode{
 	evdev.ABS_X,
 	evdev.ABS_Y,
+	evdev.ABS_RY,
+	evdev.ABS_RX,
 	evdev.ABS_Z,
 	evdev.ABS_RZ,
 	evdev.ABS_HAT0X,
 	evdev.ABS_HAT0Y,
-	evdev.ABS_RY,
-	evdev.ABS_RX,
 }
 
 type AxisInfoMap map[evdev.EvCode]evdev.AbsInfo

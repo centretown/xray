@@ -59,7 +59,7 @@ func DumpPad(cmd *GCmd) {
 const MAX_BUTTONS = 64
 
 func TestKeys(cmd *GCmd) {
-	count := gpads.BTN_THUMBR - gpads.BTN_RESERVED + 1
+	count := gpads.RL_RightThumb - gpads.RL_Unknown + 1
 	for i := range count {
 		down := js.IsPadButtonDown(cmd.Pad, i)
 		fmt.Printf("[%x:%2d]", i, b2i.Bool2int(down))

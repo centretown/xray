@@ -18,28 +18,23 @@ type GPad struct {
 	AxesInfo         AxisInfoMap
 	Properties       []evdev.EvProp
 
-	// ButtonBase  evdev.EvCode
 	ButtonCodes []evdev.EvCode
 
-	preAxisState AxisStateMap
-	curAxisState AxisStateMap
-	axisAdjust   map[evdev.EvCode]int32
+	PreAxisState [RL_AXIS_COUNT]int32
+	AxisState    [RL_AXIS_COUNT]int32
+	axisAdjust   [RL_AXIS_COUNT]int32
 
-	curButtonState evdev.StateMap
-	PressedOnce    uint64       // 1<<(evdev.EvCode - ButtonBase)
-	ReleasedOnce   uint64       // 1<<(evdev.EvCode - ButtonBase)
-	LastPressed    evdev.EvCode // Button number
+	ButtonState  [RL_BUTTON_COUNT]bool
+	PressedOnce  uint64       // 1<<(evdev.EvCode - ButtonBase)
+	ReleasedOnce uint64       // 1<<(evdev.EvCode - ButtonBase)
+	LastPressed  evdev.EvCode // Button number
 
 	intialized bool
 }
 
 func newPadG(device *evdev.InputDevice) (gpad *GPad) {
 	gpad = &GPad{
-		Device:         device,
-		preAxisState:   make(AxisStateMap),
-		curAxisState:   make(AxisStateMap),
-		axisAdjust:     make(map[evdev.EvCode]int32),
-		curButtonState: make(evdev.StateMap),
+		Device: device,
 	}
 	return gpad
 }
@@ -82,8 +77,8 @@ func OpenGPad(path string) (*GPad, error) {
 			gpad.ButtonCodes = PS3Buttons
 		}
 
-		for _, code := range gpad.ButtonCodes {
-			gpad.curButtonState[code] = state[code]
+		for button, code := range gpad.ButtonCodes {
+			gpad.ButtonState[button] = state[code]
 		}
 	}
 
@@ -91,17 +86,22 @@ func OpenGPad(path string) (*GPad, error) {
 	if err != nil {
 		fmt.Println("device.AbsInfos(): ", err)
 	} else {
-		for code, info := range gpad.AxesInfo {
+		for axis, code := range AxisEvents {
 			var adj int32 = 1
-			diff := info.Maximum - info.Minimum
-			if diff > 4 {
-				adj = diff / 256
-				if adj == 0 {
-					adj = 1
+			info, ok := gpad.AxesInfo[code]
+			if ok {
+				diff := info.Maximum - info.Minimum
+				if diff > 256 {
+					adj = diff / 256
+					if adj == 0 {
+						adj = 1
+					}
 				}
+				gpad.AxisState[axis] = info.Value
 			}
-			gpad.axisAdjust[code] = adj
+			gpad.axisAdjust[axis] = adj
 		}
+
 	}
 
 	gpad.Properties = device.Properties()
@@ -112,52 +112,64 @@ func OpenGPad(path string) (*GPad, error) {
 func (gpad *GPad) ReadState() {
 	state, err := gpad.Device.State(evdev.EV_KEY)
 	if err == nil {
-		var nowDown, wasDown bool
+		var (
+			isDown, wasDown, ok bool
+			info                evdev.AbsInfo
+			button              int
+			code                evdev.EvCode
+		)
 
 		absInfos, err := gpad.Device.AbsInfos()
 		if err == nil {
-			for k, v := range absInfos {
-				gpad.preAxisState[k] = gpad.curAxisState[k]
-				gpad.curAxisState[k] = v.Value / gpad.axisAdjust[k]
+			for axis, code := range AxisEvents {
+				info, ok = absInfos[code]
+				if ok {
+					gpad.PreAxisState[axis] = gpad.AxisState[axis]
+					gpad.AxisState[axis] = info.Value / gpad.axisAdjust[axis]
+				}
 			}
 		}
 
-		for i, code := range gpad.ButtonCodes {
-			wasDown = gpad.curButtonState[code]
-			switch i {
+		for button, code = range gpad.ButtonCodes {
+			wasDown = gpad.ButtonState[button]
+			switch button {
 			case 0:
-			case BTN_DPAD_UP:
-				nowDown = gpad.curAxisState[evdev.ABS_HAT0Y] < 0
-			case BTN_DPAD_RIGHT:
-				nowDown = gpad.curAxisState[evdev.ABS_HAT0X] > 0
-			case BTN_DPAD_DOWN:
-				nowDown = gpad.curAxisState[evdev.ABS_HAT0Y] > 0
-			case BTN_DPAD_LEFT:
-				nowDown = gpad.curAxisState[evdev.ABS_HAT0X] < 0
+			case RL_LeftFaceUp:
+				isDown = gpad.AxisState[RL_HatY] < 0
+			case RL_LeftFaceRight:
+				isDown = gpad.AxisState[RL_HatX] > 0
+			case RL_LeftFaceDown:
+				isDown = gpad.AxisState[RL_HatY] > 0
+			case RL_LeftFaceLeft:
+				isDown = gpad.AxisState[RL_HatX] < 0
+			case RL_LeftTrigger2:
+				isDown = (gpad.PadType == PAD_XBOX && gpad.AxisState[RL_LeftTrigger] > 0) ||
+					state[code]
+			case RL_RightTrigger2:
+				isDown = (gpad.PadType == PAD_XBOX && gpad.AxisState[RL_RightTrigger] > 0) ||
+					state[code]
 			default:
-				nowDown = state[code]
+				isDown = state[code]
 			}
-			gpad.PressedOnce |= b2i.Bool2uint64(!wasDown && nowDown) << i
-			gpad.ReleasedOnce |= b2i.Bool2uint64(wasDown && !nowDown) << i
-			gpad.curButtonState[code] = nowDown
+
+			gpad.PressedOnce |= b2i.Bool2uint64(!wasDown && isDown) << button
+			gpad.ReleasedOnce |= b2i.Bool2uint64(wasDown && !isDown) << button
+			gpad.ButtonState[button] = isDown
 		}
 	}
 
 }
 
 func (gpad *GPad) AxisValue(axis int) int32 {
-	k := AxisEvents[axis]
-	return gpad.curAxisState[k]
+	return gpad.AxisState[axis]
 }
 
 func (gpad *GPad) AxisMove(axis int) float32 {
-	k := AxisEvents[axis]
-	return float32(gpad.curAxisState[k] - gpad.preAxisState[k])
+	return float32(gpad.AxisState[axis] - gpad.PreAxisState[axis])
 }
 
 func (gpad *GPad) ButtonDown(button int) bool {
-	code, ok := gpad.curButtonState[gpad.ButtonCodes[button]]
-	return ok && code
+	return gpad.ButtonState[button]
 }
 func (gpad *GPad) ButtonPressed(button int) bool {
 	return gpad.PressedOnce&(1<<button) != 0
@@ -167,25 +179,25 @@ func (gpad *GPad) ButtonReleased(button int) bool {
 	return gpad.ReleasedOnce&(1<<button) != 0
 }
 
-func CheckOne[T comparable](pre, cur map[evdev.EvCode]T, k evdev.EvCode) {
-	v := cur[k]
-	if pre[k] != v {
-		fmt.Printf("[%v:%v]\n", k, v)
-	}
-}
+// func CheckOne[T comparable](pre, cur map[evdev.EvCode]T, k evdev.EvCode) {
+// 	v := cur[k]
+// 	if pre[k] != v {
+// 		fmt.Printf("[%v:%v]\n", k, v)
+// 	}
+// }
 
-func CheckAll[T comparable](pre, cur map[evdev.EvCode]T) {
-	for k, v := range cur {
-		if pre[k] != v {
-			fmt.Printf("[%v:%v]\n", k, v)
-		}
-	}
-}
+// func CheckAll[T comparable](pre, cur map[evdev.EvCode]T) {
+// 	for k, v := range cur {
+// 		if pre[k] != v {
+// 			fmt.Printf("[%v:%v]\n", k, v)
+// 		}
+// 	}
+// }
 
-func (gpad *GPad) DumpState() {
-	// CheckAll(gpad.preButtonState, gpad.curButtonState)
-	CheckAll(gpad.preAxisState, gpad.curAxisState)
-}
+// func (gpad *GPad) DumpState() {
+// 	// CheckAll(gpad.preButtonState, gpad.curButtonState)
+// 	CheckAll(gpad.PreAxisState, gpad.AxisState)
+// }
 
 func (gpad *GPad) Dump() {
 	fmt.Printf("Pad Type: %s\n", gpad.PadType)
@@ -204,14 +216,18 @@ func (gpad *GPad) Dump() {
 	fmt.Printf("Input device unique ID: %s\n", gpad.UniqueID)
 
 	fmt.Println("Axes:")
-	for code, absInfo := range gpad.AxesInfo {
-		fmt.Printf("    Event code %d (%s) Value: %d Min: %d Max: %d Fuzz: %d Flat: %d Resolution: %d\n",
-			code, evdev.CodeName(evdev.EV_ABS, code), absInfo.Value, absInfo.Minimum, absInfo.Maximum,
-			absInfo.Fuzz, absInfo.Flat, absInfo.Resolution)
+	for _, code := range AxisEvents {
+		info, ok := gpad.AxesInfo[code]
+		if ok {
+			fmt.Printf("    Event code %d (%s) Value: %d Min: %d Max: %d Fuzz: %d Flat: %d Resolution: %d\n",
+				code, evdev.CodeName(evdev.EV_ABS, code), info.Value, info.Minimum, info.Maximum,
+				info.Fuzz, info.Flat, info.Resolution)
+		}
 	}
 
 	fmt.Println("Buttons:")
-	for code, value := range gpad.curButtonState {
+	for index, value := range gpad.ButtonState {
+		code := gpad.ButtonCodes[index]
 		fmt.Printf("    Event code %d (%s) state %v\n",
 			code, evdev.CodeName(evdev.EV_KEY, code), value)
 	}

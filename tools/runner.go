@@ -221,17 +221,17 @@ func (runr *Runner) PadPosXYZ(obj, pos *rl.Vector3) {
 	p := runr.gpads
 	count := p.GetStickCount()
 	for pi := range count {
-		x, y, z := p.GetPadAxisMovement(pi, gpads.ABS_X),
-			p.GetPadAxisMovement(pi, gpads.ABS_Y),
-			p.GetPadAxisMovement(pi, gpads.ABS_Z)
+		x, y, z := p.GetPadAxisMovement(pi, gpads.RL_AxisLeftX),
+			p.GetPadAxisMovement(pi, gpads.RL_AxisLeftY),
+			p.GetPadAxisMovement(pi, gpads.RL_LeftTrigger)
 
 		const delta float32 = 1.0 / 16.0
 		pos.X += delta * x
 		pos.Y += delta * y
 		pos.Z += delta * z
 
-		px, py := p.GetPadAxisValue(pi, gpads.ABS_HAT0X),
-			p.GetPadAxisValue(pi, gpads.ABS_HAT0Y)
+		px, py := p.GetPadAxisValue(pi, gpads.RL_HatX),
+			p.GetPadAxisValue(pi, gpads.RL_HatY)
 		pos.X += float32(px)
 		pos.Y += float32(py)
 	}

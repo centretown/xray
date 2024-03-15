@@ -76,12 +76,12 @@ func (js *GPads) GetPadName(pad int) string {
 	return js.Pads[pad].Name
 }
 
-func (js *GPads) DumpState(pad int) {
-	if js.padCount <= pad {
-		return
-	}
-	js.Pads[pad].DumpState()
-}
+// func (js *GPads) DumpState(pad int) {
+// 	if js.padCount <= pad {
+// 		return
+// 	}
+// 	js.Pads[pad].DumpState()
+// }
 
 func (js *GPads) GetButtonName(pad int, button int) string {
 	if js.padCount <= pad || button >= ButtonCount {
@@ -126,14 +126,14 @@ func (js *GPads) GetPadAxisCount(pad int) int {
 	if js.padCount <= pad {
 		return 0
 	}
-	return len(js.Pads[pad].curAxisState)
+	return len(js.Pads[pad].AxisState)
 }
 
 func (js *GPads) GetPadButtonCount(pad int) int {
 	if js.padCount <= pad {
 		return 0
 	}
-	return len(js.Pads[pad].curButtonState)
+	return len(js.Pads[pad].ButtonState)
 }
 
 func (js *GPads) GetPadAxisMovement(pad int, axis int) float32 {

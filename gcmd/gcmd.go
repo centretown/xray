@@ -129,7 +129,7 @@ func RunJoyCmds(cmds []*GCmd) {
 }
 
 func (cmd *GCmd) RunCmd(stopChan <-chan int) {
-	var delay = time.Millisecond * 16 //ms
+	var delay = time.Millisecond * 16
 
 	js.BeginPad()
 	showPad(cmd.Pad)
