@@ -19,15 +19,17 @@ type GPad struct {
 	Properties       []evdev.EvProp
 
 	ButtonCodes []evdev.EvCode
+	AxisCodes   []evdev.EvCode
 
-	PreAxisState [RL_AXIS_COUNT]int32
-	AxisState    [RL_AXIS_COUNT]int32
-	axisAdjust   [RL_AXIS_COUNT]int32
+	AxisStatePrev [RL_AXIS_COUNT]int32
+	AxisState     [RL_AXIS_COUNT]int32
+	// TODO: include jitter detection
+	axisAdjust [RL_AXIS_COUNT]int32
 
 	ButtonState  [RL_BUTTON_COUNT]bool
 	PressedOnce  uint64       // 1<<(evdev.EvCode - ButtonBase)
 	ReleasedOnce uint64       // 1<<(evdev.EvCode - ButtonBase)
-	LastPressed  evdev.EvCode // Button number
+	LastPressed  evdev.EvCode // Button number?
 
 	intialized bool
 }
@@ -63,13 +65,16 @@ func OpenGPad(path string) (*GPad, error) {
 	if err != nil {
 		fmt.Println("EV_KEY.State: ", err)
 	} else {
+		gpad.AxisCodes = GameAxes
 		_, isJoy := state[BTN_JOYSTICK]
 		if isJoy {
 			gpad.PadType = PAD_JOYSTICK
 			gpad.ButtonCodes = JoyButtons
+			gpad.AxisCodes = JoyAxes
 		} else if gpad.InputID.Vendor == 0x45e && gpad.InputID.Product == 0x28e &&
 			gpad.InputID.Version == 0x110 {
 			// TODO: Improve above condition
+			// above derived from p4 clone posing as xbox
 			gpad.PadType = PAD_XBOX
 			gpad.ButtonCodes = XBoxButtons
 		} else {
@@ -86,7 +91,7 @@ func OpenGPad(path string) (*GPad, error) {
 	if err != nil {
 		fmt.Println("device.AbsInfos(): ", err)
 	} else {
-		for axis, code := range AxisEvents {
+		for axis, code := range gpad.AxisCodes {
 			var adj int32 = 1
 			info, ok := gpad.AxesInfo[code]
 			if ok {
@@ -110,26 +115,26 @@ func OpenGPad(path string) (*GPad, error) {
 }
 
 func (gpad *GPad) ReadState() {
-	state, err := gpad.Device.State(evdev.EV_KEY)
-	if err == nil {
-		var (
-			isDown, wasDown, ok bool
-			info                evdev.AbsInfo
-			button              int
-			code                evdev.EvCode
-		)
+	var (
+		isDown, wasDown, ok bool
+		info                evdev.AbsInfo
+		button              int
+		code                evdev.EvCode
+	)
 
-		absInfos, err := gpad.Device.AbsInfos()
-		if err == nil {
-			for axis, code := range AxisEvents {
-				info, ok = absInfos[code]
-				if ok {
-					gpad.PreAxisState[axis] = gpad.AxisState[axis]
-					gpad.AxisState[axis] = info.Value / gpad.axisAdjust[axis]
-				}
+	absInfos, err := gpad.Device.AbsInfos()
+	if err == nil {
+		for axis, code := range gpad.AxisCodes {
+			info, ok = absInfos[code]
+			if ok {
+				gpad.AxisStatePrev[axis] = gpad.AxisState[axis]
+				gpad.AxisState[axis] = info.Value / gpad.axisAdjust[axis]
 			}
 		}
+	}
 
+	state, err := gpad.Device.State(evdev.EV_KEY)
+	if err == nil {
 		for button, code = range gpad.ButtonCodes {
 			wasDown = gpad.ButtonState[button]
 			switch button {
@@ -165,7 +170,7 @@ func (gpad *GPad) AxisValue(axis int) int32 {
 }
 
 func (gpad *GPad) AxisMove(axis int) float32 {
-	return float32(gpad.AxisState[axis] - gpad.PreAxisState[axis])
+	return float32(gpad.AxisState[axis] - gpad.AxisStatePrev[axis])
 }
 
 func (gpad *GPad) ButtonDown(button int) bool {
@@ -178,26 +183,6 @@ func (gpad *GPad) ButtonPressed(button int) bool {
 func (gpad *GPad) ButtonReleased(button int) bool {
 	return gpad.ReleasedOnce&(1<<button) != 0
 }
-
-// func CheckOne[T comparable](pre, cur map[evdev.EvCode]T, k evdev.EvCode) {
-// 	v := cur[k]
-// 	if pre[k] != v {
-// 		fmt.Printf("[%v:%v]\n", k, v)
-// 	}
-// }
-
-// func CheckAll[T comparable](pre, cur map[evdev.EvCode]T) {
-// 	for k, v := range cur {
-// 		if pre[k] != v {
-// 			fmt.Printf("[%v:%v]\n", k, v)
-// 		}
-// 	}
-// }
-
-// func (gpad *GPad) DumpState() {
-// 	// CheckAll(gpad.preButtonState, gpad.curButtonState)
-// 	CheckAll(gpad.PreAxisState, gpad.AxisState)
-// }
 
 func (gpad *GPad) Dump() {
 	fmt.Printf("Pad Type: %s\n", gpad.PadType)
@@ -216,7 +201,7 @@ func (gpad *GPad) Dump() {
 	fmt.Printf("Input device unique ID: %s\n", gpad.UniqueID)
 
 	fmt.Println("Axes:")
-	for _, code := range AxisEvents {
+	for _, code := range gpad.AxisCodes {
 		info, ok := gpad.AxesInfo[code]
 		if ok {
 			fmt.Printf("    Event code %d (%s) Value: %d Min: %d Max: %d Fuzz: %d Flat: %d Resolution: %d\n",

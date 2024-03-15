@@ -78,9 +78,9 @@ var XBoxButtons = []evdev.EvCode{
 	evdev.BTN_DPAD_DOWN,  // Gamepad left DPAD down button
 	evdev.BTN_DPAD_LEFT,  // Gamepad left DPAD left button
 	evdev.BTN_Y,          // Gamepad right button up (i.e. PS3: Triangle, Xbox: Y)
-	evdev.BTN_X,          // Gamepad right button right (i.e. PS3: Square, Xbox: X)
-	evdev.BTN_A,          // Gamepad right button down (i.e. PS3: Cross, Xbox: A)
 	evdev.BTN_B,          // Gamepad right button left (i.e. PS3: Circle, Xbox: B)
+	evdev.BTN_A,          // Gamepad right button down (i.e. PS3: Cross, Xbox: A)
+	evdev.BTN_X,          // Gamepad right button right (i.e. PS3: Square, Xbox: X)
 	evdev.BTN_TL,         // Gamepad top/back trigger left (first), it could be a trailing button
 	evdev.BTN_TL2,        // Gamepad top/back trigger left (second), it could be a trailing button
 	evdev.BTN_TR,         // Gamepad top/back trigger right (one), it could be a trailing button
@@ -99,9 +99,9 @@ var PS3Buttons = []evdev.EvCode{
 	evdev.BTN_DPAD_DOWN,  // Gamepad left DPAD down button
 	evdev.BTN_DPAD_LEFT,  // Gamepad left DPAD left button
 	evdev.BTN_NORTH,      // Gamepad right button up (i.e. PS3: Triangle, Xbox: Y)
-	evdev.BTN_WEST,       // Gamepad right button right (i.e. PS3: Square, Xbox: X)
-	evdev.BTN_SOUTH,      // Gamepad right button down (i.e. PS3: Cross, Xbox: A)
 	evdev.BTN_EAST,       // Gamepad right button left (i.e. PS3: Circle, Xbox: B)
+	evdev.BTN_SOUTH,      // Gamepad right button down (i.e. PS3: Cross, Xbox: A)
+	evdev.BTN_WEST,       // Gamepad right button right (i.e. PS3: Square, Xbox: X)
 	evdev.BTN_TL,         // Gamepad top/back trigger left (first), it could be a trailing button
 	evdev.BTN_TL2,        // Gamepad top/back trigger left (second), it could be a trailing button
 	evdev.BTN_TR,         // Gamepad top/back trigger right (one), it could be a trailing button
@@ -120,9 +120,9 @@ var JoyButtons = []evdev.EvCode{
 	evdev.BTN_DPAD_DOWN,  // Gamepad left DPAD down button
 	evdev.BTN_DPAD_LEFT,  // Gamepad left DPAD left button
 	evdev.BTN_TOP,        // Gamepad right button up (i.e. PS3: Triangle, Xbox: Y)
-	evdev.BTN_JOYSTICK,   // Gamepad right button right (i.e. PS3: Square, Xbox: X)
-	evdev.BTN_THUMB,      // Gamepad right button down (i.e. PS3: Cross, Xbox: A)
 	evdev.BTN_THUMB2,     // Gamepad right button left (i.e. PS3: Circle, Xbox: B)
+	evdev.BTN_THUMB,      // Gamepad right button down (i.e. PS3: Cross, Xbox: A)
+	evdev.BTN_JOYSTICK,   // Gamepad right button right (i.e. PS3: Square, Xbox: X)
 	evdev.BTN_TOP2,       // Gamepad top/back trigger left (first), it could be a trailing button
 	evdev.BTN_BASE,       // Gamepad top/back trigger left (second), it could be a trailing button
 	evdev.BTN_PINKIE,     // Gamepad top/back trigger right (one), it could be a trailing button
@@ -167,22 +167,23 @@ const (
 	RL_AXIS_COUNT
 )
 
-// const (
-// 	GamepadAxisLeftX        = iota // Gamepad left stick X axis
-// 	GamepadAxisLeftY               // Gamepad left stick Y axis
-// 	GamepadAxisRightX              // Gamepad right stick X axis
-// 	GamepadAxisRightY              // Gamepad right stick Y axis
-// 	GamepadAxisLeftTrigger         // Gamepad back trigger left, pressure level: [1..-1]
-// 	GamepadAxisRightTrigger        // Gamepad back trigger right, pressure level: [1..-1]
-// )
-
-var AxisEvents = []evdev.EvCode{
+var GameAxes = []evdev.EvCode{
 	evdev.ABS_X,
 	evdev.ABS_Y,
-	evdev.ABS_RY,
 	evdev.ABS_RX,
+	evdev.ABS_RY,
 	evdev.ABS_Z,
 	evdev.ABS_RZ,
+	evdev.ABS_HAT0X,
+	evdev.ABS_HAT0Y,
+}
+var JoyAxes = []evdev.EvCode{
+	evdev.ABS_X,
+	evdev.ABS_Y,
+	evdev.ABS_Z,
+	evdev.ABS_RZ,
+	evdev.ABS_RY,
+	evdev.ABS_RX,
 	evdev.ABS_HAT0X,
 	evdev.ABS_HAT0Y,
 }
