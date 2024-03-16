@@ -1,5 +1,11 @@
-# How To Write An `if` Statement in Go
-#### Issue #6011: branchless programming
+## Branchless Programming in Go
+
+Pipelining and branch prediction are mainstays of cpu design. In order to take advantage of this a Go program needs:
+- compiler supported fast bool to numeric type conversions
+- compiler supported function inlining
+
+The Go compiler supports both of these requirements.
+#### Issue #6011: Or How To Write An "if" Statement in Go
 
 > by sjbogdan: on Aug 1, 2013
 
@@ -19,7 +25,7 @@ Issue #6011: can be found here.
 [https://github.com/golang/go/issues/6011](https://github.com/golang/go/issues/6011)
 
 
-After reading this, I decided to see if it had been implemented. It has and proven to be useful. The following code represents the most efficient form.
+After reading this, I decided to examine the results and see if it could be useful. The following code represents the most efficient form.
 
 ```
 func Bool2int(b bool) int {
@@ -148,3 +154,10 @@ bf64 = B2N[float64](f64 > 0)
   0x4821eb		f20f100ddd3f0a00	MOVSD_XMM xray/b2i.f64(SB), X1	
   0x4821f3		f20f114c2470		MOVSD_XMM X1, 0x70(SP)		
 ```
+
+## Inlining
+
+[https://dave.cheney.net/2014/06/07/five-things-that-make-go-fast](https://dave.cheney.net/2014/06/07/five-things-that-make-go-fast)
+
+"Go’s optimisations are always enabled by default. You can see the compiler’s escape analysis and inlining decisions with the -gcflags=-m switch."
+

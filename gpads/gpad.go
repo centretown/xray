@@ -33,6 +33,7 @@ type GPad struct {
 	ReleasedOnce uint64 // 1<<(evdev.EvCode - ButtonBase)
 
 	intialized bool
+	loggedErr  bool // avoid swamping stderr when device turned off
 }
 
 func newPadG(device *evdev.InputDevice) (gpad *GPad) {
@@ -44,9 +45,9 @@ func newPadG(device *evdev.InputDevice) (gpad *GPad) {
 
 func OpenGPad(path string) (*GPad, error) {
 	var (
+		device *evdev.InputDevice
 		state  evdev.StateMap
 		err    error
-		device *evdev.InputDevice
 	)
 
 	device, err = evdev.Open(path)
@@ -64,7 +65,10 @@ func OpenGPad(path string) (*GPad, error) {
 
 	state, err = device.State(evdev.EV_KEY)
 	if err != nil {
-		fmt.Println("EV_KEY.State: ", err)
+		if !gpad.loggedErr {
+			fmt.Println("evdev.InputDevice.State: ", err)
+			gpad.loggedErr = true
+		}
 	} else {
 		gpad.AxisCodes = GameAxes
 		_, isJoy := state[BTN_JOYSTICK]
@@ -90,7 +94,10 @@ func OpenGPad(path string) (*GPad, error) {
 
 	gpad.AxesInfo, err = device.AbsInfos()
 	if err != nil {
-		fmt.Println("device.AbsInfos(): ", err)
+		if !gpad.loggedErr {
+			fmt.Println("evdev.InputDevice.AbsInfos: ", err)
+			gpad.loggedErr = true
+		}
 	} else {
 		for axis, code := range gpad.AxisCodes {
 			var adj int32 = 1
@@ -140,6 +147,7 @@ func (gpad *GPad) ReadState() {
 			wasDown = gpad.ButtonState[button]
 			switch button {
 			case 0:
+				isDown = false
 			case RL_LeftFaceUp:
 				isDown = gpad.AxisState[RL_HatY] < 0
 			case RL_LeftFaceRight:
@@ -148,19 +156,21 @@ func (gpad *GPad) ReadState() {
 				isDown = gpad.AxisState[RL_HatY] > 0
 			case RL_LeftFaceLeft:
 				isDown = gpad.AxisState[RL_HatX] < 0
+
 			case RL_LeftTrigger2:
 				isDown = (gpad.PadType == PAD_XBOX && gpad.AxisState[RL_LeftTrigger] > 0) ||
 					state[code]
 			case RL_RightTrigger2:
 				isDown = (gpad.PadType == PAD_XBOX && gpad.AxisState[RL_RightTrigger] > 0) ||
 					state[code]
+
 			default:
 				isDown = state[code]
 			}
 
+			gpad.ButtonState[button] = isDown
 			gpad.PressedOnce |= b2i.Bool2uint64(!wasDown && isDown) << button
 			gpad.ReleasedOnce |= b2i.Bool2uint64(wasDown && !isDown) << button
-			gpad.ButtonState[button] = isDown
 			LastPressed = b2i.Bool2int(isDown)*button +
 				b2i.Bool2int(!isDown)*LastPressed
 		}

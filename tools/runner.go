@@ -226,8 +226,15 @@ func (runr *Runner) PadPosXYZ(obj, pos *rl.Vector3) {
 		pos.X += delta * x
 		pos.Y += delta * y
 
-		z := p.GetPadAxisMovement(pi, rl.GamepadAxisRightY)
-		pos.Z += delta * z
+		x, y = p.GetPadAxisMovement(pi, rl.GamepadAxisRightX),
+			p.GetPadAxisMovement(pi, rl.GamepadAxisRightY)
+		obj.X += delta * x
+		obj.Y -= delta * y
+
+		obj.Z += b2i.Bool2float32((p.IsPadButtonDown(pi, rl.GamepadButtonLeftFaceDown)))
+		obj.Z -= b2i.Bool2float32((p.IsPadButtonDown(pi, rl.GamepadButtonLeftFaceUp)))
+		obj.X += b2i.Bool2float32((p.IsPadButtonDown(pi, rl.GamepadButtonLeftFaceRight)))
+		obj.X -= b2i.Bool2float32((p.IsPadButtonDown(pi, rl.GamepadButtonLeftFaceLeft)))
 	}
 }
 
