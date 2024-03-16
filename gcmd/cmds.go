@@ -8,8 +8,7 @@ import (
 
 func LastButtonPressed(cmd *GCmd) {
 	button := js.GetPadButtonPressed()
-	up := js.IsPadButtonDown(cmd.Pad, button)
-	fmt.Printf("[%4d:%4d]\r", button, b2i.Bool2int(up))
+	fmt.Printf("[%2d]\r", button)
 }
 
 func IsButtonUp(cmd *GCmd) {

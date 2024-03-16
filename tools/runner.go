@@ -192,26 +192,24 @@ func (runr *Runner) Run3d() {
 		runr.gpads.BeginPad()
 		runr.PadPosXYZ(&cubeV, &camPos)
 		runr.KeyPosXYZ(&cubeV, &camPos)
+
 		camera.Position = camPos
 
 		rl.BeginDrawing()
-		{
-			runr.setupBackground() //runRect)
+		runr.setupBackground()
 
-			rl.BeginMode3D(camera)
-			{
-				for _, obj := range drawObjects {
-					obj.draw(cubeV, rl.Green)
-				}
-			}
-			rl.EndMode3D()
+		rl.BeginMode3D(camera)
+		for _, obj := range drawObjects {
+			obj.draw(cubeV, rl.Green)
+		}
+		rl.EndMode3D()
 
-			rl.DrawCircle(100, 100, 25, rl.Red)
-			for _, run := range runr.actors {
-				run.Animate(can_move, current)
-			}
+		rl.DrawCircle(100, 100, 25, rl.Red)
+		for _, run := range runr.actors {
+			run.Animate(can_move, current)
 		}
 		rl.EndDrawing()
+
 	}
 	rl.CloseWindow()
 	fmt.Println("THREE D.")
@@ -221,14 +219,14 @@ func (runr *Runner) PadPosXYZ(obj, pos *rl.Vector3) {
 	p := runr.gpads
 	count := p.GetStickCount()
 	for pi := range count {
-		x, y := p.GetPadAxisMovement(pi, gpads.RL_AxisLeftX),
-			p.GetPadAxisMovement(pi, gpads.RL_AxisLeftY)
+		x, y := p.GetPadAxisMovement(pi, rl.GamepadAxisLeftX),
+			p.GetPadAxisMovement(pi, rl.GamepadAxisLeftY)
 
 		const delta float32 = 1.0 / 16.0
 		pos.X += delta * x
 		pos.Y += delta * y
 
-		z := p.GetPadAxisMovement(pi, gpads.RL_AxisRightY)
+		z := p.GetPadAxisMovement(pi, rl.GamepadAxisRightY)
 		pos.Z += delta * z
 	}
 }

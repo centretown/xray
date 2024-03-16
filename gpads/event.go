@@ -4,8 +4,6 @@ import "github.com/holoplot/go-evdev"
 
 // button mappings
 
-var ButtonCount = len(PS3Buttons)
-
 const BTN_GAMEPAD = evdev.BTN_GAMEPAD
 const BTN_JOYSTICK = evdev.BTN_JOYSTICK
 
@@ -30,24 +28,7 @@ func (t PadType) String() string {
 	return PadTypes[t]
 }
 
-// GamepadButtonUnknown        = iota // Unknown button, just for error checking
-// GamepadButtonLeftFaceUp            // Gamepad left DPAD up button
-// GamepadButtonLeftFaceRight         // Gamepad left DPAD right button
-// GamepadButtonLeftFaceDown          // Gamepad left DPAD down button
-// GamepadButtonLeftFaceLeft          // Gamepad left DPAD left button
-// GamepadButtonRightFaceUp           // Gamepad right button up (i.e. PS3: Triangle, Xbox: Y)
-// GamepadButtonRightFaceRight        // Gamepad right button right (i.e. PS3: Square, Xbox: X)
-// GamepadButtonRightFaceDown         // Gamepad right button down (i.e. PS3: Cross, Xbox: A)
-// GamepadButtonRightFaceLeft         // Gamepad right button left (i.e. PS3: Circle, Xbox: B)
-// GamepadButtonLeftTrigger1          // Gamepad top/back trigger left (first), it could be a trailing button
-// GamepadButtonLeftTrigger2          // Gamepad top/back trigger left (second), it could be a trailing button
-// GamepadButtonRightTrigger1         // Gamepad top/back trigger right (one), it could be a trailing button
-// GamepadButtonRightTrigger2         // Gamepad top/back trigger right (second), it could be a trailing button
-// GamepadButtonMiddleLeft            // Gamepad center buttons, left one (i.e. PS3: Select)
-// GamepadButtonMiddle                // Gamepad center buttons, middle one (i.e. PS3: PS, Xbox: XBOX)
-// GamepadButtonMiddleRight           // Gamepad center buttons, right one (i.e. PS3: Start)
-// GamepadButtonLeftThumb             // Gamepad joystick pressed button left
-// GamepadButtonRightThumb            // Gamepad joystick pressed button right
+// mirror raylib constants
 
 const (
 	RL_Unknown int = iota
@@ -134,26 +115,7 @@ var JoyButtons = []evdev.EvCode{
 	evdev.BTN_BASE6,      // Gamepad joystick pressed button right
 }
 
-var JoyToGame = map[evdev.EvCode]evdev.EvCode{
-	0:                    0,
-	evdev.BTN_DPAD_UP:    evdev.BTN_DPAD_UP,
-	evdev.BTN_DPAD_RIGHT: evdev.BTN_DPAD_RIGHT,
-	evdev.BTN_DPAD_DOWN:  evdev.BTN_DPAD_DOWN,
-	evdev.BTN_DPAD_LEFT:  evdev.BTN_DPAD_LEFT,
-	evdev.BTN_TOP:        evdev.BTN_NORTH,
-	evdev.BTN_JOYSTICK:   evdev.BTN_WEST,
-	evdev.BTN_THUMB:      evdev.BTN_SOUTH,
-	evdev.BTN_THUMB2:     evdev.BTN_EAST,
-	evdev.BTN_TOP2:       evdev.BTN_TL,
-	evdev.BTN_BASE:       evdev.BTN_TL2,
-	evdev.BTN_PINKIE:     evdev.BTN_TR,
-	evdev.BTN_BASE2:      evdev.BTN_TR2,
-	evdev.BTN_BASE3:      evdev.BTN_SELECT,
-	evdev.BTN_DEAD:       evdev.BTN_MODE,
-	evdev.BTN_BASE4:      evdev.BTN_START,
-	evdev.BTN_BASE5:      evdev.BTN_THUMBL,
-	evdev.BTN_BASE6:      evdev.BTN_THUMBR,
-}
+// mirror raylib constants
 
 const (
 	RL_AxisLeftX int = iota
@@ -177,13 +139,14 @@ var GameAxes = []evdev.EvCode{
 	evdev.ABS_HAT0X,
 	evdev.ABS_HAT0Y,
 }
+
 var JoyAxes = []evdev.EvCode{
 	evdev.ABS_X,
 	evdev.ABS_Y,
 	evdev.ABS_Z,
 	evdev.ABS_RZ,
-	evdev.ABS_RY,
-	evdev.ABS_RX,
+	evdev.ABS_RX, //absent
+	evdev.ABS_RY, //absent
 	evdev.ABS_HAT0X,
 	evdev.ABS_HAT0Y,
 }

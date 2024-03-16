@@ -10,6 +10,7 @@ import (
 var _ pad.Pad = NewGPads()
 
 const PAD_MAX = 4
+const UNDEFINED = "UNDEFINED"
 
 type GPads struct {
 	Pads       [PAD_MAX]*GPad
@@ -63,8 +64,6 @@ func (js *GPads) IsPadAvailable(pad int) bool {
 	return js.padCount > pad
 }
 
-const UNDEFINED = "UNDEFINED"
-
 func (js *GPads) GetStickCount() int {
 	return js.padCount
 }
@@ -84,42 +83,42 @@ func (js *GPads) GetPadName(pad int) string {
 // }
 
 func (js *GPads) GetButtonName(pad int, button int) string {
-	if js.padCount <= pad || button >= ButtonCount {
+	if js.padCount <= pad || button >= RL_BUTTON_COUNT {
 		return UNDEFINED
 	}
 	return evdev.KEYNames[PS3Buttons[button]]
 }
 
 func (js *GPads) IsPadButtonPressed(pad int, button int) bool {
-	if js.padCount <= pad || ButtonCount <= button {
+	if js.padCount <= pad || RL_BUTTON_COUNT <= button {
 		return false
 	}
 	return js.Pads[pad].ButtonPressed(button)
 }
 
 func (js *GPads) IsPadButtonDown(pad int, button int) bool {
-	if js.padCount <= pad || button >= ButtonCount {
+	if js.padCount <= pad || button >= RL_BUTTON_COUNT {
 		return false
 	}
 	return js.Pads[pad].ButtonDown(button)
 }
 
 func (js *GPads) IsPadButtonReleased(pad int, button int) bool {
-	if js.padCount <= pad || button >= ButtonCount {
+	if js.padCount <= pad || button >= RL_BUTTON_COUNT {
 		return false
 	}
 	return js.Pads[pad].ButtonReleased(button)
 }
 
 func (js *GPads) IsPadButtonUp(pad int, button int) bool {
-	if js.padCount <= pad || button >= ButtonCount {
+	if js.padCount <= pad || button >= RL_BUTTON_COUNT {
 		return false
 	}
 	return !js.Pads[pad].ButtonDown(button)
 }
 
 func (js *GPads) GetPadButtonPressed() int {
-	return 0
+	return LastPressed
 }
 
 func (js *GPads) GetPadAxisCount(pad int) int {

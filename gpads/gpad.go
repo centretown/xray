@@ -7,6 +7,8 @@ import (
 	"github.com/holoplot/go-evdev"
 )
 
+var LastPressed int // Button number?
+
 type GPad struct {
 	PadType          PadType
 	Device           *evdev.InputDevice
@@ -27,9 +29,8 @@ type GPad struct {
 	axisAdjust [RL_AXIS_COUNT]int32
 
 	ButtonState  [RL_BUTTON_COUNT]bool
-	PressedOnce  uint64       // 1<<(evdev.EvCode - ButtonBase)
-	ReleasedOnce uint64       // 1<<(evdev.EvCode - ButtonBase)
-	LastPressed  evdev.EvCode // Button number?
+	PressedOnce  uint64 // 1<<(evdev.EvCode - ButtonBase)
+	ReleasedOnce uint64 // 1<<(evdev.EvCode - ButtonBase)
 
 	intialized bool
 }
@@ -160,6 +161,8 @@ func (gpad *GPad) ReadState() {
 			gpad.PressedOnce |= b2i.Bool2uint64(!wasDown && isDown) << button
 			gpad.ReleasedOnce |= b2i.Bool2uint64(wasDown && !isDown) << button
 			gpad.ButtonState[button] = isDown
+			LastPressed = b2i.Bool2int(isDown)*button +
+				b2i.Bool2int(!isDown)*LastPressed
 		}
 	}
 
