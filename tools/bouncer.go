@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"xray/b2i"
+	"xray/b2"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -61,8 +61,8 @@ func (anim *Bouncer) Animate(can_move int32, dr CanDraw) {
 	reverse_x := (nextX >= anim.x_max) || (nextX < anim.boundsX)
 	reverse_y := (nextY >= anim.y_max) || (nextY < anim.boundsY)
 
-	anim.dx *= b2i.Bool2int32(!reverse_x) - b2i.Bool2int32(reverse_x)
-	anim.dy *= b2i.Bool2int32(!reverse_y) - b2i.Bool2int32(reverse_y)
+	anim.dx *= b2.ToInt32(!reverse_x) - b2.ToInt32(reverse_x)
+	anim.dy *= b2.ToInt32(!reverse_y) - b2.ToInt32(reverse_y)
 
 	anim.x += anim.dx * can_move
 	anim.y += anim.dy * anim.velocity * can_move

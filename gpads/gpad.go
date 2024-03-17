@@ -2,7 +2,7 @@ package gpads
 
 import (
 	"fmt"
-	"xray/b2i"
+	"xray/b2"
 
 	"github.com/holoplot/go-evdev"
 )
@@ -136,7 +136,8 @@ func (gpad *GPad) ReadState() {
 			info, ok = absInfos[code]
 			if ok {
 				gpad.AxisStatePrev[axis] = gpad.AxisState[axis]
-				gpad.AxisState[axis] = info.Value / gpad.axisAdjust[axis]
+				gpad.AxisState[axis] = (info.Value / gpad.axisAdjust[axis])
+				// gpad.AxisState[axis] = ((info.Value & 0xfff8) / gpad.axisAdjust[axis])
 			}
 		}
 	}
@@ -169,10 +170,10 @@ func (gpad *GPad) ReadState() {
 			}
 
 			gpad.ButtonState[button] = isDown
-			gpad.PressedOnce |= b2i.Bool2uint64(!wasDown && isDown) << button
-			gpad.ReleasedOnce |= b2i.Bool2uint64(wasDown && !isDown) << button
-			LastPressed = b2i.Bool2int(isDown)*button +
-				b2i.Bool2int(!isDown)*LastPressed
+			gpad.PressedOnce |= b2.ToInt64(!wasDown && isDown) << button
+			gpad.ReleasedOnce |= b2.ToInt64(wasDown && !isDown) << button
+			LastPressed = b2.ToInt(isDown)*button +
+				b2.ToInt(!isDown)*LastPressed
 		}
 	}
 

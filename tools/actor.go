@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"xray/b2i"
+	"xray/b2"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -24,7 +24,7 @@ func NewActor(draw CanDraw, anim CanAnimate, after float64) *Actor {
 }
 
 func (act *Actor) Animate(can_move int32, current float64) {
-	can_move = can_move * b2i.Bool2int32(current >= act.next)
+	can_move = can_move * b2.ToInt32(current >= act.next)
 	act.anim.Animate(can_move, act.draw)
 }
 

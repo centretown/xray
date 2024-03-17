@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"time"
-	"xray/b2i"
+	"xray/b2"
 	"xray/gpads"
 	"xray/pad"
 	"xray/tools"
@@ -177,10 +177,10 @@ func NewCmds() []*GCmd {
 		cmd.Button = buttons[btnNext]
 		cmd.Delay = time.Duration(seconds[secNext]) * time.Second
 
-		padNext += b2i.Bool2int(padNext < jLast)
-		axisNext += b2i.Bool2int(axisNext < aLast)
-		btnNext += b2i.Bool2int(btnNext < bLast)
-		secNext += b2i.Bool2int(secNext < sLast)
+		padNext += b2.ToInt(padNext < jLast)
+		axisNext += b2.ToInt(axisNext < aLast)
+		btnNext += b2.ToInt(btnNext < bLast)
+		secNext += b2.ToInt(secNext < sLast)
 		cmds = append(cmds, &cmd)
 		showCmd(&cmd)
 	}

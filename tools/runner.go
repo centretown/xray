@@ -1,11 +1,7 @@
 package tools
 
 import (
-	"fmt"
 	"image/color"
-
-	"xray/b2i"
-	"xray/gpads"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -18,62 +14,26 @@ const (
 )
 
 type Runner struct {
-	width  int32
-	height int32
-	fps    int32
+	Width  int32
+	Height int32
+	FPS    int32
 
-	actors []*Actor
-	gpads  *gpads.GPads
+	Actors []*Actor
 }
 
 func NewRunner(width int32, height int32, fps int32) *Runner {
 	runr := &Runner{
-		height: height,
-		width:  width,
-		fps:    fps,
-		actors: make([]*Actor, 0),
+		Height: height,
+		Width:  width,
+		FPS:    fps,
+		Actors: make([]*Actor, 0),
 	}
-
-	runr.gpads = gpads.NewGPads()
 
 	return runr
 }
 
 func (runr *Runner) Add(d CanDraw, a CanAnimate, after float64) {
-	runr.actors = append(runr.actors, NewActor(d, a, after))
-}
-
-func (runr *Runner) Run2d() {
-	runr.setupWindow("2d")
-
-	var (
-		current  float64 = rl.GetTime()
-		previous float64 = current
-		interval float64 = float64(rl.GetFrameTime())
-		can_move int32   = 0
-	)
-
-	runr.Refresh(current)
-
-	for !rl.WindowShouldClose() {
-		current = rl.GetTime()
-		can_move = b2i.Bool2int32(current > previous+interval)
-		previous = float64(can_move) * interval
-
-		if rl.IsWindowResized() {
-			runr.Refresh(current)
-		}
-
-		rl.BeginDrawing()
-		runr.setupBackground()
-
-		for _, run := range runr.actors {
-			run.Animate(can_move, current)
-		}
-		rl.EndDrawing()
-	}
-
-	rl.CloseWindow()
+	runr.Actors = append(runr.Actors, NewActor(d, a, after))
 }
 
 func (runr *Runner) AddBouncingBalls() {
@@ -101,159 +61,16 @@ func (runr *Runner) AddBouncingBalls() {
 
 func (runr *Runner) Refresh(current float64) {
 	viewPort := runr.GetViewPort()
-	for _, run := range runr.actors {
+	for _, run := range runr.Actors {
 		run.Resize(viewPort, current)
 	}
 }
 
-func (runr *Runner) setupWindow(title string) {
+func (runr *Runner) SetupWindow(title string) {
 	rl.SetTraceLogLevel(rl.LogInfo)
-	rl.InitWindow(runr.width, runr.height, title)
-	rl.SetTargetFPS(runr.fps)
+	rl.InitWindow(runr.Width, runr.Height, title)
+	rl.SetTargetFPS(runr.FPS)
 	rl.SetWindowState(rl.FlagWindowResizable)
-}
-
-func (runr *Runner) setupBackground() {
-	// runRect := runr.GetViewPort()
-	rl.ClearBackground(rl.Black)
-	// rl.DrawRectangleGradientV(0, 0, int32(rl.GetRenderWidth()), int32(rl.GetRenderHeight()), rl.DarkBlue, rl.Black)
-	// rl.DrawRectangleGradientV(runRect.X, runRect.Y, runRect.Width, runRect.Height, rl.Black, rl.DarkBlue)
-}
-
-type draw3dFunc struct {
-	draw func(pos rl.Vector3, color color.RGBA)
-}
-
-var drawCubeWires = draw3dFunc{
-	draw: func(pos rl.Vector3, color color.RGBA) {
-		rl.DrawCubeWires(pos, 4, 4, 4, color)
-	},
-}
-
-var drawCube = draw3dFunc{
-	draw: func(pos rl.Vector3, color color.RGBA) {
-		var (
-			position = rl.Vector3{X: pos.X, Y: pos.Y, Z: pos.Z + 5}
-		)
-		rl.DrawCubeV(position, rl.Vector3{X: 4, Y: 4, Z: 4}, color)
-	},
-}
-
-var drawGrid = draw3dFunc{
-	draw: func(rl.Vector3, color.RGBA) {
-		rl.DrawGrid(6, 2)
-	},
-}
-
-var drawCircle3d = draw3dFunc{
-	draw: func(pos rl.Vector3, color color.RGBA) {
-		var (
-			position         = rl.Vector3{X: pos.X, Y: pos.Y, Z: pos.Z - 5}
-			rotation         = rl.Vector3{X: 0, Y: 0, Z: 0}
-			angle    float32 = 45.0
-		)
-		rl.DrawCircle3D(position, 4, rotation, angle, color)
-	},
-}
-
-func (runr *Runner) Run3d() {
-	runr.setupWindow("3d")
-	runr.gpads.BeginPad()
-	var (
-		current  float64 = rl.GetTime()
-		previous float64 = current
-		interval float64 = float64(rl.GetFrameTime() * 100)
-		can_move int32   = 0
-
-		camPos    = rl.Vector3{X: 10, Y: 10, Z: 10}
-		camTarget = rl.Vector3{X: 0, Y: 0, Z: 0}
-		camUp     = rl.Vector3{X: 0, Y: .5, Z: 0}
-		camera    = rl.NewCamera3D(camPos, camTarget, camUp,
-			60, rl.CameraPerspective)
-		cubeV = rl.Vector3{X: 0, Y: 0, Z: 0}
-
-		drawObjects = []draw3dFunc{drawCubeWires, drawCircle3d, drawCube, drawGrid}
-	)
-
-	runr.AddBouncingBalls()
-	runr.Refresh(current)
-
-	// shader := rl.LoadShader("../shaders/lightint.vs", "../shaders/lightint.fs")
-
-	for !rl.WindowShouldClose() {
-		current = rl.GetTime()
-		can_move = b2i.Bool2int32(current > previous+interval)
-		previous = float64(can_move) * interval
-
-		if rl.IsWindowResized() {
-			runr.Refresh(current)
-		}
-
-		runr.gpads.BeginPad()
-		runr.PadPosXYZ(&cubeV, &camPos)
-		runr.KeyPosXYZ(&cubeV, &camPos)
-
-		camera.Position = camPos
-
-		rl.BeginDrawing()
-		runr.setupBackground()
-
-		rl.BeginMode3D(camera)
-		for _, obj := range drawObjects {
-			obj.draw(cubeV, rl.Green)
-		}
-		rl.EndMode3D()
-
-		rl.DrawCircle(100, 100, 25, rl.Red)
-		for _, run := range runr.actors {
-			run.Animate(can_move, current)
-		}
-		rl.EndDrawing()
-
-	}
-	rl.CloseWindow()
-	fmt.Println("THREE D.")
-}
-
-func (runr *Runner) PadPosXYZ(obj, pos *rl.Vector3) {
-	p := runr.gpads
-	count := p.GetStickCount()
-	for pi := range count {
-		x, y := p.GetPadAxisMovement(pi, rl.GamepadAxisLeftX),
-			p.GetPadAxisMovement(pi, rl.GamepadAxisLeftY)
-
-		const delta float32 = 1.0 / 16.0
-		pos.X += delta * x
-		pos.Y += delta * y
-
-		x, y = p.GetPadAxisMovement(pi, rl.GamepadAxisRightX),
-			p.GetPadAxisMovement(pi, rl.GamepadAxisRightY)
-		obj.X += delta * x
-		obj.Y -= delta * y
-
-		obj.Z += b2i.Bool2float32((p.IsPadButtonDown(pi, rl.GamepadButtonLeftFaceDown)))
-		obj.Z -= b2i.Bool2float32((p.IsPadButtonDown(pi, rl.GamepadButtonLeftFaceUp)))
-		obj.X += b2i.Bool2float32((p.IsPadButtonDown(pi, rl.GamepadButtonLeftFaceRight)))
-		obj.X -= b2i.Bool2float32((p.IsPadButtonDown(pi, rl.GamepadButtonLeftFaceLeft)))
-	}
-}
-
-func (runr *Runner) KeyPosXYZ(obj, pos *rl.Vector3) {
-	x, y, z := rl.IsKeyDown(rl.KeyX), rl.IsKeyDown(rl.KeyY), rl.IsKeyDown(rl.KeyZ)
-	up := rl.IsKeyDown(rl.KeyUp) || rl.IsKeyDown(rl.KeyRight)
-	down := rl.IsKeyDown(rl.KeyDown) || rl.IsKeyDown(rl.KeyLeft)
-
-	vecs := []*rl.Vector3{obj, pos}
-	i := b2i.Bool2int(rl.IsKeyDown(rl.KeyLeftShift) || rl.IsKeyDown(rl.KeyRightShift))
-	v := vecs[i]
-
-	const delta = .25
-	v.X -= b2i.Bool2float32(up && x) * delta
-	v.X += b2i.Bool2float32(down && x) * delta
-	v.Y += b2i.Bool2float32(up && y) * delta
-	v.Y -= b2i.Bool2float32(down && y) * delta
-	v.Z -= b2i.Bool2float32(up && z) * delta
-	v.Z += b2i.Bool2float32(down && z) * delta
 }
 
 func (runr *Runner) GetViewPort() rl.RectangleInt32 {
@@ -270,7 +87,7 @@ func (runr *Runner) GetViewPort() rl.RectangleInt32 {
 	return rl.RectangleInt32{
 		X:      leftMargin,
 		Y:      topMargin,
-		Width:  runr.width,
-		Height: runr.height,
+		Width:  runr.Width,
+		Height: runr.Height,
 	}
 }
