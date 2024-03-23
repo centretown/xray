@@ -2,6 +2,7 @@ package tools
 
 import (
 	"fmt"
+	"image/color"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -12,25 +13,17 @@ var _ CanDraw = (*Ball)(nil)
 
 type Ball struct {
 	Radius int32
-	Colors []rl.Color
+	Color  color.RGBA
 	draw   func(x, y int32)
 }
 
-func NewBall(radius int32, colors []rl.Color) *Ball {
+func NewBall(radius int32, col color.RGBA) *Ball {
 	b := &Ball{
 		Radius: radius,
-		Colors: colors,
+		Color:  col,
 	}
 
-	if len(b.Colors) == 0 {
-		b.Colors = append(b.Colors, rl.Lime)
-	}
-
-	if len(b.Colors) < 2 {
-		b.draw = b.drawSolid
-	} else {
-		b.draw = b.drawGradient
-	}
+	b.draw = b.drawSolid
 	return b
 }
 
@@ -58,11 +51,11 @@ func (b *Ball) Draw(x, y int32) {
 	b.draw(x, y)
 }
 
-func (b *Ball) drawGradient(x, y int32) {
-	rl.DrawCircleGradient(x, y, float32(b.Radius),
-		b.Colors[0], b.Colors[1])
-}
+// func (b *Ball) drawGradient(x, y int32) {
+// 	rl.DrawCircleGradient(x, y, float32(b.Radius),
+// 		b.Colors[0], b.Colors[1])
+// }
 
 func (b *Ball) drawSolid(x, y int32) {
-	rl.DrawCircle(x, y, float32(b.Radius), b.Colors[0])
+	rl.DrawCircle(x, y, float32(b.Radius), b.Color)
 }

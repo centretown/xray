@@ -52,10 +52,10 @@ func (runr *Runner) AddBouncingBalls() {
 
 	viewPort := runr.GetViewPort()
 
-	runr.Add(NewBall(60, colors), NewBouncer(viewPort, 60, 60), 0)
-	runr.Add(NewBall(40, colors[6:]), NewBouncer(viewPort, 40, 40), 1)
-	runr.Add(NewBall(30, colors[2:]), NewBouncer(viewPort, 30, 30), 2)
-	runr.Add(NewBall(20, colors[4:]), NewBouncer(viewPort, 20, 20), 3)
+	runr.Add(NewBall(60, colors[0]), NewBouncer(viewPort, 60, 60), 0)
+	runr.Add(NewBall(40, colors[1]), NewBouncer(viewPort, 40, 40), 1)
+	runr.Add(NewBall(30, colors[2]), NewBouncer(viewPort, 30, 30), 2)
+	runr.Add(NewBall(20, colors[3]), NewBouncer(viewPort, 20, 20), 3)
 
 }
 

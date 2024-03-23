@@ -4,8 +4,12 @@ import (
 	"fmt"
 	"image/color"
 	"xray/b2"
+	"xray/capture"
 	"xray/gpads"
 	"xray/tools"
+
+	_ "image/gif"
+	_ "image/png"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -86,7 +90,7 @@ func Run3d(runr *tools.Runner, gpads *gpads.GPads) {
 		}
 
 		gpads.BeginPad()
-		PadPosXYZ(gpads, &cubeV, &camPos)
+		PadPosXYZ(gpads, &cubeV, &camPos, current)
 		// KeyPosXYZ(&cubeV, &camPos)
 
 		camera.Position = camPos
@@ -111,7 +115,9 @@ func Run3d(runr *tools.Runner, gpads *gpads.GPads) {
 	fmt.Println("THREE D.")
 }
 
-func PadPosXYZ(gpad *gpads.GPads, obj, pos *rl.Vector3) {
+var nextTime float64
+
+func PadPosXYZ(gpad *gpads.GPads, obj, pos *rl.Vector3, current float64) {
 	count := gpad.GetStickCount()
 	for pi := range count {
 		x, y := gpad.GetPadAxisMovement(pi, rl.GamepadAxisLeftX),
@@ -131,10 +137,12 @@ func PadPosXYZ(gpad *gpads.GPads, obj, pos *rl.Vector3) {
 		obj.X += b2.To[float32]((gpad.IsPadButtonDown(pi, rl.GamepadButtonLeftFaceRight))) / 4
 		obj.X -= b2.To[float32]((gpad.IsPadButtonDown(pi, rl.GamepadButtonLeftFaceLeft))) / 4
 		home := b2.To[float32](gpad.IsPadButtonUp(pi, rl.GamepadButtonRightFaceLeft))
-		obj.X *= home
-		obj.Y *= home
-		obj.Z *= home
+		obj.X, obj.Y, obj.Z = home*obj.X, home*obj.Y, home*obj.Z
 
+		if current > nextTime && gpad.IsPadButtonDown(pi, rl.GamepadButtonMiddleLeft) {
+			capture.CapturePNG()
+			nextTime = current + .5
+		}
 	}
 }
 
