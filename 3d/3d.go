@@ -140,7 +140,7 @@ func PadPosXYZ(gpad *gpads.GPads, obj, pos *rl.Vector3, current float64) {
 		obj.X, obj.Y, obj.Z = home*obj.X, home*obj.Y, home*obj.Z
 
 		if current > nextTime && gpad.IsPadButtonDown(pi, rl.GamepadButtonMiddleLeft) {
-			capture.CapturePNG()
+			capture.CapturePNG(rl.LoadImageFromScreen().ToImage())
 			nextTime = current + .5
 		}
 	}
