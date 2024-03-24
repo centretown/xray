@@ -85,8 +85,7 @@ func Run2d(runr *tools.Runner) {
 		}
 		rl.EndDrawing()
 
-		pads.BeginPad()
-		PadInput(pads, current)
+		ProcessInput(pads, current)
 	}
 
 	rl.CloseWindow()
@@ -100,7 +99,8 @@ var (
 	scrChan    = make(chan image.Image)
 )
 
-func PadInput(pads *gpads.GPads, current float64) {
+func ProcessInput(pads *gpads.GPads, current float64) {
+	pads.BeginPad()
 	if current > next {
 		next = current + .02
 		if capturing {

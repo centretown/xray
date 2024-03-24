@@ -8,8 +8,6 @@ import (
 	"image/png"
 	"os"
 	"time"
-
-	_ "image/gif"
 )
 
 var fileCounter = 0
@@ -35,6 +33,7 @@ func CapturePNG(img image.Image) {
 
 func CaptureGIF(stop <-chan int, scr <-chan image.Image,
 	colorMap map[color.Color]uint8, pal color.Palette) {
+	fmt.Println("Capturing...")
 
 	var pics = make([]image.Image, 0)
 	for {
@@ -42,8 +41,9 @@ func CaptureGIF(stop <-chan int, scr <-chan image.Image,
 		case pic := <-scr:
 			pics = append(pics, pic)
 		case <-stop:
-			fmt.Println("Writing")
+			fmt.Println("Writing...")
 			WriteGIF(pics, colorMap, pal)
+			fmt.Println("Done.")
 			return
 
 		default:
