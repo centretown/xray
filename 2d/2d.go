@@ -24,11 +24,11 @@ const (
 )
 
 var colorsMap = map[color.Color]uint8{
-	rl.Black:  BLACK,
-	rl.Red:    RED,
-	rl.Yellow: YELLOW,
-	rl.Green:  GREEN,
-	rl.Blue:   BLUE,
+	image.Transparent: BLACK,
+	rl.Red:            RED,
+	rl.Yellow:         YELLOW,
+	rl.Green:          GREEN,
+	rl.Blue:           BLUE,
 }
 
 var colors = []color.RGBA{
@@ -40,7 +40,7 @@ var colors = []color.RGBA{
 }
 
 var pal = color.Palette{
-	rl.Black,
+	image.Transparent,
 	rl.Red,
 	rl.Yellow,
 	rl.Green,
@@ -48,7 +48,7 @@ var pal = color.Palette{
 }
 
 func main() {
-	runr := tools.NewRunner(360, 360, 60)
+	runr := tools.NewRunner(640, 400, 60)
 	viewPort := runr.GetViewPort()
 
 	runr.Add(tools.NewBall(30, colors[RED]), tools.NewBouncer(viewPort, 60, 60), 0)
@@ -133,31 +133,19 @@ func PadInput(pads *gpads.GPads, current float64) {
 }
 
 func Poll(stop <-chan int, scr <-chan image.Image) {
-	var images = make([]*image.Paletted, 0)
-
+	var pics = make([]image.Image, 0)
 	for {
 		select {
 		case pic := <-scr:
-			rect := pic.Bounds()
-			img := image.NewPaletted(rect, pal)
-			// draw.Draw(img, rect, scr, rect.Min, draw.Src)
-			for y := range rect.Max.Y {
-				for x := range rect.Max.X {
-					c := colorsMap[pic.At(x, y)]
-					// if !ok {
-					// 	fmt.Print("X")
-					// }
-					img.SetColorIndex(x, y, c)
-				}
-			}
-			images = append(images, img)
+			pics = append(pics, pic)
 		case <-stop:
 			fmt.Println("Writing")
-			WriteGIF(images)
+			WriteGIF(pics)
 			return
 
 		default:
-			time.Sleep(time.Millisecond)
+			time.Sleep(0)
+			// time.Sleep(time.Millisecond)
 		}
 	}
 
@@ -165,10 +153,23 @@ func Poll(stop <-chan int, scr <-chan image.Image) {
 
 var fileCounter int
 
-func WriteGIF(images []*image.Paletted) {
-	imageCount := len(images)
+func WriteGIF(pics []image.Image) {
+	imageCount := len(pics)
 	if imageCount < 1 {
 		return
+	}
+
+	var images = make([]*image.Paletted, imageCount)
+	rect := pics[0].Bounds()
+
+	for i, pic := range pics {
+		img := image.NewPaletted(rect, pal)
+		for y := range rect.Max.Y {
+			for x := range rect.Max.X {
+				img.SetColorIndex(x, y, colorsMap[pic.At(x, y)])
+			}
+		}
+		images[i] = img
 	}
 
 	fileCounter++
@@ -183,11 +184,9 @@ func WriteGIF(images []*image.Paletted) {
 	delays := make([]int, imageCount)
 	disposals := make([]byte, imageCount)
 	for i := range imageCount {
-		delays[i] = 2
+		delays[i] = 4
 		disposals[i] = gif.DisposalBackground
 	}
-
-	rect := images[0].Bounds()
 
 	opts := &gif.GIF{
 		Image:     images,
