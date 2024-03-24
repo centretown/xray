@@ -116,8 +116,8 @@ func PadInput(pads *gpads.GPads, current float64) {
 		for i := range pads.GetStickCount() {
 			if pads.IsPadButtonDown(i, rl.GamepadButtonMiddleLeft) {
 				capturing = true
-				go capture.CaptureGIF(stopChan, scrChan, colorMap, pal)
 				frameCount = 360
+				go capture.CaptureGIF(stopChan, scrChan, colorMap, pal)
 				return
 			}
 			if pads.IsPadButtonDown(i, rl.GamepadButtonMiddleRight) {

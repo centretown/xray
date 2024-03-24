@@ -7,7 +7,7 @@ eXperiments with go and raylib 2d animation
 ## 3d
 eXperiments with go and raylib 3d
 
-## [b2i and b2](./b2/README.md)
+## [b2test and b2](./b2test/README.md)
 How to write an if statement in go. Notes on branchless go programming.
 
 ## [joystickc](./joystickc/README.md)
