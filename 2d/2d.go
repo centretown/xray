@@ -19,13 +19,13 @@ const (
 	BLUE
 )
 
-var colorMap = map[color.Color]uint8{
-	image.Transparent: BLACK,
-	rl.Red:            RED,
-	rl.Yellow:         YELLOW,
-	rl.Green:          GREEN,
-	rl.Blue:           BLUE,
-}
+// var colorMap = map[color.Color]uint8{
+// 	image.Transparent: BLACK,
+// 	rl.Red:            RED,
+// 	rl.Yellow:         YELLOW,
+// 	rl.Green:          GREEN,
+// 	rl.Blue:           BLUE,
+// }
 
 var colors = []color.RGBA{
 	rl.Black,
@@ -35,13 +35,13 @@ var colors = []color.RGBA{
 	rl.Blue,
 }
 
-var pal = color.Palette{
-	image.Transparent,
-	rl.Red,
-	rl.Yellow,
-	rl.Green,
-	rl.Blue,
-}
+// var pal = color.Palette{
+// 	image.Transparent,
+// 	rl.Red,
+// 	rl.Yellow,
+// 	rl.Green,
+// 	rl.Blue,
+// }
 
 func main() {
 	runr := tools.NewRunner(640, 400, 60)
@@ -117,7 +117,8 @@ func ProcessInput(pads *gpads.GPads, current float64) {
 			if pads.IsPadButtonDown(i, rl.GamepadButtonMiddleLeft) {
 				capturing = true
 				frameCount = 360
-				go capture.CaptureGIF(stopChan, scrChan, colorMap, pal)
+				go capture.CaptureGIF(stopChan, scrChan)
+				// go capture.CaptureGIF(stopChan, scrChan, colorMap, pal)
 				return
 			}
 			if pads.IsPadButtonDown(i, rl.GamepadButtonMiddleRight) {

@@ -1,5 +1,5 @@
 ## gpads
-This controller used the modern Linux `evdev` interface with pure go.
+This controller implements the Linux `evdev` interface with pure go.
 
 Implements [pad](../pad/README.md) interface.
 

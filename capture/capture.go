@@ -8,6 +8,8 @@ import (
 	"image/png"
 	"os"
 	"time"
+
+	"github.com/ericpauley/go-quantize/quantize"
 )
 
 var fileCounter = 0
@@ -31,8 +33,11 @@ func CapturePNG(img image.Image) {
 	png.Encode(w, img)
 }
 
-func CaptureGIF(stop <-chan int, scr <-chan image.Image,
-	colorMap map[color.Color]uint8, pal color.Palette) {
+// func CaptureGIF(stop <-chan int, scr <-chan image.Image,
+// 	colorMap map[color.Color]uint8, pal color.Palette) {
+// 	fmt.Println("Capturing...")
+
+func CaptureGIF(stop <-chan int, scr <-chan image.Image) {
 	fmt.Println("Capturing...")
 
 	var pics = make([]image.Image, 0)
@@ -42,7 +47,7 @@ func CaptureGIF(stop <-chan int, scr <-chan image.Image,
 			pics = append(pics, pic)
 		case <-stop:
 			fmt.Println("Writing...")
-			WriteGIF(pics, colorMap, pal)
+			WriteGIF(pics)
 			fmt.Println("Done.")
 			return
 
@@ -54,20 +59,34 @@ func CaptureGIF(stop <-chan int, scr <-chan image.Image,
 
 }
 
-func WriteGIF(pics []image.Image, colorsMap map[color.Color]uint8, pal color.Palette) {
+func MakePalette(img image.Image) (pal color.Palette, colorMap map[color.Color]uint8) {
+	pal = make(color.Palette, 0, 63)
+	q := quantize.MedianCutQuantizer{}
+	pal = q.Quantize(pal, img)
+	colorMap = make(map[color.Color]uint8)
+	for i, c := range pal {
+		colorMap[c] = uint8(i)
+	}
+	return
+}
+
+func WriteGIF(pics []image.Image) {
 	imageCount := len(pics)
 	if imageCount < 1 {
 		return
 	}
 
 	var images = make([]*image.Paletted, imageCount)
-	rect := pics[0].Bounds()
+	pic := pics[0]
+	rect := pic.Bounds()
+
+	pal, colorMap := MakePalette(pic)
 
 	for i, pic := range pics {
 		img := image.NewPaletted(rect, pal)
 		for y := range rect.Max.Y {
 			for x := range rect.Max.X {
-				img.SetColorIndex(x, y, colorsMap[pic.At(x, y)])
+				img.SetColorIndex(x, y, colorMap[pic.At(x, y)])
 			}
 		}
 		images[i] = img

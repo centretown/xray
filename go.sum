@@ -1,5 +1,7 @@
 github.com/ebitengine/purego v0.6.0-alpha.1.0.20231122024802-192c5e846faa h1:Ik7QikRgeH+bFOfAcMpttCbs6XxWXxCLXMm4awxtOXk=
 github.com/ebitengine/purego v0.6.0-alpha.1.0.20231122024802-192c5e846faa/go.mod h1:ah1In8AOtksoNK6yk5z1HTJeUkC1Ez4Wk2idgGslMwQ=
+github.com/ericpauley/go-quantize v0.0.0-20200331213906-ae555eb2afa4 h1:BBade+JlV/f7JstZ4pitd4tHhpN+w+6I+LyOS7B4fyU=
+github.com/ericpauley/go-quantize v0.0.0-20200331213906-ae555eb2afa4/go.mod h1:H7chHJglrhPPzetLdzBleF8d22WYOv7UM/lEKYiwlKM=
 github.com/gen2brain/raylib-go/raylib v0.0.0-20240227114648-c3665eb9abf8 h1:KdLtsrVX5K+9XmHawsV/ivkHUjS7cP4dWxcYUwfoY4U=
 github.com/gen2brain/raylib-go/raylib v0.0.0-20240227114648-c3665eb9abf8/go.mod h1:P/hDjVwz/9fhR0ww3+umzDpDA7Bf7Tce4xNChHIEFqE=
 github.com/holoplot/go-evdev v0.0.0-20240306072622-217e18f17db1 h1:92OsBIf5KB1Tatx+uUGOhah73jyNUrt7DmfDRXXJ5Xo=
