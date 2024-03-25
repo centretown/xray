@@ -16,41 +16,31 @@ const (
 	RED
 	YELLOW
 	GREEN
+	CYAN
 	BLUE
+	MAGENTA
+	TRANSPARENT
 )
 
-// var colorMap = map[color.Color]uint8{
-// 	image.Transparent: BLACK,
-// 	rl.Red:            RED,
-// 	rl.Yellow:         YELLOW,
-// 	rl.Green:          GREEN,
-// 	rl.Blue:           BLUE,
-// }
-
-var colors = []color.RGBA{
+var pal = color.Palette{
 	rl.Black,
 	rl.Red,
 	rl.Yellow,
 	rl.Green,
+	color.RGBA{R: 0, G: 255, B: 255, A: 0},
 	rl.Blue,
+	rl.Magenta,
+	color.Transparent,
 }
-
-// var pal = color.Palette{
-// 	image.Transparent,
-// 	rl.Red,
-// 	rl.Yellow,
-// 	rl.Green,
-// 	rl.Blue,
-// }
 
 func main() {
 	runr := tools.NewRunner(640, 400, 60)
 	viewPort := runr.GetViewPort()
 
-	runr.Add(tools.NewBall(30, colors[RED]), tools.NewBouncer(viewPort, 30, 30), 0)
-	runr.Add(tools.NewBall(20, colors[YELLOW]), tools.NewBouncer(viewPort, 20, 20), 1)
-	runr.Add(tools.NewBall(15, colors[GREEN]), tools.NewBouncer(viewPort, 15, 15), 2)
-	runr.Add(tools.NewBall(10, colors[BLUE]), tools.NewBouncer(viewPort, 10, 10), 3)
+	runr.Add(tools.NewBall(30, pal[RED]), tools.NewBouncer(viewPort, 30, 30), 0)
+	runr.Add(tools.NewBall(20, pal[YELLOW]), tools.NewBouncer(viewPort, 20, 20), 1)
+	runr.Add(tools.NewBall(15, pal[GREEN]), tools.NewBouncer(viewPort, 15, 15), 2)
+	runr.Add(tools.NewBall(10, pal[BLUE]), tools.NewBouncer(viewPort, 10, 10), 3)
 	Run2d(runr)
 }
 
@@ -85,7 +75,7 @@ func Run2d(runr *tools.Runner) {
 		}
 		rl.EndDrawing()
 
-		ProcessInput(pads, current)
+		ProcessInput(pads, current, .02)
 	}
 
 	rl.CloseWindow()
@@ -99,10 +89,10 @@ var (
 	scrChan    = make(chan image.Image)
 )
 
-func ProcessInput(pads *gpads.GPads, current float64) {
+func ProcessInput(pads *gpads.GPads, current float64, interval float64) {
 	pads.BeginPad()
 	if current > next {
-		next = current + .02
+		next = current + interval
 		if capturing {
 			scrChan <- rl.LoadImageFromScreen().ToImage()
 			frameCount--
@@ -117,7 +107,7 @@ func ProcessInput(pads *gpads.GPads, current float64) {
 			if pads.IsPadButtonDown(i, rl.GamepadButtonMiddleLeft) {
 				capturing = true
 				frameCount = 360
-				go capture.CaptureGIF(stopChan, scrChan)
+				go capture.CaptureGIF(stopChan, scrChan, pal, interval)
 				// go capture.CaptureGIF(stopChan, scrChan, colorMap, pal)
 				return
 			}

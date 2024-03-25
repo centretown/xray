@@ -37,7 +37,7 @@ func CapturePNG(img image.Image) {
 // 	colorMap map[color.Color]uint8, pal color.Palette) {
 // 	fmt.Println("Capturing...")
 
-func CaptureGIF(stop <-chan int, scr <-chan image.Image) {
+func CaptureGIF(stop <-chan int, scr <-chan image.Image, pal color.Palette, interval float64) {
 	fmt.Println("Capturing...")
 
 	var pics = make([]image.Image, 0)
@@ -47,7 +47,7 @@ func CaptureGIF(stop <-chan int, scr <-chan image.Image) {
 			pics = append(pics, pic)
 		case <-stop:
 			fmt.Println("Writing...")
-			WriteGIF(pics)
+			WriteGIF(pics, pal, interval)
 			fmt.Println("Done.")
 			return
 
@@ -70,17 +70,27 @@ func MakePalette(img image.Image) (pal color.Palette, colorMap map[color.Color]u
 	return
 }
 
-func WriteGIF(pics []image.Image) {
+func WriteGIF(pics []image.Image, pal color.Palette, interval float64) {
 	imageCount := len(pics)
 	if imageCount < 1 {
 		return
 	}
 
+	// interval ms
+	// gif delays 10ms
+
+	var delayT int = int(interval * 100)
+	fmt.Println("delayT", delayT)
+
 	var images = make([]*image.Paletted, imageCount)
 	pic := pics[0]
 	rect := pic.Bounds()
 
-	pal, colorMap := MakePalette(pic)
+	// pal, colorMap := MakePalette(pic)
+	colorMap := make(map[color.Color]uint8)
+	for v, c := range pal {
+		colorMap[c] = uint8(v)
+	}
 
 	for i, pic := range pics {
 		img := image.NewPaletted(rect, pal)
@@ -101,7 +111,7 @@ func WriteGIF(pics []image.Image) {
 	delays := make([]int, imageCount)
 	disposals := make([]byte, imageCount)
 	for i := range imageCount {
-		delays[i] = 4
+		delays[i] = delayT
 		disposals[i] = gif.DisposalBackground
 	}
 

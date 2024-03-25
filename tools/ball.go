@@ -17,14 +17,22 @@ type Ball struct {
 	draw   func(x, y int32)
 }
 
-func NewBall(radius int32, col color.RGBA) *Ball {
-	b := &Ball{
-		Radius: radius,
-		Color:  col,
+func NewBall(radius int32, col color.Color) *Ball {
+	r, g, b, a := col.RGBA()
+	var c = color.RGBA{
+		R: uint8(r),
+		G: uint8(g),
+		B: uint8(b),
+		A: uint8(a),
 	}
 
-	b.draw = b.drawSolid
-	return b
+	ball := &Ball{
+		Radius: radius,
+		Color:  c,
+	}
+
+	ball.draw = ball.drawSolid
+	return ball
 }
 
 func (b *Ball) Width() int32 {
