@@ -32,7 +32,7 @@ func NewRunner(width int32, height int32, fps int32) *Runner {
 	return runr
 }
 
-func (runr *Runner) Add(d CanDraw, a CanAnimate, after float64) {
+func (runr *Runner) Add(d CanDraw, a CanMove, after float64) {
 	runr.Actors = append(runr.Actors, NewActor(d, a, after))
 }
 
@@ -60,10 +60,10 @@ func (runr *Runner) AddBouncingBalls() {
 }
 
 func (runr *Runner) Refresh(current float64) {
-	viewPort := runr.GetViewPort()
-	for _, run := range runr.Actors {
-		run.Resize(viewPort, current)
-	}
+	// viewPort := runr.GetViewPort()
+	// for _, run := range runr.Actors {
+	// 	run.Resize(viewPort, current)
+	// }
 }
 
 func (runr *Runner) SetupWindow(title string) {

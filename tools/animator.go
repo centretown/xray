@@ -10,11 +10,11 @@ type CanResize interface {
 }
 
 type CanDraw interface {
-	CanResize
 	Draw(x, y int32)
 }
 
-type CanAnimate interface {
-	Resize(rect rl.RectangleInt32, boundsX, boundsY int32)
+type CanMove interface {
 	Animate(can_move int32, dr CanDraw)
+	Position() (int32, int32)
+	Resize(rect rl.RectangleInt32, boundsX, boundsY int32)
 }

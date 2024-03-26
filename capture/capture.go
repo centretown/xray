@@ -37,7 +37,7 @@ func CapturePNG(img image.Image) {
 // 	colorMap map[color.Color]uint8, pal color.Palette) {
 // 	fmt.Println("Capturing...")
 
-func CaptureGIF(stop <-chan int, scr <-chan image.Image, pal color.Palette, interval float64) {
+func CaptureGIF(stop <-chan int, scr <-chan image.Image, pal color.Palette, interval float64, colorMap map[color.Color]uint8) {
 	fmt.Println("Capturing...")
 
 	var pics = make([]image.Image, 0)
@@ -47,7 +47,7 @@ func CaptureGIF(stop <-chan int, scr <-chan image.Image, pal color.Palette, inte
 			pics = append(pics, pic)
 		case <-stop:
 			fmt.Println("Writing...")
-			WriteGIF(pics, pal, interval)
+			WriteGIF(pics, pal, colorMap, interval)
 			fmt.Println("Done.")
 			return
 
@@ -59,18 +59,19 @@ func CaptureGIF(stop <-chan int, scr <-chan image.Image, pal color.Palette, inte
 
 }
 
-func MakePalette(img image.Image) (pal color.Palette, colorMap map[color.Color]uint8) {
-	pal = make(color.Palette, 0, 63)
+func ExtendPalette(pal color.Palette, img image.Image) color.Palette {
+	newpal := make(color.Palette, 0, 256)
+	newpal = append(newpal, pal...)
 	q := quantize.MedianCutQuantizer{}
-	pal = q.Quantize(pal, img)
-	colorMap = make(map[color.Color]uint8)
-	for i, c := range pal {
-		colorMap[c] = uint8(i)
-	}
-	return
+	newpal = q.Quantize(newpal, img)
+	// colorMap = make(map[color.Color]uint8)
+	// for i, c := range pal {
+	// 	colorMap[c] = uint8(i)
+	// }
+	return newpal
 }
 
-func WriteGIF(pics []image.Image, pal color.Palette, interval float64) {
+func WriteGIF(pics []image.Image, pal color.Palette, colorMap map[color.Color]uint8, interval float64) {
 	imageCount := len(pics)
 	if imageCount < 1 {
 		return
@@ -86,11 +87,7 @@ func WriteGIF(pics []image.Image, pal color.Palette, interval float64) {
 	pic := pics[0]
 	rect := pic.Bounds()
 
-	// pal, colorMap := MakePalette(pic)
-	colorMap := make(map[color.Color]uint8)
-	for v, c := range pal {
-		colorMap[c] = uint8(v)
-	}
+	// extend map
 
 	for i, pic := range pics {
 		img := image.NewPaletted(rect, pal)

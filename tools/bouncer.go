@@ -6,7 +6,7 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-var _ CanAnimate = (*Bouncer)(nil)
+var _ CanMove = (*Bouncer)(nil)
 
 const (
 	max_velocity int32 = 34
@@ -30,6 +30,10 @@ func NewBouncer(rect rl.RectangleInt32, boundsX, boundsY int32) *Bouncer {
 	return anim
 }
 
+func (anim *Bouncer) Position() (int32, int32) {
+	return anim.x, anim.y
+
+}
 func (anim *Bouncer) Resize(rect rl.RectangleInt32, boundsX, boundsY int32) {
 	if boundsX <= 0 || boundsY <= 0 {
 		panic("radius <= 0")
