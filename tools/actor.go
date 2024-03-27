@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"xray/b2"
+	"github/centretown/xray/b2"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )

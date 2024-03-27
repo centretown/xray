@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github/centretown/xray/b2"
+	"github/centretown/xray/capture"
+	"github/centretown/xray/tools"
 	"image/color"
-	"xray/b2"
-	"xray/capture"
-	"xray/tools"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )

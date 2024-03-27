@@ -1,9 +1,9 @@
 package main
 
 import (
-	"xray/b2"
-	"xray/gpads"
+	"github/centretown/xray/b2"
 
+	"github.com/centretown/gpads/gpads"
 	"github.com/holoplot/go-evdev"
 )
 

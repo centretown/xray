@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github/centretown/xray/b2"
+	"github/centretown/xray/capture"
+	"github/centretown/xray/tools"
 	"image/color"
-	"xray/b2"
-	"xray/capture"
-	"xray/gpads"
-	"xray/tools"
+
+	"github.com/centretown/gpads/gpads"
 
 	_ "image/gif"
 	_ "image/png"

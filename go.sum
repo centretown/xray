@@ -1,3 +1,5 @@
+github.com/centretown/gpads v0.0.0-20240327131952-417a4b7df80d h1:t/jnI2Vw74CQgFFWaUJx1LOns4nt5d3yb8sZqvIT1Gw=
+github.com/centretown/gpads v0.0.0-20240327131952-417a4b7df80d/go.mod h1:CuOki+cHwsOu+HmoIfaCSIzwQnd8DM45cHpQDvbsEaI=
 github.com/ebitengine/purego v0.6.0-alpha.1.0.20231122024802-192c5e846faa h1:Ik7QikRgeH+bFOfAcMpttCbs6XxWXxCLXMm4awxtOXk=
 github.com/ebitengine/purego v0.6.0-alpha.1.0.20231122024802-192c5e846faa/go.mod h1:ah1In8AOtksoNK6yk5z1HTJeUkC1Ez4Wk2idgGslMwQ=
 github.com/ericpauley/go-quantize v0.0.0-20200331213906-ae555eb2afa4 h1:BBade+JlV/f7JstZ4pitd4tHhpN+w+6I+LyOS7B4fyU=
