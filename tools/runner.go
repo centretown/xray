@@ -60,10 +60,10 @@ func (runr *Runner) AddBouncingBalls() {
 }
 
 func (runr *Runner) Refresh(current float64) {
-	// viewPort := runr.GetViewPort()
-	// for _, run := range runr.Actors {
-	// 	run.Resize(viewPort, current)
-	// }
+	viewPort := runr.GetViewPort()
+	for _, run := range runr.Actors {
+		run.Resize(viewPort, current)
+	}
 }
 
 func (runr *Runner) SetupWindow(title string) {
@@ -71,6 +71,13 @@ func (runr *Runner) SetupWindow(title string) {
 	rl.InitWindow(runr.Width, runr.Height, title)
 	rl.SetTargetFPS(runr.FPS)
 	rl.SetWindowState(rl.FlagWindowResizable)
+}
+
+func (runr *Runner) GetMessageBox() rl.RectangleInt32 {
+	v := runr.GetViewPort()
+	v.Y = v.Height - 80
+	v.Height -= v.Y
+	return v
 }
 
 func (runr *Runner) GetViewPort() rl.RectangleInt32 {

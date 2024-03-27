@@ -10,6 +10,7 @@ type CanResize interface {
 }
 
 type CanDraw interface {
+	CanResize
 	Draw(x, y int32)
 }
 

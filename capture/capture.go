@@ -59,16 +59,30 @@ func CaptureGIF(stop <-chan int, scr <-chan image.Image, pal color.Palette, inte
 
 }
 
-func ExtendPalette(pal color.Palette, img image.Image) color.Palette {
-	newpal := make(color.Palette, 0, 256)
-	newpal = append(newpal, pal...)
+func ExtendPalette(pal color.Palette, img image.Image) (color.Palette, map[color.Color]uint8) {
+	newPal := make(color.Palette, 0, 64)
+	newPal = append(newPal, pal...)
 	q := quantize.MedianCutQuantizer{}
-	newpal = q.Quantize(newpal, img)
-	// colorMap = make(map[color.Color]uint8)
-	// for i, c := range pal {
-	// 	colorMap[c] = uint8(i)
-	// }
-	return newpal
+	newPal = q.Quantize(newPal, img)
+	colorMap := make(map[color.Color]uint8)
+	for v, c := range newPal {
+		colorMap[c] = uint8(v)
+	}
+
+	paletted := image.NewPaletted(img.Bounds(), newPal)
+	model := paletted.ColorModel()
+	rect := img.Bounds()
+
+	for y := range rect.Max.Y {
+		for x := range rect.Max.X {
+			c := img.At(x, y)
+			cv := model.Convert(c)
+			ix := colorMap[cv]
+			colorMap[c] = ix
+		}
+	}
+
+	return newPal, colorMap
 }
 
 func WriteGIF(pics []image.Image, pal color.Palette, colorMap map[color.Color]uint8, interval float64) {

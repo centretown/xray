@@ -2,6 +2,8 @@ package tools
 
 import (
 	"xray/b2"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type Actor struct {
@@ -26,7 +28,7 @@ func (act *Actor) Animate(can_move int32, current float64) {
 	act.anim.Animate(can_move, act.draw)
 }
 
-// func (act *Actor) Resize(rect rl.RectangleInt32, current float64) {
-// 	act.anim.Resize(rect, act.draw.Width(), act.draw.Height())
-// 	act.next = current + act.after
-// }
+func (act *Actor) Resize(rect rl.RectangleInt32, current float64) {
+	act.anim.Resize(rect, act.draw.Width(), act.draw.Height())
+	act.next = current + act.after
+}

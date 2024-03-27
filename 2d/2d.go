@@ -2,11 +2,9 @@ package main
 
 import (
 	"fmt"
-	"image"
 	"image/color"
 	"xray/b2"
 	"xray/capture"
-	"xray/gpads"
 	"xray/tools"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -23,28 +21,24 @@ const (
 	MAGENTA
 )
 
-var redBall *tools.Ball
-var redBouncer *tools.Bouncer
-
 const (
 	baseInterval = .02
-	screenWidth  = 640
-	screenHeight = 480
-	fps          = 60
+	screenWidth  = 1280
+	screenHeight = 720
+	fps          = 30
 )
 
-func addBalls(runr *tools.Runner, viewPort rl.RectangleInt32, pal color.Palette) {
-	redBall = tools.NewBall(40, pal[RED])
-	redBouncer = tools.NewBouncer(viewPort, 40, 40)
-	runr.Add(tools.NewBall(15, pal[MAGENTA]), tools.NewBouncer(viewPort, 15, 15), 5)
-	runr.Add(tools.NewBall(20, pal[BLUE]), tools.NewBouncer(viewPort, 20, 20), 4)
-	runr.Add(tools.NewBall(25, pal[CYAN]), tools.NewBouncer(viewPort, 25, 25), 3)
-	runr.Add(tools.NewBall(30, pal[GREEN]), tools.NewBouncer(viewPort, 30, 30), 2)
-	runr.Add(tools.NewBall(35, pal[YELLOW]), tools.NewBouncer(viewPort, 35, 35), 1)
-	runr.Add(redBall, redBouncer, 0)
-}
+// var (
+// 	next       float64
+// 	capturing  bool
+// 	paused     bool
+// 	frameCount int
+// 	stopChan   = make(chan int)
+// 	scrChan    = make(chan image.Image)
+// )
 
 func main() {
+
 	var fixedPal = color.Palette{
 		rl.White,
 		rl.Black,
@@ -55,44 +49,42 @@ func main() {
 		rl.Blue,
 		rl.Magenta,
 	}
+
 	runr := tools.NewRunner(screenWidth, screenHeight, fps)
 	runr.SetupWindow("2d")
 	viewPort := runr.GetViewPort()
-	addBalls(runr, viewPort, fixedPal)
 
-	var (
-		current  float64 = rl.GetTime()
-		previous float64 = current
-		interval float64 = float64(rl.GetFrameTime())
-		can_move int32   = 0
-		pads             = gpads.NewGPads()
-	)
+	gs := NewGameState()
 
-	head := rl.LoadTexture("head.png")
-	actor := tools.NewHeadText(head)
-	bouncer := tools.NewBouncer(viewPort, 60, 60)
-	runr.Add(actor, bouncer, 7)
+	AddBouncingBall(runr, 40, rl.Red, 0)
 
-	// pal = capture.ExtendPalette(pal, myface.ToImage())
-	// fmt.Println("pal length", len(pal))
-	// head := tools.NewHeadText(myface)
+	head := rl.LoadTexture("head_90.png")
+	gs.actors = append(gs.actors, tools.NewTextureDrawer(head))
+	bouncer := tools.NewBouncer(viewPort, head.Width, head.Height)
+	runr.Add(gs.actors[0], bouncer, 8)
 
-	runr.Refresh(current)
+	gander := rl.LoadTexture("gander.png")
+	gs.actors = append(gs.actors, tools.NewTextureDrawer(gander))
+	bouncer = tools.NewBouncer(viewPort, gander.Width, gander.Height)
+	runr.Add(gs.actors[1], bouncer, 4)
 
-	pal, colorMap := createPaletteFromTexture(actor, fixedPal)
-	// fmt.Println("Pal", len(pal), pal)
+	runr.Refresh(gs.current)
+
+	gs.pal, gs.colorMap = createPaletteFromTextures(fixedPal, gs.actors...)
 
 	for !rl.WindowShouldClose() {
-		ProcessInput(pads, current, baseInterval, pal, colorMap)
 
-		current = rl.GetTime()
-		bMove := current >= previous+interval
-		can_move = b2.To[int32](bMove)
-		moveFloat := b2.To[float64](bMove)
-		previous = moveFloat*interval + moveFloat*current
+		gs.ProcessInput()
+
+		gs.current = rl.GetTime()
+
+		bMove := gs.current >= gs.previous+gs.interval
+		gs.can_move = b2.To[int32](bMove && !gs.paused)
+		moveFloat := float64(gs.can_move)
+		gs.previous = moveFloat*gs.interval + moveFloat*gs.current
 
 		if rl.IsWindowResized() {
-			runr.Refresh(current)
+			runr.Refresh(gs.current)
 		}
 
 		rl.BeginDrawing()
@@ -100,95 +92,44 @@ func main() {
 		rl.ClearBackground(rl.Black)
 
 		for _, run := range runr.Actors {
-			run.Animate(can_move, current)
+			run.Animate(gs.can_move, gs.current)
 		}
 
-		// NOTE: Using DrawTexturePro() we can easily rotate and scale the part of the texture we draw
-		// sourceRec defines the part of the texture we use for drawing
-		// destRec defines the rectangle where our texture part will fit (scaling it to fit)
-		// origin defines the point of the texture used as reference for rotation and scaling
-		// rotation defines the texture rotation (using origin as rotation point)
-		// DrawTexturePro(scarfy, sourceRec, destRec, origin, (float)rotation, WHITE);
+		mb := runr.GetMessageBox()
+		gs.DrawStatus(runr)
 
-		// x, y := redBouncer.Position()
-		// rl.DrawTexturePro(head, x-20, y-20, rl.White)
-
+		if gs.capturing && bMove {
+			rl.DrawText(fmt.Sprintf("Capturing... %4d", gs.captureCount),
+				mb.X, mb.Y+32, 20, rl.Green)
+		}
 		rl.EndDrawing()
 
+		if gs.capturing && bMove {
+			gs.GIFCapture()
+		}
 	}
 
 	rl.UnloadTexture(head)
 	rl.CloseWindow()
 }
 
-func createPaletteFromTexture(head *tools.HeadText, pal color.Palette) (color.Palette, map[color.Color]uint8) {
+func createPaletteFromTextures(pal color.Palette, heads ...*tools.TextureDrawer) (color.Palette, map[color.Color]uint8) {
 
 	rl.BeginDrawing()
 
 	rl.ClearBackground(rl.Black)
-	head.Draw(0, 0)
+	x := int32(0)
+	for _, head := range heads {
+		rl.DrawTexture(head.Texture2D, x, 0, rl.White)
+		// h.Draw(x, 0)
+		x += head.Width() + 120
+	}
 	rl.EndDrawing()
 
-	img := rl.LoadImageFromScreen()
-	pic := img.ToImage()
-
-	newPal := capture.ExtendPalette(pal, pic)
-	colorMap := make(map[color.Color]uint8)
-	for v, c := range newPal {
-		colorMap[c] = uint8(v)
-	}
-
-	p := image.NewPaletted(pic.Bounds(), newPal)
-	model := p.ColorModel()
-	rect := pic.Bounds()
-	for y := range rect.Max.Y {
-		for x := range rect.Max.X {
-			c := pic.At(x, y)
-			cv := model.Convert(c)
-			ix := colorMap[cv]
-			colorMap[c] = ix
-		}
-	}
-
-	fmt.Println(colorMap)
-	fmt.Println(len(colorMap))
-	return newPal, colorMap
+	pic := rl.LoadImageFromScreen().ToImage()
+	return capture.ExtendPalette(pal, pic)
 }
 
-var (
-	next       float64
-	capturing  bool
-	frameCount int
-	stopChan   = make(chan int)
-	scrChan    = make(chan image.Image)
-)
-
-func ProcessInput(pads *gpads.GPads, current float64, interval float64, pal color.Palette, colorMap map[color.Color]uint8) {
-	pads.BeginPad()
-	if current > next {
-		next = current + interval
-		if capturing {
-			scrChan <- rl.LoadImageFromScreen().ToImage()
-			frameCount--
-			if frameCount < 0 {
-				capturing = false
-				stopChan <- 1
-			}
-			return
-		}
-
-		for i := range pads.GetStickCount() {
-			if pads.IsPadButtonDown(i, rl.GamepadButtonMiddleLeft) {
-				capturing = true
-				frameCount = 720
-				go capture.CaptureGIF(stopChan, scrChan, pal, interval, colorMap)
-				// go capture.CaptureGIF(stopChan, scrChan, colorMap, pal)
-				return
-			}
-			if pads.IsPadButtonDown(i, rl.GamepadButtonMiddleRight) {
-				capture.CapturePNG(rl.LoadImageFromScreen().ToImage())
-				return
-			}
-		}
-	}
+func AddBouncingBall(runr *tools.Runner, radius int32, clr color.RGBA, layer float64) {
+	runr.Add(tools.NewBall(radius, clr), tools.NewBouncer(runr.GetViewPort(), radius, radius), layer)
 }
