@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github/centretown/xray/b2"
+	"github.com/centretown/xray/b2"
 
 	"github.com/centretown/gpads/gpads"
 	"github.com/holoplot/go-evdev"
