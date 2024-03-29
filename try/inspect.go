@@ -1,4 +1,4 @@
-package b2
+package try
 
 import "fmt"
 
@@ -34,18 +34,18 @@ func Inspect() {
 	)
 
 	// INSPECT THIS BLOCK
-	bi = To[int](i > 0)
-	bi8 = To[int8](i8 > 0)
-	bi16 = To[int16](i16 > 0)
-	bi32 = To[int32](i32 > 0)
-	bi64 = To[int64](i64 > 0)
-	bui = To[uint](ui > 0)
-	bui8 = To[uint8](ui8 > 0)
-	bui16 = To[uint16](ui16 > 0)
-	bui32 = To[uint32](ui32 > 0)
-	bui64 = To[uint64](ui64 > 0)
-	bf32 = To[float32](f32 > 0)
-	bf64 = To[float64](f64 > 0)
+	bi = As[int](i > 0)
+	bi8 = As[int8](i8 > 0)
+	bi16 = As[int16](i16 > 0)
+	bi32 = As[int32](i32 > 0)
+	bi64 = As[int64](i64 > 0)
+	bui = As[uint](ui > 0)
+	bui8 = As[uint8](ui8 > 0)
+	bui16 = As[uint16](ui16 > 0)
+	bui32 = As[uint32](ui32 > 0)
+	bui64 = As[uint64](ui64 > 0)
+	bf32 = As[float32](f32 > 0)
+	bf64 = As[float64](f64 > 0)
 	//
 
 	fmt.Printf(""+

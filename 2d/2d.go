@@ -55,27 +55,27 @@ func main() {
 
 	gs := NewGameState(fps)
 
-	hole := tools.NewPicture(rl.LoadTexture("hole.png"), -1)
-	gs.actors = append(gs.actors, hole)
-	bouncer := tools.NewBouncer(hole.Rect(), viewPort, 0, 0)
-	runr.Add(gs.actors[0], bouncer, 6)
+	hole := tools.NewPicture(rl.LoadTexture("polar.png"), 200)
+	gs.textures = append(gs.textures, hole)
+	bouncer := tools.NewBouncer(hole.Rect(), viewPort, 10, 10, 1)
+	runr.Add(gs.textures[0], bouncer, 6)
 
-	ball := tools.NewBall(40, rl.Green)
-	bouncer = tools.NewBouncer(ball.Rect(), viewPort, 50, 200)
+	ball := tools.NewBall(20, rl.Green)
+	bouncer = tools.NewBouncer(ball.Rect(), viewPort, 200, 100, 0)
 	runr.Add(ball, bouncer, 1)
 
 	head := tools.NewPicture(rl.LoadTexture("head_90.png"), 10)
-	gs.actors = append(gs.actors, head)
-	bouncer = tools.NewBouncer(head.Rect(), viewPort, 240, 240)
-	runr.Add(gs.actors[1], bouncer, 8)
+	gs.textures = append(gs.textures, head)
+	bouncer = tools.NewBouncer(head.Rect(), viewPort, 240, 240, 5)
+	runr.Add(gs.textures[1], bouncer, 8)
 
 	gander := tools.NewPicture(rl.LoadTexture("gander.png"), 2)
-	gs.actors = append(gs.actors, gander)
-	bouncer = tools.NewBouncer(gander.Rect(), viewPort, 66, 66)
-	runr.Add(gs.actors[2], bouncer, 4)
+	gs.textures = append(gs.textures, gander)
+	bouncer = tools.NewBouncer(gander.Rect(), viewPort, 666, 666, 3)
+	runr.Add(gs.textures[2], bouncer, 4)
 
 	// generate palette and color map for paletted images
-	gs.pal, gs.colorMap = createPaletteFromTextures(fixedPal, gs.actors...)
+	gs.pal, gs.colorMap = createPaletteFromTextures(fixedPal, gs.textures...)
 	// time.Sleep(time.Second * 2)
 
 	rl.SetTargetFPS(gs.fps)
@@ -83,11 +83,18 @@ func main() {
 	gs.Dump()
 
 	defer func() {
-		for i := range gs.actors {
-			rl.UnloadTexture(gs.actors[i].Texture2D)
+		for i := range gs.textures {
+			rl.UnloadTexture(gs.textures[i].Texture2D)
 		}
 		rl.CloseWindow()
 	}()
+
+	loop(runr, gs)
+}
+
+var BG = color.RGBA{R: 15, G: 0, B: 0, A: 255}
+
+func loop(runr *tools.Runner, gs *Game) {
 
 	for !rl.WindowShouldClose() {
 
@@ -99,7 +106,7 @@ func main() {
 
 		rl.BeginDrawing()
 
-		rl.ClearBackground(rl.Black)
+		rl.ClearBackground(BG)
 
 		for _, run := range runr.Actors {
 			run.Animate(!gs.paused, gs.current)

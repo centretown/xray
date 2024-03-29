@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"github.com/centretown/xray/b2"
+	"github.com/centretown/xray/try"
 )
 
 type Axis struct {
@@ -27,14 +27,14 @@ func (ax *Axis) Refresh(max int32, now float64) {
 func (ax *Axis) Next(current, rate float64) {
 	delta := current - ax.LastTime
 	deltaPos := int32(delta * rate)
-	ax.LastTime += delta * b2.To[float64](deltaPos != 0)
+	ax.LastTime += delta * try.As[float64](deltaPos != 0)
 
 	newPos := ax.Position + deltaPos*ax.Direction
 
 	less := newPos < 0
 	more := newPos >= ax.Max
 	outside := less || more
-	ax.Direction *= b2.To[int32](!outside) - b2.To[int32](outside)
+	ax.Direction *= try.As[int32](!outside) - try.As[int32](outside)
 	// fmt.Print(ax.Direction)
 
 	// if more {
@@ -47,7 +47,7 @@ func (ax *Axis) Next(current, rate float64) {
 	// 	ax.Position = newPos
 	// }
 
-	ax.Position = b2.To[int32](more)*(ax.Max-deltaPos) +
-		b2.To[int32](less)*-deltaPos +
-		b2.To[int32](!less && !more)*newPos
+	ax.Position = try.As[int32](more)*(ax.Max-deltaPos) +
+		try.As[int32](less)*deltaPos +
+		try.As[int32](!less && !more)*newPos
 }

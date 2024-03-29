@@ -5,17 +5,17 @@ import (
 	"image"
 	"image/color"
 
-	"github.com/centretown/xray/b2"
 	"github.com/centretown/xray/capture"
 	"github.com/centretown/xray/tools"
+	"github.com/centretown/xray/try"
 
 	"github.com/centretown/gpads/gpads"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-type GameState struct {
-	next         float64
+type Game struct {
+	nextInput    float64
 	capturing    bool
 	paused       bool
 	captureDelay int
@@ -29,28 +29,20 @@ type GameState struct {
 	scrChan  chan image.Image
 
 	current  float64
-	previous float64
-	interval float64
-	base     float64
-	can_move int32
 	pads     *gpads.GPads
-	actors   []*tools.Picture
+	textures []*tools.Picture
 	pal      color.Palette
 	colorMap map[color.Color]uint8
 	fps      int32
 }
 
-func NewGameState(fps int32) *GameState {
-	gs := &GameState{
+func NewGameState(fps int32) *Game {
+	gs := &Game{
 		stopChan:        make(chan int),
 		scrChan:         make(chan image.Image),
 		current:         rl.GetTime(),
-		previous:        rl.GetTime(),
-		interval:        float64(rl.GetFrameTime() * 2),
-		base:            baseInterval,
-		can_move:        0,
 		pads:            gpads.NewGPads(),
-		actors:          make([]*tools.Picture, 0),
+		textures:        make([]*tools.Picture, 0),
 		captureStart:    100,
 		captureDelay:    4,
 		captureInterval: float64(rl.GetFrameTime()) * 2,
@@ -71,18 +63,18 @@ const (
 	PAD_STATE_COUNT
 )
 
-func (gs *GameState) CanCapture() bool {
+func (gs *Game) CanCapture() bool {
 	canCapture := gs.current >= gs.previousCapture+gs.captureInterval
-	moveFloat := b2.To[float64](canCapture)
+	moveFloat := try.As[float64](canCapture)
 	gs.previousCapture = moveFloat*gs.captureInterval + moveFloat*gs.current
 	return canCapture
 }
 
-func (gs *GameState) ProcessInput() {
+func (gs *Game) ProcessInput() {
 	gs.pads.BeginPad()
 
-	if gs.current > gs.next {
-		gs.next = gs.current + .2
+	if gs.current > gs.nextInput {
+		gs.nextInput = gs.current + .2
 		var state [PAD_STATE_COUNT]bool
 
 		for i := range gs.pads.GetStickCount() {
@@ -128,12 +120,12 @@ func (gs *GameState) ProcessInput() {
 			}
 
 			if state[CAPTURE_COUNT_INC] {
-				inc := 1 + 9*b2.To[int](state[TIMES_TEN])
+				inc := 1 + 9*try.As[int](state[TIMES_TEN])
 				gs.captureStart += inc
 			}
 
 			if state[CAPTURE_COUNT_DEC] {
-				dec := 1 + 9*b2.To[int](state[TIMES_TEN])
+				dec := 1 + 9*try.As[int](state[TIMES_TEN])
 				if gs.captureStart-dec > 1 {
 					gs.captureStart -= dec
 				} else {
@@ -145,7 +137,7 @@ func (gs *GameState) ProcessInput() {
 	}
 }
 
-func (gs *GameState) BeginGIFCapture() {
+func (gs *Game) BeginGIFCapture() {
 	if gs.capturing {
 		fmt.Println("already capturing...")
 		return
@@ -156,7 +148,7 @@ func (gs *GameState) BeginGIFCapture() {
 		gs.captureDelay, gs.colorMap)
 }
 
-func (gs *GameState) GIFCapture() {
+func (gs *Game) GIFCapture() {
 	if !gs.capturing {
 		fmt.Println("not supposed to capture")
 		return
@@ -169,7 +161,7 @@ func (gs *GameState) GIFCapture() {
 	}
 }
 
-func (gs *GameState) EndGIFCapture() {
+func (gs *Game) EndGIFCapture() {
 	if !gs.capturing {
 		fmt.Println("nothing to end. not capturing!")
 		return
@@ -180,11 +172,15 @@ func (gs *GameState) EndGIFCapture() {
 	gs.stopChan <- 1
 }
 
-func (gs *GameState) DrawStatus(runr *tools.Runner) {
+func (gs *Game) DrawStatus(runr *tools.Runner) {
 	mb := runr.GetMessageBox()
 	rl.DrawLine(mb.X, mb.Y, mb.Width, mb.Y, rl.Red)
 
-	text := fmt.Sprintf("FPS:%3d, Capture Count:%4d",
+	monitor := rl.GetCurrentMonitor()
+
+	text := fmt.Sprintf("Monitor:%1d (%4d/%4d %3d), FPS:%3d, Capture Count:%4d",
+		monitor, rl.GetMonitorWidth(monitor),
+		rl.GetMonitorHeight(monitor), rl.GetMonitorRefreshRate(monitor),
 		rl.GetFPS(), gs.captureStart)
 	rl.DrawText(text, mb.X, mb.Y+mb.Height-22, 20, rl.Green)
 
@@ -194,11 +190,5 @@ func (gs *GameState) DrawStatus(runr *tools.Runner) {
 	}
 }
 
-func (gs *GameState) Dump() {
-	fmt.Printf("current=%f previous=%f interval=%f base=%f can_move=%d\n",
-		gs.current,
-		gs.previous,
-		gs.interval,
-		gs.base,
-		gs.can_move)
+func (gs *Game) Dump() {
 }

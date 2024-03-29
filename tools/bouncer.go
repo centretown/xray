@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"github.com/centretown/xray/b2"
+	"github.com/centretown/xray/try"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -17,20 +17,23 @@ type Bouncer struct {
 	source rl.RectangleInt32
 	bounds rl.RectangleInt32
 
-	pixelRateY float64 // pixels per second
-	pixelRateX float64
-	xAxis      *Axis
-	yAxis      *Axis
+	pixelRateY   float64 // pixels per second
+	pixelRateX   float64
+	rotation     float32
+	rotationRate float32
+	xAxis        *Axis
+	yAxis        *Axis
 }
 
 func NewBouncer(source, bounds rl.RectangleInt32,
-	pixelRateX, pixelRateY float64) *Bouncer {
+	pixelRateX, pixelRateY float64, rotation float32) *Bouncer {
 
 	bc := &Bouncer{
-		source:     source,
-		bounds:     bounds,
-		pixelRateX: pixelRateX,
-		pixelRateY: pixelRateY,
+		source:       source,
+		bounds:       bounds,
+		pixelRateX:   pixelRateX,
+		pixelRateY:   pixelRateY,
+		rotationRate: rotation,
 	}
 
 	bc.adjustBounds()
@@ -65,12 +68,15 @@ func (bc *Bouncer) Refresh(current float64, bounds rl.RectangleInt32) {
 
 func (bc *Bouncer) Draw(can_move bool, current float64, dr Drawable) {
 	x, y := bc.xAxis, bc.yAxis
-	dr.Draw(bc.bounds.X+x.Position, bc.bounds.Y+y.Position)
+	dr.Draw(rl.Vector3{X: float32(bc.bounds.X + x.Position),
+		Y: float32(bc.bounds.Y + y.Position),
+		Z: float32(bc.rotation)})
 
-	m := b2.To[float64](can_move)
+	m := try.As[float64](can_move)
 	x.Next(current, bc.pixelRateX*m)
 	// gRateY := float64(bc.bounds.Y) + bc.pixelRateY*
 	// 	(float64(y.Position)/
 	// 		(float64(y.Max)/2))
 	y.Next(current, bc.pixelRateY*m)
+	bc.rotation += bc.rotationRate
 }

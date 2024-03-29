@@ -41,6 +41,7 @@ func (b *Ball) Rect() rl.RectangleInt32 {
 	}
 }
 
-func (b *Ball) Draw(x, y int32) {
+func (b *Ball) Draw(v rl.Vector3) {
+	x, y := int32(v.X), int32(v.Y)
 	rl.DrawCircle(x, y, float32(b.Radius), b.Color)
 }

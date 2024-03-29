@@ -3,7 +3,7 @@ package tools
 import rl "github.com/gen2brain/raylib-go/raylib"
 
 type Drawable interface {
-	Draw(x, y int32)
+	Draw(rl.Vector3)
 	Rect() rl.RectangleInt32
 }
 

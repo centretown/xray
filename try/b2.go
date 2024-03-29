@@ -1,4 +1,4 @@
-package b2
+package try
 
 // The compiler currently only optimizes this form.
 //
@@ -14,7 +14,7 @@ package b2
 // use for branch free conditional
 // hopefully this gets inlined (so far it does)
 
-func To[T int | uint | int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 | uint64 | float32 | float64](b bool) T {
+func As[T int | uint | int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 | uint64 | float32 | float64](b bool) T {
 	var i int
 	if b {
 		i = 1
