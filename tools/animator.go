@@ -2,20 +2,14 @@ package tools
 
 import rl "github.com/gen2brain/raylib-go/raylib"
 
-type CanResize interface {
-	Resize(w, h int32)
-	MinSize() (w, h int32)
-	Width() int32
-	Height() int32
-}
-
-type CanDraw interface {
-	CanResize
+type Drawable interface {
 	Draw(x, y int32)
+	Rect() rl.RectangleInt32
 }
 
-type CanMove interface {
-	Animate(can_move int32, dr CanDraw)
-	Position() (int32, int32)
-	Resize(rect rl.RectangleInt32, boundsX, boundsY int32)
+type Moveable interface {
+	Draw(can_move bool, current float64, dr Drawable)
+	Refresh(current float64, rect rl.RectangleInt32)
+	// SetPixelRate(float64, float64)
+	// GetPixelRate() (float64, float64)
 }

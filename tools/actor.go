@@ -1,19 +1,17 @@
 package tools
 
 import (
-	"github.com/centretown/xray/b2"
-
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type Actor struct {
-	draw  CanDraw
-	anim  CanMove
+	draw  Drawable
+	anim  Moveable
 	next  float64
 	after float64
 }
 
-func NewActor(draw CanDraw, anim CanMove, after float64) *Actor {
+func NewActor(draw Drawable, anim Moveable, after float64) *Actor {
 	act := &Actor{
 		draw:  draw,
 		anim:  anim,
@@ -23,12 +21,11 @@ func NewActor(draw CanDraw, anim CanMove, after float64) *Actor {
 	return act
 }
 
-func (act *Actor) Animate(can_move int32, current float64) {
-	can_move = can_move * b2.ToInt32(current >= act.next)
-	act.anim.Animate(can_move, act.draw)
+func (act *Actor) Animate(can_move bool, current float64) {
+	act.anim.Draw(can_move, current, act.draw)
 }
 
 func (act *Actor) Resize(rect rl.RectangleInt32, current float64) {
-	act.anim.Resize(rect, act.draw.Width(), act.draw.Height())
+	act.anim.Refresh(current, rect)
 	act.next = current + act.after
 }

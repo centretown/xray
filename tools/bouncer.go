@@ -2,74 +2,75 @@ package tools
 
 import (
 	"github.com/centretown/xray/b2"
-
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-var _ CanMove = (*Bouncer)(nil)
+var _ Moveable = (*Bouncer)(nil)
 
 const (
-	max_velocity int32 = 34
-	min_velocity int32 = 0
-	vrange       int32 = max_velocity - min_velocity
+	XAxis int = iota
+	YAxis
+	ZAxis
 )
 
 type Bouncer struct {
-	rect             rl.RectangleInt32
-	boundsX, boundsY int32
-	color_index      int32
-	x_max, y_max     int32
-	velocity         int32
-	dx, dy           int32
-	x, y             int32
+	source rl.RectangleInt32
+	bounds rl.RectangleInt32
+
+	pixelRateY float64 // pixels per second
+	pixelRateX float64
+	xAxis      *Axis
+	yAxis      *Axis
 }
 
-func NewBouncer(rect rl.RectangleInt32, boundsX, boundsY int32) *Bouncer {
-	anim := &Bouncer{}
-	anim.Resize(rect, boundsX, boundsY)
-	return anim
-}
+func NewBouncer(source, bounds rl.RectangleInt32,
+	pixelRateX, pixelRateY float64) *Bouncer {
 
-func (anim *Bouncer) Position() (int32, int32) {
-	return anim.x, anim.y
-
-}
-func (anim *Bouncer) Resize(rect rl.RectangleInt32, boundsX, boundsY int32) {
-	if boundsX <= 0 || boundsY <= 0 {
-		panic("radius <= 0")
+	bc := &Bouncer{
+		source:     source,
+		bounds:     bounds,
+		pixelRateX: pixelRateX,
+		pixelRateY: pixelRateY,
 	}
-	if rect.Width <= boundsX {
-		panic("ball width <= 0")
-	}
-	if rect.Height <= boundsY {
-		panic("ball height <= 0")
-	}
-	anim.rect = rect
-	anim.boundsX = boundsX
-	anim.boundsY = boundsY
-	anim.x_max = rect.Width - boundsX
-	anim.y_max = rect.Height - boundsY
-	anim.x = boundsX
-	anim.y = boundsY
-	anim.dx = 2
-	anim.dy = 1
-	anim.velocity = 1
+
+	bc.adjustBounds()
+
+	bc.xAxis = NewAxis(bc.bounds.Width, rl.GetTime())
+	bc.yAxis = NewAxis(bc.bounds.Height, rl.GetTime())
+	return bc
 }
 
-func (anim *Bouncer) Animate(can_move int32, dr CanDraw) {
-	dr.Draw(anim.rect.X+anim.x, anim.rect.Y+anim.y)
+func (bc *Bouncer) adjustBounds() {
+	bc.bounds.X += bc.source.Width / 2
+	bc.bounds.Y += bc.source.Height / 2
+	bc.bounds.Width -= bc.source.Width
+	bc.bounds.Height -= bc.source.Height
+}
 
-	nextX := anim.x + anim.dx
-	nextY := anim.y + anim.dy
+func (bc *Bouncer) SetPixelRate(pixelRateX, pixelRateY float64) {
+	bc.pixelRateY = pixelRateY
+	bc.pixelRateX = pixelRateX
+}
 
-	reverse_x := (nextX >= anim.x_max) || (nextX < anim.boundsX)
-	reverse_y := (nextY >= anim.y_max) || (nextY < anim.boundsY)
+func (bc *Bouncer) GetPixelRate() (float64, float64) {
+	return bc.pixelRateX, bc.pixelRateY
+}
 
-	anim.dx *= b2.ToInt32(!reverse_x) - b2.ToInt32(reverse_x)
-	anim.dy *= b2.ToInt32(!reverse_y) - b2.ToInt32(reverse_y)
+func (bc *Bouncer) Refresh(current float64, bounds rl.RectangleInt32) {
+	bc.bounds = bounds
+	bc.adjustBounds()
+	bc.xAxis.Refresh(bounds.Width-bc.source.Width, current)
+	bc.yAxis.Refresh(bounds.Height-bc.source.Height, current)
+}
 
-	anim.x += anim.dx * can_move
-	anim.y += anim.dy * anim.velocity * can_move
-	anim.velocity = anim.y * vrange / anim.rect.Height
+func (bc *Bouncer) Draw(can_move bool, current float64, dr Drawable) {
+	x, y := bc.xAxis, bc.yAxis
+	dr.Draw(bc.bounds.X+x.Position, bc.bounds.Y+y.Position)
 
+	m := b2.To[float64](can_move)
+	x.Next(current, bc.pixelRateX*m)
+	// gRateY := float64(bc.bounds.Y) + bc.pixelRateY*
+	// 	(float64(y.Position)/
+	// 		(float64(y.Max)/2))
+	y.Next(current, bc.pixelRateY*m)
 }

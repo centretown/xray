@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	runr := tools.NewRunner(1280, 720, 120)
+	runr := tools.NewRunner(1280, 720)
 	gpads := gpads.NewGPads()
 	Run3d(runr, gpads)
 }
@@ -108,7 +108,7 @@ func Run3d(runr *tools.Runner, gpads *gpads.GPads) {
 
 		rl.DrawCircle(100, 100, 25, rl.Red)
 		for _, run := range runr.Actors {
-			run.Animate(can_move, current)
+			run.Animate(true, current)
 		}
 		rl.EndDrawing()
 
