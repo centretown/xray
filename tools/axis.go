@@ -35,7 +35,7 @@ func (ax *Axis) Refresh(now float64, position, max int32) {
 	ax.position = position
 }
 
-func (ax *Axis) Next(current, rate float64) {
+func (ax *Axis) Next(current, rate float64) int32 {
 	var (
 		delta    = current - ax.LastTime
 		deltaPos = int32(delta * rate)
@@ -50,4 +50,5 @@ func (ax *Axis) Next(current, rate float64) {
 	ax.position = try.As[int32](more)*(ax.Max-deltaPos) +
 		try.As[int32](less)*deltaPos +
 		try.As[int32](!outside)*newPos
+	return ax.position
 }

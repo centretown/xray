@@ -64,9 +64,9 @@ func main() {
 	bouncer = tools.NewBouncer(ball.Rect(), viewPort, 200, 100, 0)
 	run.Add(ball, bouncer, 1)
 
-	head := tools.NewPicture(rl.LoadTexture("head_90.png"))
+	head := tools.NewPicture(rl.LoadTexture("head.png"))
 	gs.textures = append(gs.textures, head)
-	bouncer = tools.NewBouncer(head.Rect(), viewPort, 240, 240, 2.75)
+	bouncer = tools.NewBouncer(head.Rect(), viewPort, 70, 140, 1.75)
 	run.Add(gs.textures[1], bouncer, 8)
 
 	gander := tools.NewPicture(rl.LoadTexture("gander.png"))
@@ -117,6 +117,10 @@ func loop(run *tools.Runner, gs *Game) {
 		rl.EndDrawing()
 
 		gs.ProcessInput()
+
+		if gs.capturing {
+			gs.GIFCapture()
+		}
 	}
 }
 
@@ -124,7 +128,7 @@ func createPaletteFromTextures(pal color.Palette, heads ...*tools.Picture) (colo
 
 	rl.BeginDrawing()
 
-	rl.ClearBackground(rl.Black)
+	rl.ClearBackground(BG)
 	x := int32(0)
 
 	for _, head := range heads {

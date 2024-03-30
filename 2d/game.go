@@ -76,60 +76,59 @@ func mul10[T int | int32](m bool) T {
 
 func (gs *Game) ProcessInput() {
 	gs.pads.BeginPad()
-
 	if gs.current > gs.nextInput {
 		gs.nextInput = gs.current + .2
-
 		for i := range gs.pads.GetStickCount() {
-			var mul bool
-			for b := range PAD_STATE_COUNT {
-				switch b {
-				case TIMES_TEN:
-					mul = gs.pads.IsPadButtonDown(i, rl.GamepadButtonLeftTrigger1)
-				case FPS_INC:
-					if gs.pads.IsPadButtonDown(i, rl.GamepadButtonLeftFaceUp) {
-						gs.fps += mul10[int32](mul)
-						rl.SetTargetFPS(gs.fps)
-					}
-				case FPS_DEC:
-					if gs.pads.IsPadButtonDown(i, rl.GamepadButtonLeftFaceDown) {
-						gs.fps -= mul10[int32](mul)
-						if gs.fps < 5 {
-							gs.fps = 5
-						}
-						rl.SetTargetFPS(gs.fps)
-					}
-				case CAPTURE_COUNT_INC:
-					if gs.pads.IsPadButtonDown(i, rl.GamepadButtonRightFaceUp) {
-						gs.captureStart += mul10[int](mul)
-					}
-				case CAPTURE_COUNT_DEC:
-					if gs.pads.IsPadButtonDown(i, rl.GamepadButtonRightFaceDown) {
-						gs.captureStart -= mul10[int](mul)
-						if gs.captureStart < 1 {
-							gs.captureStart = 1
-						}
-					}
+			gs.CheckPad(i)
+		}
+	}
+}
 
-				case CAPTURE_GIF:
-					if gs.pads.IsPadButtonDown(i, rl.GamepadButtonMiddleLeft) {
-						if gs.capturing {
-							gs.EndGIFCapture()
-						} else {
-							gs.BeginGIFCapture()
-						}
-					}
-
-				case CAPTURE_PNG:
-					if gs.pads.IsPadButtonDown(i, rl.GamepadButtonMiddleRight) {
-						capture.CapturePNG(rl.LoadImageFromScreen().ToImage())
-					}
-
-				case PAUSED:
-					if gs.pads.IsPadButtonDown(i, rl.GamepadButtonRightFaceLeft) {
-						gs.paused = !gs.paused
-					}
+func (gs *Game) CheckPad(i int) {
+	var mul bool
+	for b := range PAD_STATE_COUNT {
+		switch b {
+		case TIMES_TEN:
+			mul = gs.pads.IsPadButtonDown(i, rl.GamepadButtonLeftTrigger1)
+		case FPS_INC:
+			if gs.pads.IsPadButtonDown(i, rl.GamepadButtonLeftFaceUp) {
+				gs.fps += mul10[int32](mul)
+				rl.SetTargetFPS(gs.fps)
+			}
+		case FPS_DEC:
+			if gs.pads.IsPadButtonDown(i, rl.GamepadButtonLeftFaceDown) {
+				gs.fps -= mul10[int32](mul)
+				if gs.fps < 5 {
+					gs.fps = 5
 				}
+				rl.SetTargetFPS(gs.fps)
+			}
+		case CAPTURE_COUNT_INC:
+			if gs.pads.IsPadButtonDown(i, rl.GamepadButtonRightFaceUp) {
+				gs.captureStart += mul10[int](mul)
+			}
+		case CAPTURE_COUNT_DEC:
+			if gs.pads.IsPadButtonDown(i, rl.GamepadButtonRightFaceDown) {
+				gs.captureStart -= mul10[int](mul)
+				if gs.captureStart < 1 {
+					gs.captureStart = 1
+				}
+			}
+		case CAPTURE_GIF:
+			if gs.pads.IsPadButtonDown(i, rl.GamepadButtonMiddleLeft) {
+				if gs.capturing {
+					gs.EndGIFCapture()
+				} else {
+					gs.BeginGIFCapture()
+				}
+			}
+		case CAPTURE_PNG:
+			if gs.pads.IsPadButtonDown(i, rl.GamepadButtonMiddleRight) {
+				capture.CapturePNG(rl.LoadImageFromScreen().ToImage())
+			}
+		case PAUSED:
+			if gs.pads.IsPadButtonDown(i, rl.GamepadButtonRightFaceLeft) {
+				gs.paused = !gs.paused
 			}
 		}
 	}

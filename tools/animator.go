@@ -3,8 +3,8 @@ package tools
 import rl "github.com/gen2brain/raylib-go/raylib"
 
 type Drawable interface {
-	Draw(rl.Vector3)
 	Rect() rl.RectangleInt32
+	Draw(rl.Vector3)
 }
 
 type Moveable interface {
@@ -13,10 +13,8 @@ type Moveable interface {
 }
 
 type Action interface {
-	// SetPixelRate(float64, float64)
-	// GetPixelRate() (float64, float64)
-	Refresh(now float64, position, max int32)
-	Next(current, rate float64)
 	Position() int32
 	Direction() int32
+	Next(current, rate float64) (position int32)
+	Refresh(now float64, position, max int32)
 }

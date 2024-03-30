@@ -76,10 +76,9 @@ func (bc *Bouncer) Draw(can_move bool, now float64, dr Drawable) {
 		Z: float32(bc.rotation)})
 
 	m := try.As[float64](can_move)
-	p := x.Position()
-	x.Next(now, bc.pixelRateX*m)
 	y.Next(now, bc.pixelRateY*m)
 
-	p -= x.Position()
+	p := x.Position()
+	p -= x.Next(now, bc.pixelRateX*m)
 	bc.rotation += bc.rotationRate * float32(p)
 }
