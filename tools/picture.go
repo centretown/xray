@@ -10,30 +10,27 @@ var _ Drawable = (*Picture)(nil)
 
 type Picture struct {
 	rl.Texture2D
-	// Rotation int
-	// lastX    int32
 }
 
-func NewPicture(texture rl.Texture2D, rotation int) *Picture {
-	text := &Picture{
+func NewPicture(texture rl.Texture2D) *Picture {
+	pic := &Picture{
 		Texture2D: texture,
-		// Rotation:  rotation,
 	}
-	return text
+	return pic
 }
 
-func (td *Picture) Draw(v rl.Vector3) {
+func (pic *Picture) Draw(v rl.Vector3) {
 	x, y, rotation := v.X, v.Y, v.Z
-	width, height := float32(td.Texture2D.Width), float32(td.Texture2D.Height)
+	width, height := float32(pic.Texture2D.Width), float32(pic.Texture2D.Height)
 	srcRec := rl.Rectangle{X: 0, Y: 0, Width: width, Height: height}
 	destRec := rl.Rectangle{X: x, Y: y, Width: width, Height: height}
 	origin := rl.Vector2{X: width / 2, Y: height / 2}
 
-	rl.DrawTexturePro(td.Texture2D, srcRec, destRec, origin,
+	rl.DrawTexturePro(pic.Texture2D, srcRec, destRec, origin,
 		rotation, color.RGBA{255, 255, 255, 255})
 }
 
-func (td *Picture) Rect() rl.RectangleInt32 {
+func (pic *Picture) Rect() rl.RectangleInt32 {
 	return rl.RectangleInt32{X: 0, Y: 0,
-		Width: td.Texture2D.Width, Height: td.Texture2D.Width}
+		Width: pic.Texture2D.Width, Height: pic.Texture2D.Width}
 }

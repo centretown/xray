@@ -84,7 +84,7 @@ func Run3d(runr *tools.Runner, gpads *gpads.GPads) {
 
 	for !rl.WindowShouldClose() {
 		current = rl.GetTime()
-		can_move = try.ToInt32(current > previous+interval)
+		can_move = try.As[int32](current > previous+interval)
 		previous = float64(can_move) * interval
 
 		if rl.IsWindowResized() {
@@ -154,7 +154,7 @@ func KeyPosXYZ(obj, pos *rl.Vector3) {
 	down := rl.IsKeyDown(rl.KeyDown) || rl.IsKeyDown(rl.KeyLeft)
 
 	vecs := []*rl.Vector3{obj, pos}
-	i := try.ToInt(rl.IsKeyDown(rl.KeyLeftShift) || rl.IsKeyDown(rl.KeyRightShift))
+	i := try.As[int](rl.IsKeyDown(rl.KeyLeftShift) || rl.IsKeyDown(rl.KeyRightShift))
 	v := vecs[i]
 
 	const delta = .25

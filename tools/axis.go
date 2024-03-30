@@ -4,50 +4,50 @@ import (
 	"github.com/centretown/xray/try"
 )
 
+var _ Action = (*Axis)(nil)
+
 type Axis struct {
 	LastTime  float64 // seconds
 	Max       int32
-	Position  int32
-	Direction int32
+	position  int32
+	direction int32
 }
 
 func NewAxis(max int32, now float64) *Axis {
 	return &Axis{
 		Max:       max,
 		LastTime:  now,
-		Direction: 1,
+		direction: 1,
 	}
 }
 
-func (ax *Axis) Refresh(max int32, now float64) {
+func (ax *Axis) Position() int32 {
+	return ax.position
+}
+
+func (ax *Axis) Direction() int32 {
+	return ax.direction
+}
+
+func (ax *Axis) Refresh(now float64, position, max int32) {
 	ax.Max = max
 	ax.LastTime = now
+	ax.position = position
 }
 
 func (ax *Axis) Next(current, rate float64) {
-	delta := current - ax.LastTime
-	deltaPos := int32(delta * rate)
+	var (
+		delta    = current - ax.LastTime
+		deltaPos = int32(delta * rate)
+		newPos   = ax.position + deltaPos*ax.direction
+		less     = newPos < 0
+		more     = newPos >= ax.Max
+		outside  = less || more
+	)
+
 	ax.LastTime += delta * try.As[float64](deltaPos != 0)
-
-	newPos := ax.Position + deltaPos*ax.Direction
-
-	less := newPos < 0
-	more := newPos >= ax.Max
-	outside := less || more
-	ax.Direction *= try.As[int32](!outside) - try.As[int32](outside)
-	// fmt.Print(ax.Direction)
-
-	// if more {
-	// 	ax.Position = ax.Max - deltaPos
-	// 	// ax.Direction = -1
-	// } else if less {
-	// 	ax.Position = -deltaPos
-	// 	// ax.Direction = 1
-	// } else {
-	// 	ax.Position = newPos
-	// }
-
-	ax.Position = try.As[int32](more)*(ax.Max-deltaPos) +
+	ax.direction *= try.As[int32](!outside) - try.As[int32](outside)
+	ax.position = try.As[int32](more)*(ax.Max-deltaPos) +
 		try.As[int32](less)*deltaPos +
-		try.As[int32](!less && !more)*newPos
+		try.As[int32](!outside)*newPos
 }

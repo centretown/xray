@@ -25,9 +25,9 @@ func Example(gpad *gpads.GPad) {
 			// flag gets set only button was up and is now down
 			// if b2i returns 1 and is shifted left button positions
 			// if b2i returns 0 nothing happens
-			gpad.PressedOnce |= try.ToInt64(!wasDown && isDown) << button
+			gpad.PressedOnce |= try.As[uint64](!wasDown && isDown) << button
 			// flag gets set only button was down and is now up
-			gpad.ReleasedOnce |= try.ToInt64(wasDown && !isDown) << button
+			gpad.ReleasedOnce |= try.As[uint64](wasDown && !isDown) << button
 			gpad.ButtonState[button] = isDown
 		}
 	}

@@ -21,25 +21,26 @@ type Bouncer struct {
 	pixelRateX   float64
 	rotation     float32
 	rotationRate float32
-	xAxis        *Axis
-	yAxis        *Axis
+	actions      []Action
 }
 
 func NewBouncer(source, bounds rl.RectangleInt32,
-	pixelRateX, pixelRateY float64, rotation float32) *Bouncer {
+	pixelRateX, pixelRateY float64, rotationRate float32) *Bouncer {
 
 	bc := &Bouncer{
 		source:       source,
 		bounds:       bounds,
 		pixelRateX:   pixelRateX,
 		pixelRateY:   pixelRateY,
-		rotationRate: rotation,
+		rotation:     0,
+		rotationRate: rotationRate,
+		actions:      make([]Action, 2),
 	}
 
 	bc.adjustBounds()
 
-	bc.xAxis = NewAxis(bc.bounds.Width, rl.GetTime())
-	bc.yAxis = NewAxis(bc.bounds.Height, rl.GetTime())
+	bc.actions[0] = NewAxis(bc.bounds.Width, rl.GetTime())
+	bc.actions[1] = NewAxis(bc.bounds.Height, rl.GetTime())
 	return bc
 }
 
@@ -59,24 +60,26 @@ func (bc *Bouncer) GetPixelRate() (float64, float64) {
 	return bc.pixelRateX, bc.pixelRateY
 }
 
-func (bc *Bouncer) Refresh(current float64, bounds rl.RectangleInt32) {
+func (bc *Bouncer) Refresh(now float64, bounds rl.RectangleInt32) {
 	bc.bounds = bounds
 	bc.adjustBounds()
-	bc.xAxis.Refresh(bounds.Width-bc.source.Width, current)
-	bc.yAxis.Refresh(bounds.Height-bc.source.Height, current)
+	bc.actions[0].Refresh(now, 0, bounds.Width-bc.source.Width)
+	// bc.actions[0].Position())
+	bc.actions[1].Refresh(now, 0, bounds.Height-bc.source.Height)
+	// bc.actions[1].Position())
 }
 
-func (bc *Bouncer) Draw(can_move bool, current float64, dr Drawable) {
-	x, y := bc.xAxis, bc.yAxis
-	dr.Draw(rl.Vector3{X: float32(bc.bounds.X + x.Position),
-		Y: float32(bc.bounds.Y + y.Position),
+func (bc *Bouncer) Draw(can_move bool, now float64, dr Drawable) {
+	x, y := bc.actions[0], bc.actions[1]
+	dr.Draw(rl.Vector3{X: float32(bc.bounds.X + x.Position()),
+		Y: float32(bc.bounds.Y + y.Position()),
 		Z: float32(bc.rotation)})
 
 	m := try.As[float64](can_move)
-	x.Next(current, bc.pixelRateX*m)
-	// gRateY := float64(bc.bounds.Y) + bc.pixelRateY*
-	// 	(float64(y.Position)/
-	// 		(float64(y.Max)/2))
-	y.Next(current, bc.pixelRateY*m)
-	bc.rotation += bc.rotationRate
+	p := x.Position()
+	x.Next(now, bc.pixelRateX*m)
+	y.Next(now, bc.pixelRateY*m)
+
+	p -= x.Position()
+	bc.rotation += bc.rotationRate * float32(p)
 }

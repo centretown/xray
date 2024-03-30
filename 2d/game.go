@@ -52,14 +52,14 @@ func NewGameState(fps int32) *Game {
 }
 
 const (
-	PAUSED = iota
+	TIMES_TEN = iota
 	FPS_INC
 	FPS_DEC
-	CAPTURE_GIF
-	CAPTURE_PNG
 	CAPTURE_COUNT_INC
 	CAPTURE_COUNT_DEC
-	TIMES_TEN
+	CAPTURE_GIF
+	CAPTURE_PNG
+	PAUSED
 	PAD_STATE_COUNT
 )
 
@@ -70,70 +70,68 @@ func (gs *Game) CanCapture() bool {
 	return canCapture
 }
 
+func mul10[T int | int32](m bool) T {
+	return 1 + 9*try.As[T](m)
+}
+
 func (gs *Game) ProcessInput() {
 	gs.pads.BeginPad()
 
 	if gs.current > gs.nextInput {
 		gs.nextInput = gs.current + .2
-		var state [PAD_STATE_COUNT]bool
 
 		for i := range gs.pads.GetStickCount() {
+			var mul bool
+			for b := range PAD_STATE_COUNT {
+				switch b {
+				case TIMES_TEN:
+					mul = gs.pads.IsPadButtonDown(i, rl.GamepadButtonLeftTrigger1)
+				case FPS_INC:
+					if gs.pads.IsPadButtonDown(i, rl.GamepadButtonLeftFaceUp) {
+						gs.fps += mul10[int32](mul)
+						rl.SetTargetFPS(gs.fps)
+					}
+				case FPS_DEC:
+					if gs.pads.IsPadButtonDown(i, rl.GamepadButtonLeftFaceDown) {
+						gs.fps -= mul10[int32](mul)
+						if gs.fps < 5 {
+							gs.fps = 5
+						}
+						rl.SetTargetFPS(gs.fps)
+					}
+				case CAPTURE_COUNT_INC:
+					if gs.pads.IsPadButtonDown(i, rl.GamepadButtonRightFaceUp) {
+						gs.captureStart += mul10[int](mul)
+					}
+				case CAPTURE_COUNT_DEC:
+					if gs.pads.IsPadButtonDown(i, rl.GamepadButtonRightFaceDown) {
+						gs.captureStart -= mul10[int](mul)
+						if gs.captureStart < 1 {
+							gs.captureStart = 1
+						}
+					}
 
-			state[PAUSED] = gs.pads.IsPadButtonDown(i, rl.GamepadButtonRightFaceLeft)
+				case CAPTURE_GIF:
+					if gs.pads.IsPadButtonDown(i, rl.GamepadButtonMiddleLeft) {
+						if gs.capturing {
+							gs.EndGIFCapture()
+						} else {
+							gs.BeginGIFCapture()
+						}
+					}
 
-			state[FPS_INC] = gs.pads.IsPadButtonDown(i, rl.GamepadButtonLeftFaceUp)
-			state[FPS_DEC] = gs.pads.IsPadButtonDown(i, rl.GamepadButtonLeftFaceDown)
+				case CAPTURE_PNG:
+					if gs.pads.IsPadButtonDown(i, rl.GamepadButtonMiddleRight) {
+						capture.CapturePNG(rl.LoadImageFromScreen().ToImage())
+					}
 
-			state[CAPTURE_GIF] = gs.pads.IsPadButtonDown(i, rl.GamepadButtonMiddleLeft)
-			state[CAPTURE_PNG] = gs.pads.IsPadButtonDown(i, rl.GamepadButtonMiddleRight)
-			state[CAPTURE_COUNT_INC] = gs.pads.IsPadButtonDown(i, rl.GamepadButtonRightFaceUp)
-			state[CAPTURE_COUNT_DEC] = gs.pads.IsPadButtonDown(i, rl.GamepadButtonRightFaceDown)
-			state[TIMES_TEN] = gs.pads.IsPadButtonDown(i, rl.GamepadButtonLeftTrigger1)
-
-			if state[PAUSED] {
-				gs.paused = !gs.paused
-			}
-
-			if state[FPS_INC] {
-				gs.fps++
-				rl.SetTargetFPS(gs.fps)
-			}
-
-			if state[FPS_DEC] {
-				gs.fps--
-				if gs.fps < 1 {
-					gs.fps = 1
-				}
-				rl.SetTargetFPS(gs.fps)
-			}
-
-			if state[CAPTURE_GIF] {
-				if gs.capturing {
-					gs.EndGIFCapture()
-				} else {
-					gs.BeginGIFCapture()
-				}
-			}
-
-			if state[CAPTURE_PNG] {
-				capture.CapturePNG(rl.LoadImageFromScreen().ToImage())
-			}
-
-			if state[CAPTURE_COUNT_INC] {
-				inc := 1 + 9*try.As[int](state[TIMES_TEN])
-				gs.captureStart += inc
-			}
-
-			if state[CAPTURE_COUNT_DEC] {
-				dec := 1 + 9*try.As[int](state[TIMES_TEN])
-				if gs.captureStart-dec > 1 {
-					gs.captureStart -= dec
-				} else {
-					gs.captureStart = 1
+				case PAUSED:
+					if gs.pads.IsPadButtonDown(i, rl.GamepadButtonRightFaceLeft) {
+						gs.paused = !gs.paused
+					}
 				}
 			}
 		}
-
 	}
 }
 
