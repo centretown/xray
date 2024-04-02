@@ -32,6 +32,7 @@ title VARCHAR(128) NOT NULL,
 category VARCHAR(40) NOT NULL,
 created TIMESTAMP,
 updated TIMESTAMP,
+encoding VARCHAR(16),
 content TEXT,
 PRIMARY KEY (id));`,
 
@@ -60,9 +61,8 @@ PRIMARY KEY (id,link));`,
 		"CREATE INDEX links_link ON links (link,id);",
 	},
 
-	// &Person{"Jane", "Citizen", "jane.citzen@example.com"})",
 	InsertVersion: "INSERT INTO version (major, minor, patch, extension) " +
 		"VALUES (:major, :minor, :patch, :extension);",
-	InsertItem: "INSERT INTO items (id, origin, title, category, created, updated, content) " +
-		"VALUES (:id, :origin, :title, :category, :created, :updated, :content);",
+	InsertItem: "INSERT INTO items (id, origin, title, category, created, updated, encoding, content) " +
+		"VALUES (:id, :origin, :title, :category, :created, :updated, :encoding, :content);",
 }

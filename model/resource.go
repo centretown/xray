@@ -13,15 +13,16 @@ type ResourceItem struct {
 	Scheme   Scheme
 	IsDir    bool
 	Size     int64
+	Content  any
 }
 
 type Resource struct {
-	Record *Item
+	Record *Record
 	Item   ResourceItem
 	Err    error
 }
 
-func NewFileResource(path string, category Category) (res *Resource) {
+func NewFileResource(path string, category Category, content any) (res *Resource) {
 	var (
 		abs  string
 		info fs.FileInfo
@@ -30,6 +31,7 @@ func NewFileResource(path string, category Category) (res *Resource) {
 	)
 
 	res = &Resource{}
+	res.Item.Content = content
 	res.Item.Category = category
 	res.Item.Scheme = File
 

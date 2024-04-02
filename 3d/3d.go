@@ -5,7 +5,6 @@ import (
 	"image/color"
 
 	"github.com/centretown/xray/capture"
-	"github.com/centretown/xray/tools"
 	"github.com/centretown/xray/try"
 
 	"github.com/centretown/gpads/gpads"
@@ -17,7 +16,7 @@ import (
 )
 
 func main() {
-	runr := tools.NewRunner(1280, 720)
+	runr := NewRunner(1280, 720)
 	gpads := gpads.NewGPads()
 	Run3d(runr, gpads)
 }
@@ -58,8 +57,9 @@ var drawCircle3d = Draw3d{
 	},
 }
 
-func Run3d(runr *tools.Runner, gpads *gpads.GPads) {
-	runr.SetupWindow("3d")
+func Run3d(runr *Runner, gpads *gpads.GPads) {
+	rl.InitWindow(1280, 720, "3d")
+
 	gpads.BeginPad()
 	gpads.DumpPad()
 	var (
@@ -108,7 +108,7 @@ func Run3d(runr *tools.Runner, gpads *gpads.GPads) {
 
 		rl.DrawCircle(100, 100, 25, rl.Red)
 		for _, run := range runr.Actors {
-			run.Animate(true, current)
+			run.Move(true, current)
 		}
 		rl.EndDrawing()
 

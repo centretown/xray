@@ -4,7 +4,7 @@ type Category int
 
 const (
 	Picture Category = iota
-	Bouncer          //Pink Elephant
+	Mover            //Pink Elephant
 	Scene
 	Person
 	Ball

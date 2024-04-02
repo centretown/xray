@@ -1,15 +1,16 @@
 package tools
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import "github.com/centretown/xray/rayl"
 
 type Drawable interface {
-	Rect() rl.RectangleInt32
-	Draw(rl.Vector3)
+	Rect() rayl.RectangleInt32
+	Draw(rayl.Vector3)
 }
 
 type Moveable interface {
-	Draw(can_move bool, current float64, dr Drawable)
-	Refresh(now float64, rect rl.RectangleInt32)
+	Move(can_move bool, current float64)
+	Refresh(now float64, rect rayl.RectangleInt32)
+	Drawer() Drawable
 }
 
 type Action interface {

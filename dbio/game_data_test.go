@@ -21,11 +21,11 @@ func TestSchema(t *testing.T) {
 		},
 		{
 			desc: "Ping sqlite db using gamedata",
-			f:    ping_gamedata,
+			f:    ping_mem_gamedata,
 		},
 		{
 			desc: "create sqlite mem db using gamedata",
-			f:    create_gamedata,
+			f:    create_mem_gamedata,
 		},
 		// {
 		// 	desc: "create sqlite file db using gamedata",
@@ -33,7 +33,7 @@ func TestSchema(t *testing.T) {
 		// },
 		{
 			desc: "create sqlite file db using gamedata",
-			f:    create_data,
+			f:    create_mem_game,
 		},
 	}
 
@@ -62,7 +62,7 @@ func ping(t *testing.T) {
 
 }
 
-func ping_gamedata(t *testing.T) {
+func ping_mem_gamedata(t *testing.T) {
 	gd := NewGameData("sqlite3", ":memory:")
 	gd.Open()
 	if gd.Err != nil {
@@ -77,7 +77,7 @@ func ping_gamedata(t *testing.T) {
 	}
 }
 
-func create_gamedata(t *testing.T) {
+func create_mem_gamedata(t *testing.T) {
 	gd := NewGameData("sqlite3", ":memory:")
 	gd.Open()
 	if gd.Err != nil {
@@ -94,8 +94,9 @@ func create_gamedata(t *testing.T) {
 	gd.Create()
 }
 
-func create_data(t *testing.T) {
-	gd := NewGameData("sqlite3", "gd2.db")
+func create_mem_game(t *testing.T) {
+	// gd := NewGameData("sqlite3", "/home/dave/xray/test/db/gd2.db")
+	gd := NewGameData("sqlite3", "/home/dave/xray/test/db/gd2.db")
 	gd.Open()
 	if gd.Err != nil {
 		t.Fatal(gd.Err)
@@ -123,7 +124,7 @@ func create_data(t *testing.T) {
 	}
 
 	for _, path := range paths {
-		item := model.NewFileResource(path, model.Picture)
+		item := model.NewFileResource(path, model.Picture, "just a test")
 		if item.Err != nil {
 			t.Fatal(gd.Err)
 		}

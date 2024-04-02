@@ -16,17 +16,18 @@ func init() {
 	origin, _ = uuid.Parse(IN_HOUSE)
 }
 
-type Item struct {
+type Record struct {
 	ID       uuid.UUID `db:"id"`
 	Origin   uuid.UUID
 	Title    string
 	Category string
 	Created  time.Time
 	Updated  time.Time
+	Encoding string
 	Content  string
 }
 
-func NewItem(title string, category Category, v any) *Item {
+func NewItem(title string, category Category, v any) *Record {
 
 	id, err := uuid.NewV7()
 	if err != nil {
@@ -38,13 +39,14 @@ func NewItem(title string, category Category, v any) *Item {
 		content = []byte(err.Error())
 	}
 
-	return &Item{
+	return &Record{
 		ID:       id,
 		Origin:   origin,
 		Title:    title,
 		Category: category.String(),
 		Created:  time.Now(),
 		Updated:  time.Now(),
+		Encoding: "json",
 		Content:  string(content),
 	}
 }

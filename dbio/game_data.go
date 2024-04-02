@@ -36,14 +36,12 @@ func (gd *GameData) Create() {
 		gd.DB.MustExec(sch)
 	}
 	tx := gd.DB.MustBegin()
-	fmt.Println(gd.Schema.Version)
 	tx.NamedExec(gd.Schema.InsertVersion, &gd.Schema.Version)
 	gd.Err = tx.Commit()
 }
 
-func (gd *GameData) InsertItem(item *model.Item) {
+func (gd *GameData) InsertItem(item *model.Record) {
 	tx := gd.DB.MustBegin()
-	fmt.Println(item)
 	tx.NamedExec(gd.Schema.InsertItem, item)
 	gd.Err = tx.Commit()
 }

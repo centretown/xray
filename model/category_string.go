@@ -9,7 +9,7 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[Picture-0]
-	_ = x[Bouncer-1]
+	_ = x[Mover-1]
 	_ = x[Scene-2]
 	_ = x[Person-3]
 	_ = x[Ball-4]

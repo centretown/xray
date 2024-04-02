@@ -1,6 +1,8 @@
-package tools
+package main
 
 import (
+	"github.com/centretown/xray/rayl"
+	"github.com/centretown/xray/tools"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -14,27 +16,30 @@ const (
 type Runner struct {
 	Width  int32
 	Height int32
-	Actors []*Actor
+	Actors []tools.Moveable
 }
 
 func NewRunner(width int32, height int32) *Runner {
 	runr := &Runner{
 		Height: height,
 		Width:  width,
-		Actors: make([]*Actor, 0),
+		Actors: make([]tools.Moveable, 0),
 	}
 
 	return runr
 }
 
-func (runr *Runner) Add(d Drawable, a Moveable, after float64) {
-	runr.Actors = append(runr.Actors, NewActor(d, a, after))
+func (runr *Runner) Add(a tools.Moveable, after float64) {
+	runr.Actors = append(runr.Actors, a)
 }
 
 func (runr *Runner) Refresh(current float64) {
-	viewPort := runr.GetViewPort()
-	for _, run := range runr.Actors {
-		run.Resize(viewPort, current)
+
+	viewPort := rl.RectangleInt32{X: 0, Y: 0, Width: int32(rl.GetRenderWidth()),
+		Height: int32(rl.GetRenderHeight())}
+
+	for _, mover := range runr.Actors {
+		mover.Refresh(current, rayl.RectangleInt32(viewPort))
 	}
 }
 

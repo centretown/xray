@@ -28,7 +28,7 @@ func NewAccess(driver, path string) *Access {
 	return acc
 }
 
-func (acc *Access) Load(path string) (err error) {
+func Load(path string) (acc *Access, err error) {
 	var rdr *os.File
 	rdr, err = os.Open(path)
 	if err != nil {

@@ -16,13 +16,19 @@ package try
 
 func As[T int | uint | int8 | int16 | int32 | int64 |
 	uint8 | uint16 | uint32 | uint64 |
-	float32 | float64](b bool) T {
+	float32 | float64](condition bool) T {
 
 	var i int
-	if b {
+	if condition {
 		i = 1
 	} else {
 		i = 0
 	}
 	return T(i)
+}
+
+func Or[T int | uint | int8 | int16 | int32 | int64 |
+	uint8 | uint16 | uint32 | uint64 |
+	float32 | float64](condition bool, falseVal, trueVal T) T {
+	return falseVal + (trueVal-falseVal)*As[T](condition)
 }
