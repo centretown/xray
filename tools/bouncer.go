@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"github.com/centretown/xray/model"
 	"github.com/centretown/xray/try"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -14,71 +15,72 @@ const (
 )
 
 type Bouncer struct {
-	source rl.RectangleInt32
-	bounds rl.RectangleInt32
+	Item   *model.Item
+	Source rl.RectangleInt32
+	Bounds rl.RectangleInt32
 
-	pixelRateY   float64 // pixels per second
-	pixelRateX   float64
-	rotation     float32
-	rotationRate float32
-	actions      []Action
+	PixelRateY   float64 // pixels per second
+	PixelRateX   float64
+	Rotation     float32
+	RotationRate float32
+	Actions      []Action
 }
 
 func NewBouncer(source, bounds rl.RectangleInt32,
 	pixelRateX, pixelRateY float64, rotationRate float32) *Bouncer {
 
 	bc := &Bouncer{
-		source:       source,
-		bounds:       bounds,
-		pixelRateX:   pixelRateX,
-		pixelRateY:   pixelRateY,
-		rotation:     0,
-		rotationRate: rotationRate,
-		actions:      make([]Action, 2),
+		Source:       source,
+		Bounds:       bounds,
+		PixelRateX:   pixelRateX,
+		PixelRateY:   pixelRateY,
+		Rotation:     0,
+		RotationRate: rotationRate,
+		Actions:      make([]Action, 2),
 	}
 
 	bc.adjustBounds()
-
-	bc.actions[0] = NewAxis(bc.bounds.Width, rl.GetTime())
-	bc.actions[1] = NewAxis(bc.bounds.Height, rl.GetTime())
+	bc.Actions[0] = NewAxis(rl.GetTime(), bc.Bounds.Width)
+	bc.Actions[1] = NewAxis(rl.GetTime(), bc.Bounds.Height)
+	bc.Item = model.NewItem("bouncer", model.Bouncer, bc)
 	return bc
 }
 
 func (bc *Bouncer) adjustBounds() {
-	bc.bounds.X += bc.source.Width / 2
-	bc.bounds.Y += bc.source.Height / 2
-	bc.bounds.Width -= bc.source.Width
-	bc.bounds.Height -= bc.source.Height
+	bc.Bounds.X += bc.Source.Width / 2
+	bc.Bounds.Y += bc.Source.Height / 2
+	bc.Bounds.Width -= bc.Source.Width
+	bc.Bounds.Height -= bc.Source.Height
 }
 
 func (bc *Bouncer) SetPixelRate(pixelRateX, pixelRateY float64) {
-	bc.pixelRateY = pixelRateY
-	bc.pixelRateX = pixelRateX
+	bc.PixelRateY = pixelRateY
+	bc.PixelRateX = pixelRateX
 }
 
 func (bc *Bouncer) GetPixelRate() (float64, float64) {
-	return bc.pixelRateX, bc.pixelRateY
+	return bc.PixelRateX, bc.PixelRateY
 }
 
 func (bc *Bouncer) Refresh(now float64, bounds rl.RectangleInt32) {
-	bc.bounds = bounds
+	bc.Bounds = bounds
 	bc.adjustBounds()
-	bc.actions[0].Refresh(now, 0, bounds.Width-bc.source.Width)
+	bc.Actions[0].Refresh(now, bounds.Width-bc.Source.Width)
 	// bc.actions[0].Position())
-	bc.actions[1].Refresh(now, 0, bounds.Height-bc.source.Height)
+	bc.Actions[1].Refresh(now, bounds.Height-bc.Source.Height)
 	// bc.actions[1].Position())
 }
 
 func (bc *Bouncer) Draw(can_move bool, now float64, dr Drawable) {
-	x, y := bc.actions[0], bc.actions[1]
-	dr.Draw(rl.Vector3{X: float32(bc.bounds.X + x.Position()),
-		Y: float32(bc.bounds.Y + y.Position()),
-		Z: float32(bc.rotation)})
+	x, y := bc.Actions[0], bc.Actions[1]
+	dr.Draw(rl.Vector3{X: float32(bc.Bounds.X + x.Position()),
+		Y: float32(bc.Bounds.Y + y.Position()),
+		Z: float32(bc.Rotation)})
 
 	m := try.As[float64](can_move)
-	y.Next(now, bc.pixelRateY*m)
+	y.Next(now, bc.PixelRateY*m)
 
 	p := x.Position()
-	p -= x.Next(now, bc.pixelRateX*m)
-	bc.rotation += bc.rotationRate * float32(p)
+	p -= x.Next(now, bc.PixelRateX*m)
+	bc.Rotation += bc.RotationRate * float32(p)
 }

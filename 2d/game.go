@@ -28,9 +28,10 @@ type Game struct {
 	stopChan chan int
 	scrChan  chan image.Image
 
-	current  float64
-	pads     *gpads.GPads
-	textures []*tools.Picture
+	current float64
+	pads    *gpads.GPads
+	Actors  []*tools.Actor
+
 	pal      color.Palette
 	colorMap map[color.Color]uint8
 	fps      int32
@@ -42,11 +43,11 @@ func NewGameState(fps int32) *Game {
 		scrChan:         make(chan image.Image),
 		current:         rl.GetTime(),
 		pads:            gpads.NewGPads(),
-		textures:        make([]*tools.Picture, 0),
-		captureStart:    100,
+		captureStart:    250,
 		captureDelay:    4,
 		captureInterval: float64(rl.GetFrameTime()) * 2,
 		fps:             fps,
+		Actors:          make([]*tools.Actor, 0),
 	}
 	return gs
 }
@@ -60,8 +61,12 @@ const (
 	CAPTURE_GIF
 	CAPTURE_PNG
 	PAUSED
-	PAD_STATE_COUNT
+	PAD_STATES
 )
+
+func (gs *Game) AddActor(d tools.Drawable, a tools.Moveable, after float64) {
+	gs.Actors = append(gs.Actors, tools.NewActor(d, a, after))
+}
 
 func (gs *Game) CanCapture() bool {
 	canCapture := gs.current >= gs.previousCapture+gs.captureInterval
@@ -85,8 +90,8 @@ func (gs *Game) ProcessInput() {
 }
 
 func (gs *Game) CheckPad(i int) {
-	var mul bool
-	for b := range PAD_STATE_COUNT {
+	var mul, down bool
+	for b := range PAD_STATES {
 		switch b {
 		case TIMES_TEN:
 			mul = gs.pads.IsPadButtonDown(i, rl.GamepadButtonLeftTrigger1)
@@ -115,12 +120,11 @@ func (gs *Game) CheckPad(i int) {
 				}
 			}
 		case CAPTURE_GIF:
-			if gs.pads.IsPadButtonDown(i, rl.GamepadButtonMiddleLeft) {
-				if gs.capturing {
-					gs.EndGIFCapture()
-				} else {
-					gs.BeginGIFCapture()
-				}
+			down = gs.pads.IsPadButtonDown(i, rl.GamepadButtonMiddleLeft)
+			if down && gs.capturing {
+				gs.EndGIFCapture()
+			} else if down {
+				gs.BeginGIFCapture()
 			}
 		case CAPTURE_PNG:
 			if gs.pads.IsPadButtonDown(i, rl.GamepadButtonMiddleRight) {
@@ -129,7 +133,11 @@ func (gs *Game) CheckPad(i int) {
 		case PAUSED:
 			if gs.pads.IsPadButtonDown(i, rl.GamepadButtonRightFaceLeft) {
 				gs.paused = !gs.paused
+				if !gs.paused {
+					gs.Refresh(gs.current)
+				}
 			}
+
 		}
 	}
 }
@@ -141,6 +149,16 @@ func (gs *Game) BeginGIFCapture() {
 	}
 	gs.captureCount = gs.captureStart
 	gs.capturing = true
+
+	fps := rl.GetFPS()
+	if fps >= 50 {
+		rl.SetTargetFPS(50)
+		gs.captureDelay = 2
+	} else {
+		rl.SetTargetFPS(25)
+		gs.captureDelay = 4
+	}
+
 	go capture.CaptureGIF(gs.stopChan, gs.scrChan, gs.pal,
 		gs.captureDelay, gs.colorMap)
 }
@@ -169,22 +187,68 @@ func (gs *Game) EndGIFCapture() {
 	gs.stopChan <- 1
 }
 
-func (gs *Game) DrawStatus(runr *tools.Runner) {
-	mb := runr.GetMessageBox()
+func (gs *Game) DrawStatus() {
+	mb := gs.GetMessageBox()
 	rl.DrawLine(mb.X, mb.Y, mb.Width, mb.Y, rl.Red)
 
 	monitor := rl.GetCurrentMonitor()
 
-	text := fmt.Sprintf("Monitor:%1d (%4d/%4d %3d), FPS:%3d, Capture Count:%4d",
+	text := fmt.Sprintf("FPS:%3d, Monitor:%1d (%4d/%4d %3d), View: %4dx%4d, Capture Count:%4d",
+		rl.GetFPS(),
 		monitor, rl.GetMonitorWidth(monitor),
 		rl.GetMonitorHeight(monitor), rl.GetMonitorRefreshRate(monitor),
-		rl.GetFPS(), gs.captureStart)
-	rl.DrawText(text, mb.X, mb.Y+mb.Height-22, 20, rl.Green)
+		rl.GetScreenWidth(), rl.GetScreenHeight(),
+		gs.captureStart)
+	rl.DrawText(text, mb.X, mb.Y+mb.Height-22, 16, rl.Green)
 
 	if gs.capturing {
 		rl.DrawText(fmt.Sprintf("Capturing... %4d", gs.captureCount),
-			mb.X, mb.Y+32, 20, rl.Green)
+			mb.X, mb.Y+32, 16, rl.Green)
 	}
+}
+
+func (gs *Game) Refresh(current float64) {
+	viewPort := gs.GetViewPort()
+	for _, run := range gs.Actors {
+		run.Resize(viewPort, current)
+	}
+}
+
+const (
+	msg_height = 80
+	min_width  = 200
+	min_height = 280
+)
+
+func (gs *Game) GetViewPort() rl.RectangleInt32 {
+	rw := rl.GetRenderWidth()
+	rh := rl.GetRenderHeight()
+
+	if rw >= min_width && rh >= min_height {
+		return rl.RectangleInt32{
+			X:      0,
+			Y:      0,
+			Width:  int32(rw),
+			Height: int32(rh - msg_height),
+		}
+	}
+
+	return rl.RectangleInt32{
+		X:      0,
+		Y:      0,
+		Width:  min_width,
+		Height: min_height - msg_height,
+	}
+}
+
+func (gs *Game) GetMessageBox() (rect rl.RectangleInt32) {
+	rw := int32(rl.GetRenderWidth())
+	rh := int32(rl.GetRenderHeight())
+	rect.X = 0
+	rect.Width = rw
+	rect.Y = rh - msg_height
+	rect.Height = msg_height
+	return
 }
 
 func (gs *Game) Dump() {

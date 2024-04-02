@@ -13,10 +13,10 @@ type Axis struct {
 	direction int32
 }
 
-func NewAxis(max int32, now float64) *Axis {
+func NewAxis(now float64, max int32) *Axis {
 	return &Axis{
-		Max:       max,
 		LastTime:  now,
+		Max:       max,
 		direction: 1,
 	}
 }
@@ -29,10 +29,9 @@ func (ax *Axis) Direction() int32 {
 	return ax.direction
 }
 
-func (ax *Axis) Refresh(now float64, position, max int32) {
-	ax.Max = max
+func (ax *Axis) Refresh(now float64, max int32) {
 	ax.LastTime = now
-	ax.position = position
+	ax.Max = max
 }
 
 func (ax *Axis) Next(current, rate float64) int32 {

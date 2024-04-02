@@ -16,5 +16,5 @@ type Action interface {
 	Position() int32
 	Direction() int32
 	Next(current, rate float64) (position int32)
-	Refresh(now float64, position, max int32)
+	Refresh(now float64, max int32)
 }
