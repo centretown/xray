@@ -120,7 +120,7 @@ func Run3d(runr *Runner, gpads *gpads.GPads) {
 var nextTime float64
 
 func PadPosXYZ(gpad *gpads.GPads, obj, pos *rl.Vector3, current float64) {
-	count := gpad.GetStickCount()
+	count := gpad.GetPadCount()
 	for pi := range count {
 		x, y := gpad.GetPadAxisMovement(pi, rl.GamepadAxisLeftX),
 			gpad.GetPadAxisMovement(pi, rl.GamepadAxisLeftY)

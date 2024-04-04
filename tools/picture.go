@@ -4,27 +4,34 @@ import (
 	"image/color"
 
 	"github.com/centretown/xray/model"
-	"github.com/centretown/xray/rayl"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 var _ Drawable = (*Picture)(nil)
 
-type Picture struct {
-	*model.Resource
+type PictureItem struct {
 	Comment   string
 	texture2D rl.Texture2D
 }
 
+type Picture struct {
+	PictureItem
+	Resource *model.Resource
+}
+
 func NewPicture(path string) (pic *Picture) {
-	pic = &Picture{Comment: "game element"}
-	res := model.NewFileResource(path, model.Picture, &pic.Comment)
-	pic.Resource = res
+	pic = &Picture{}
+	pic.Comment = "what the hell is"
+	pic.Resource = model.NewFileResource(path, model.Picture, &pic.PictureItem)
 	return pic
 }
 
+func (pic *Picture) GetRecord() *model.Record {
+	return pic.Resource.Record
+}
+
 func (pic *Picture) Load() *Picture {
-	pic.texture2D = rl.LoadTexture(pic.Item.Path)
+	pic.texture2D = rl.LoadTexture(pic.Resource.Path)
 	return pic
 }
 
@@ -33,10 +40,11 @@ func (pic *Picture) Unload() {
 }
 
 func (pic *Picture) DrawSimple(x, y int32) {
-	rl.DrawTexture(pic.texture2D, x, y, rl.White)
+	rl.DrawTexture(pic.texture2D, x, y,
+		color.RGBA{255, 255, 255, 255})
 }
 
-func (pic *Picture) Draw(v rayl.Vector3) {
+func (pic *Picture) Draw(v rl.Vector3) {
 	x, y, rotation := v.X, v.Y, v.Z
 	width, height := float32(pic.texture2D.Width), float32(pic.texture2D.Height)
 	srcRec := rl.Rectangle{X: 0, Y: 0, Width: width, Height: height}
@@ -47,7 +55,7 @@ func (pic *Picture) Draw(v rayl.Vector3) {
 		rotation, color.RGBA{255, 255, 255, 255})
 }
 
-func (pic *Picture) Rect() rayl.RectangleInt32 {
-	return rayl.RectangleInt32{X: 0, Y: 0,
+func (pic *Picture) Rect() rl.RectangleInt32 {
+	return rl.RectangleInt32{X: 0, Y: 0,
 		Width: pic.texture2D.Width, Height: pic.texture2D.Width}
 }

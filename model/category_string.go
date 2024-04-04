@@ -12,12 +12,12 @@ func _() {
 	_ = x[Mover-1]
 	_ = x[Scene-2]
 	_ = x[Person-3]
-	_ = x[Ball-4]
+	_ = x[Circle-4]
 }
 
-const _Category_name = "PictureMoverScenePersonBall"
+const _Category_name = "PictureMoverScenePersonCircle"
 
-var _Category_index = [...]uint8{0, 7, 12, 17, 23, 27}
+var _Category_index = [...]uint8{0, 7, 12, 17, 23, 29}
 
 func (i Category) String() string {
 	if i < 0 || i >= Category(len(_Category_index)-1) {

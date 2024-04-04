@@ -7,19 +7,18 @@ import (
 )
 
 type ResourceItem struct {
-	Title    string
-	Path     string
-	Category Category
-	Scheme   Scheme
-	IsDir    bool
-	Size     int64
-	Content  any
+	Name   string
+	Path   string
+	Scheme Scheme
+	IsDir  bool
+	Size   int64
+	Item   any
 }
 
 type Resource struct {
-	Record *Record
-	Item   ResourceItem
-	Err    error
+	*Record
+	ResourceItem
+	Err error
 }
 
 func NewFileResource(path string, category Category, content any) (res *Resource) {
@@ -31,9 +30,8 @@ func NewFileResource(path string, category Category, content any) (res *Resource
 	)
 
 	res = &Resource{}
-	res.Item.Content = content
-	res.Item.Category = category
-	res.Item.Scheme = File
+	res.Item = content
+	res.Scheme = File
 
 	defer func() {
 		res.Err = *errp
@@ -41,16 +39,20 @@ func NewFileResource(path string, category Category, content any) (res *Resource
 
 	abs, err = filepath.Abs(path)
 	if err == nil {
-		res.Item.Path = abs
+		res.Path = abs
 		info, err = os.Stat(abs)
 
 		if err == nil {
-			res.Item.Title = info.Name()
-			res.Item.Size = info.Size()
-			res.Item.IsDir = info.IsDir()
-			res.Record = NewItem(res.Item.Title, category, &res.Item)
+			res.Name = info.Name()
+			res.Size = info.Size()
+			res.IsDir = info.IsDir()
+			res.Record = NewRecord(res.Name, category, &res.ResourceItem)
 		}
 	}
 
 	return
+}
+
+func (res *Resource) GetRecord() *Record {
+	return res.Record
 }

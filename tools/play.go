@@ -3,13 +3,13 @@ package tools
 import (
 	"fmt"
 
-	"github.com/centretown/xray/rayl"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func (gs *Game) Run(rl rayl.RunLib) {
+func (gs *Game) Run() {
 
 	defer func() {
-		for _, actor := range gs.Actors {
+		for _, actor := range gs.Actors() {
 			t, ok := actor.Drawer().(*Picture)
 			if ok {
 				fmt.Println("UnloadTexture")
@@ -31,7 +31,7 @@ func (gs *Game) Run(rl rayl.RunLib) {
 
 		rl.ClearBackground(gs.backGround)
 
-		for _, actor := range gs.Actors {
+		for _, actor := range gs.Actors() {
 			actor.Move(!gs.Paused, gs.Current)
 		}
 

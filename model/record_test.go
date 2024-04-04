@@ -1,4 +1,4 @@
-package access
+package model
 
 import (
 	"testing"
@@ -14,8 +14,16 @@ func TestUuid(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		t.Log(id.String(), len(id.String()))
 		m[id.String()] = false
+		major, minor := RecordID(id)
+		idd := RecordUUID(major, minor)
+		if idd != id {
+			t.Logf("%x", id)
+			t.Logf("%x", idd)
+			t.Fatalf("major%x minor%x", major, minor)
+		}
+
+		t.Logf("%x %x %s,%d", major, minor, id.String(), len(id.String()))
 	}
 
 	if len(m) != 1000 {

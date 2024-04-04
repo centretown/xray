@@ -30,7 +30,6 @@ func (gd *GameData) Close() {
 }
 
 func (gd *GameData) Create() {
-
 	for _, sch := range gd.Schema.Create {
 		fmt.Println(sch)
 		gd.DB.MustExec(sch)
@@ -40,8 +39,14 @@ func (gd *GameData) Create() {
 	gd.Err = tx.Commit()
 }
 
-func (gd *GameData) InsertItem(item *model.Record) {
+func (gd *GameData) InsertItem(item model.Recordable) {
 	tx := gd.DB.MustBegin()
-	tx.NamedExec(gd.Schema.InsertItem, item)
+	err, _ := tx.NamedExec(gd.Schema.InsertItem, item.GetRecord())
+	if err != nil {
+		fmt.Println("InsertItem", err)
+	}
 	gd.Err = tx.Commit()
+	if gd.Err != nil {
+		fmt.Println("InsertItem", err)
+	}
 }

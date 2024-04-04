@@ -93,9 +93,45 @@ func (rayl *RayL) DrawText(text string, x int32, y int32, font_size int32, c col
 	rl.DrawText(text, x, y, font_size, c)
 }
 
+func (rayl *RayL) DrawTextEx(font rl.Font, text string, position rl.Vector2,
+	fontSize float32, spacing float32, tint color.RGBA) {
+	rl.DrawTextEx(font, text, position, fontSize, spacing, tint)
+}
+
 func (rayl *RayL) GetRenderWidth() int {
 	return rl.GetRenderWidth()
 }
 func (rayl *RayL) GetRenderHeight() int {
 	return rl.GetRenderHeight()
+}
+
+func (rayl *RayL) DrawTexture(texture Texture2D, posX int32, posY int32, tint color.RGBA) {
+	rl.DrawTexture(rl.Texture2D(texture), posX, posY, tint)
+}
+
+func (rayl *RayL) LoadTexture(path string) Texture2D {
+	return Texture2D(rl.LoadTexture(path))
+}
+
+func (rayl *RayL) UnloadTexture(texture Texture2D) {
+	rl.UnloadTexture(rl.Texture2D(texture))
+}
+
+func (rayl *RayL) DrawTexturePro(texture Texture2D, sourceRec,
+	destRec Rectangle, origin Vector2, rotation float32, tint color.RGBA) {
+
+	rl.DrawTexturePro(rl.Texture2D(texture),
+		rl.Rectangle(sourceRec), rl.Rectangle(destRec),
+		rl.Vector2(origin), rotation, tint)
+}
+
+var rl_ImageClearBackground *rl.Image
+var img_ImageClearBackground image.Image
+
+func (rayl *RayL) ImageClearBackground(dst image.Image, c color.RGBA) {
+	if dst != img_ImageClearBackground {
+		img_ImageClearBackground = dst
+		rl_ImageClearBackground = rl.NewImageFromImage(img_ImageClearBackground)
+	}
+	rl.ImageClearBackground(rl_ImageClearBackground, c)
 }

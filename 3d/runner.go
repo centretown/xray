@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/centretown/xray/rayl"
 	"github.com/centretown/xray/tools"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -39,7 +38,7 @@ func (runr *Runner) Refresh(current float64) {
 		Height: int32(rl.GetRenderHeight())}
 
 	for _, mover := range runr.Actors {
-		mover.Refresh(current, rayl.RectangleInt32(viewPort))
+		mover.Refresh(current, viewPort)
 	}
 }
 

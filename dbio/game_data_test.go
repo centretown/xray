@@ -128,7 +128,7 @@ func create_mem_game(t *testing.T) {
 		if item.Err != nil {
 			t.Fatal(gd.Err)
 		}
-		gd.InsertItem(item.Record)
+		gd.InsertItem(item)
 		if gd.Err != nil {
 			t.Fatal(gd.Err)
 		}

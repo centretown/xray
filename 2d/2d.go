@@ -3,46 +3,46 @@ package main
 import (
 	"image/color"
 
-	"github.com/centretown/xray/rayl"
+	"github.com/centretown/gpads/gpads"
+	"github.com/centretown/gpads/pad"
 	"github.com/centretown/xray/tools"
-	// rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func main() {
-	rl := &rayl.RayL{}
-
-	gs := setup(rl)
-	gs.Run(rl)
+	gp := &gpads.GPads{}
+	gs := setup(gp)
+	gs.Run()
 }
 
-func setup(rl rayl.RunLib) *tools.Game {
+func setup(gp pad.Pad) *tools.Game {
 
-	rl.LogWarnings()
+	rl.SetTraceLogLevel(rl.LogWarning)
 	rl.InitWindow(screenWidth, screenHeight, "2d")
-	rl.SetWindowResizble()
+	rl.SetWindowState(rl.FlagWindowResizable)
 
-	gs := tools.NewGame(fps, rl)
+	gs := tools.NewGame(gp, fps)
 	viewPort := gs.GetViewPort()
 
 	hole := tools.NewPicture("polar.png").Load()
-	bouncer := tools.NewBouncer(hole, viewPort, 10, 10, 10)
+	bouncer := tools.NewMover(hole, viewPort, 10, 10, 10)
 	gs.AddActor(bouncer, 6)
 
-	ball := tools.NewBall(20, color.White)
-	bouncer = tools.NewBouncer(ball, viewPort, 200, 100, 0)
+	ball := tools.NewCircle(20, tools.Cyan)
+	bouncer = tools.NewMover(ball, viewPort, 200, 100, 0)
 	gs.AddActor(bouncer, 1)
 
 	head := tools.NewPicture("head_300.png").Load()
-	bouncer = tools.NewBouncer(head, viewPort, 70, 140, 1.75)
+	bouncer = tools.NewMover(head, viewPort, 70, 140, 1.75)
 	gs.AddActor(bouncer, 8)
 
 	gander := tools.NewPicture("gander.png").Load()
-	bouncer = tools.NewBouncer(gander, viewPort, 300, 300, 0.5)
+	bouncer = tools.NewMover(gander, viewPort, 300, 300, 0.5)
 	gs.AddActor(bouncer, 4)
 
 	// generate palette and color map for paletted images
 	pal, colorMap :=
-		tools.CreatePaletteFromTextures(color.RGBA{}, fixedPalette, gs.Actors...)
+		tools.CreatePaletteFromTextures(color.RGBA{}, fixedPalette, gs.Actors()...)
 	gs.SetColors(color.RGBA{}, pal, colorMap)
 
 	rl.SetTargetFPS(gs.FPS)
@@ -76,12 +76,12 @@ const (
 
 var fixedPalette = color.Palette{
 	color.Transparent,
-	color.White,
-	color.Black,
-	color.RGBA{255, 0, 0, 255},               //RED
-	color.RGBA{255, 255, 0, 255},             //Yellow,
-	color.RGBA{0, 255, 0, 255},               //Green
-	color.RGBA{R: 0, G: 255, B: 255, A: 255}, //cyan
-	color.RGBA{R: 0, G: 0, B: 255, A: 255},   //blue
-	color.RGBA{R: 255, G: 0, B: 255, A: 255}, //Magenta
+	tools.White,
+	tools.Black,
+	tools.Red,
+	tools.Yellow,
+	tools.Green,
+	tools.Cyan,
+	tools.Blue,
+	tools.Magenta,
 }

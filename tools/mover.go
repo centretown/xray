@@ -2,7 +2,6 @@ package tools
 
 import (
 	"github.com/centretown/xray/model"
-	"github.com/centretown/xray/rayl"
 	"github.com/centretown/xray/try"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -15,11 +14,9 @@ const (
 	ZAxis
 )
 
-type Mover struct {
-	Item   *model.Record
-	Source rayl.RectangleInt32
-	Bounds rayl.RectangleInt32
-
+type MoverItem struct {
+	Source       rl.RectangleInt32
+	Bounds       rl.RectangleInt32
 	PixelRateY   float64 // pixels per second
 	PixelRateX   float64
 	Rotation     float32
@@ -28,62 +25,67 @@ type Mover struct {
 	drawer       Drawable
 }
 
-func NewBouncer(drawer Drawable, bounds rayl.RectangleInt32,
+type Mover struct {
+	MoverItem
+	Record *model.Record
+}
+
+func NewMover(drawer Drawable, bounds rl.RectangleInt32,
 	pixelRateX, pixelRateY float64, rotationRate float32) *Mover {
 
-	bc := &Mover{
-		Source:       drawer.Rect(),
-		Bounds:       bounds,
-		PixelRateX:   pixelRateX,
-		PixelRateY:   pixelRateY,
-		Rotation:     0,
-		RotationRate: rotationRate,
-		Actions:      make([]Action, 2),
-		drawer:       drawer,
-	}
+	mv := &Mover{}
+	mv.Source = drawer.Rect()
+	mv.Bounds = bounds
+	mv.PixelRateX = pixelRateX
+	mv.PixelRateY = pixelRateY
+	mv.Rotation = 0
+	mv.RotationRate = rotationRate
+	mv.Actions = make([]Action, 2)
+	mv.drawer = drawer
 
-	bc.adjustBounds()
-	bc.Actions[0] = NewAxis(rl.GetTime(), bc.Bounds.Width)
-	bc.Actions[1] = NewAxis(rl.GetTime(), bc.Bounds.Height)
-	bc.Item = model.NewItem("bouncer", model.Mover, bc)
-	return bc
+	mv.adjustBounds()
+	mv.Actions[0] = NewAxis(rl.GetTime(), mv.Bounds.Width)
+	mv.Actions[1] = NewAxis(rl.GetTime(), mv.Bounds.Height)
+	mv.Record = model.NewRecord("mover", model.Mover, &mv.MoverItem)
+	return mv
 }
 
-func (bc *Mover) Drawer() Drawable { return bc.drawer }
+func (mv *Mover) Drawer() Drawable         { return mv.drawer }
+func (mv *Mover) GetRecord() *model.Record { return mv.Record }
 
-func (bc *Mover) adjustBounds() {
-	bc.Bounds.X += bc.Source.Width / 2
-	bc.Bounds.Y += bc.Source.Height / 2
-	bc.Bounds.Width -= bc.Source.Width
-	bc.Bounds.Height -= bc.Source.Height
+func (mv *Mover) adjustBounds() {
+	mv.Bounds.X += mv.Source.Width / 2
+	mv.Bounds.Y += mv.Source.Height / 2
+	mv.Bounds.Width -= mv.Source.Width
+	mv.Bounds.Height -= mv.Source.Height
 }
 
-func (bc *Mover) SetPixelRate(pixelRateX, pixelRateY float64) {
-	bc.PixelRateY = pixelRateY
-	bc.PixelRateX = pixelRateX
+func (mv *Mover) SetPixelRate(pixelRateX, pixelRateY float64) {
+	mv.PixelRateY = pixelRateY
+	mv.PixelRateX = pixelRateX
 }
 
-func (bc *Mover) GetPixelRate() (float64, float64) {
-	return bc.PixelRateX, bc.PixelRateY
+func (mv *Mover) GetPixelRate() (float64, float64) {
+	return mv.PixelRateX, mv.PixelRateY
 }
 
-func (bc *Mover) Refresh(now float64, bounds rayl.RectangleInt32) {
-	bc.Bounds = bounds
-	bc.adjustBounds()
-	bc.Actions[0].Refresh(now, bounds.Width-bc.Source.Width)
-	bc.Actions[1].Refresh(now, bounds.Height-bc.Source.Height)
+func (mv *Mover) Refresh(now float64, bounds rl.RectangleInt32) {
+	mv.Bounds = bounds
+	mv.adjustBounds()
+	mv.Actions[0].Refresh(now, bounds.Width-mv.Source.Width)
+	mv.Actions[1].Refresh(now, bounds.Height-mv.Source.Height)
 }
 
-func (bc *Mover) Move(can_move bool, now float64) {
-	x, y := bc.Actions[0], bc.Actions[1]
-	bc.drawer.Draw(rayl.Vector3{X: float32(bc.Bounds.X + x.Position()),
-		Y: float32(bc.Bounds.Y + y.Position()),
-		Z: float32(bc.Rotation)})
+func (mv *Mover) Move(can_move bool, now float64) {
+	x, y := mv.Actions[0], mv.Actions[1]
+	mv.drawer.Draw(rl.Vector3{X: float32(mv.Bounds.X + x.Position()),
+		Y: float32(mv.Bounds.Y + y.Position()),
+		Z: float32(mv.Rotation)})
 
 	m := try.As[float64](can_move)
-	y.Next(now, bc.PixelRateY*m)
+	y.Next(now, mv.PixelRateY*m)
 
 	p := x.Position()
-	p -= x.Next(now, bc.PixelRateX*m)
-	bc.Rotation += bc.RotationRate * float32(p)
+	p -= x.Next(now, mv.PixelRateX*m)
+	mv.Rotation += mv.RotationRate * float32(p)
 }

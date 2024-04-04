@@ -5,7 +5,7 @@ import (
 )
 
 func TestSchema(t *testing.T) {
-	f := NewItem("Dave", Person, "had a little lamb")
-	t.Log(f.Title, f.Category, f.ID, f.Origin, f.Content)
+	f := NewRecord("Dave", Person, "had a little lamb")
+	t.Log(f.Title, f.Category, f.Major, f.Minor, f.OriginMajor, f.OriginMinor, f.Content)
 
 }

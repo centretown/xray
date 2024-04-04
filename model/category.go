@@ -7,7 +7,7 @@ const (
 	Mover            //Pink Elephant
 	Scene
 	Person
-	Ball
+	Circle
 )
 
 //go:generate stringer -type=Category
