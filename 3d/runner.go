@@ -15,20 +15,20 @@ const (
 type Runner struct {
 	Width  int32
 	Height int32
-	Actors []tools.Moveable
+	Actors []tools.Actor
 }
 
 func NewRunner(width int32, height int32) *Runner {
 	runr := &Runner{
 		Height: height,
 		Width:  width,
-		Actors: make([]tools.Moveable, 0),
+		Actors: make([]tools.Actor, 0),
 	}
 
 	return runr
 }
 
-func (runr *Runner) Add(a tools.Moveable, after float64) {
+func (runr *Runner) Add(a tools.Actor, after float64) {
 	runr.Actors = append(runr.Actors, a)
 }
 

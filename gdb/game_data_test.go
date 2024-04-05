@@ -1,4 +1,4 @@
-package dbio
+package gdb
 
 import (
 	"testing"
@@ -70,7 +70,7 @@ func ping_mem_gamedata(t *testing.T) {
 	}
 	defer gd.Close()
 
-	gd.Err = gd.DB.Ping()
+	gd.Err = gd.dbx.Ping()
 
 	if gd.Err != nil {
 		t.Fatal(gd.Err)
@@ -85,7 +85,7 @@ func create_mem_gamedata(t *testing.T) {
 	}
 	defer gd.Close()
 
-	gd.Err = gd.DB.Ping()
+	gd.Err = gd.dbx.Ping()
 
 	if gd.Err != nil {
 		t.Fatal(gd.Err)
@@ -103,7 +103,7 @@ func create_mem_game(t *testing.T) {
 	}
 	defer gd.Close()
 
-	gd.Err = gd.DB.Ping()
+	gd.Err = gd.dbx.Ping()
 
 	if gd.Err != nil {
 		t.Fatal(gd.Err)
@@ -124,11 +124,11 @@ func create_mem_game(t *testing.T) {
 	}
 
 	for _, path := range paths {
-		item := model.NewFileResource(path, model.Picture, "just a test")
+		item := model.NewFileResource(path, 0, "just a test")
 		if item.Err != nil {
 			t.Fatal(gd.Err)
 		}
-		gd.InsertItem(item)
+		// gd.InsertItem(item)
 		if gd.Err != nil {
 			t.Fatal(gd.Err)
 		}

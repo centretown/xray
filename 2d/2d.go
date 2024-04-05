@@ -24,25 +24,25 @@ func setup(gp pad.Pad) *tools.Game {
 	gs := tools.NewGame(gp, fps)
 	viewPort := gs.GetViewPort()
 
-	hole := tools.NewPicture("polar.png").Load()
+	hole := tools.NewTexture("polar.png").Load()
 	bouncer := tools.NewMover(hole, viewPort, 10, 10, 10)
-	gs.AddActor(bouncer, 6)
+	gs.AddMover(bouncer, 6)
 
 	ball := tools.NewCircle(20, tools.Cyan)
 	bouncer = tools.NewMover(ball, viewPort, 200, 100, 0)
-	gs.AddActor(bouncer, 1)
+	gs.AddMover(bouncer, 1)
 
-	head := tools.NewPicture("head_300.png").Load()
+	head := tools.NewTexture("head_300.png").Load()
 	bouncer = tools.NewMover(head, viewPort, 70, 140, 1.75)
-	gs.AddActor(bouncer, 8)
+	gs.AddMover(bouncer, 8)
 
-	gander := tools.NewPicture("gander.png").Load()
+	gander := tools.NewTexture("gander.png").Load()
 	bouncer = tools.NewMover(gander, viewPort, 300, 300, 0.5)
-	gs.AddActor(bouncer, 4)
+	gs.AddMover(bouncer, 4)
 
 	// generate palette and color map for paletted images
 	pal, colorMap :=
-		tools.CreatePaletteFromTextures(color.RGBA{}, fixedPalette, gs.Actors()...)
+		tools.CreatePaletteFromTextures(color.RGBA{}, fixedPalette, gs.Movers()...)
 	gs.SetColors(color.RGBA{}, pal, colorMap)
 
 	rl.SetTargetFPS(gs.FPS)

@@ -7,7 +7,7 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func CreatePaletteFromTextures(BG rl.Color, fixedPalette color.Palette, actors ...Moveable) (color.Palette, map[color.Color]uint8) {
+func CreatePaletteFromTextures(BG rl.Color, fixedPalette color.Palette, actors ...*Mover) (color.Palette, map[color.Color]uint8) {
 
 	rl.BeginDrawing()
 
@@ -15,10 +15,10 @@ func CreatePaletteFromTextures(BG rl.Color, fixedPalette color.Palette, actors .
 	x := int32(0)
 
 	for _, actor := range actors {
-		t, ok := actor.Drawer().(*Picture)
+		t, ok := actor.GetDrawer().(*Texture)
 		if ok {
 			t.DrawSimple(x, 0)
-			x += t.Rect().Width + 120
+			x += t.Bounds().Width + 120
 		}
 	}
 	rl.EndDrawing()

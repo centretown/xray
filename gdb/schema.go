@@ -1,4 +1,4 @@
-package dbio
+package gdb
 
 import (
 	"github.com/centretown/xray/model"
@@ -12,6 +12,10 @@ type Schema struct {
 	InsertItem    string
 	InsertLink    string
 	InsertTag     string
+
+	GetItem  string
+	GetLink  string
+	GetLinks string
 }
 
 func NewSchema() *Schema {

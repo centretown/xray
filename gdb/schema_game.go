@@ -1,4 +1,4 @@
-package dbio
+package gdb
 
 import (
 	"time"
@@ -35,7 +35,7 @@ created TIMESTAMP, updated TIMESTAMP,
 encoding SMALLINT,
 PRIMARY KEY (major,minor));`,
 
-		"CREATE UNIQUE INDEX items_title ON items (title,category,origin_major,origin_minor);",
+		"CREATE INDEX items_title ON items (title,category,origin_major,origin_minor);",
 		"CREATE INDEX items_category ON items (category,title,origin_major,origin_minor);",
 		"CREATE INDEX items_origin_t ON items (origin_major,origin_minor,title,category);",
 		"CREATE INDEX items_origin_c ON items (origin_major,origin_minor,category,title);",
@@ -51,13 +51,13 @@ PRIMARY KEY (name,major,minor));`,
 
 		`CREATE TABLE links (
 major BIGINT, minor BIGINT,
-link_major BIGINT, link_minor BIGINT,
-count SMALLINT, weight DOUBLE PRECISION,
-PRIMARY KEY (major,minor,link_major,link_minor));`,
+linked_major BIGINT, linked_minor BIGINT,
+repeated SMALLINT, weight DOUBLE PRECISION,
+PRIMARY KEY (major,minor,linked_major,linked_minor));`,
 
-		"CREATE UNIQUE INDEX links_link ON links (link_major,link_minor,major,minor);",
+		// "CREATE UNIQUE INDEX links_link ON links (linked_major,linked_minor,major,minor);",
 		"CREATE INDEX links_weight ON links (major,minor,weight);",
-		"CREATE INDEX links_weight_link ON links (link_major,link_minor,weight);",
+		"CREATE INDEX links_weight_link ON links (linked_major,linked_minor,weight);",
 	},
 
 	InsertVersion: `INSERT INTO version (major, minor, patch, extension) 
@@ -65,4 +65,16 @@ VALUES (:major, :minor, :patch, :extension);`,
 
 	InsertItem: `INSERT INTO items (title, category, content, encoding, major, minor, origin_major, origin_minor, created, updated)
 VALUES (:title, :category, :content, :encoding, :major, :minor, :origin_major, :origin_minor, :created, :updated);`,
+
+	InsertLink: `INSERT INTO links (major, minor, linked_major, linked_minor, repeated, weight)
+VALUES (:major, :minor, :linked_major, :linked_minor, :repeated, :weight);`,
+
+	InsertTag: `INSERT INTO tags (name, weight, major, minor)
+VALUES (:name, :weight, :major, :minor);`,
+
+	GetItem: `SELECT * FROM items WHERE major=$1 AND minor=$2;`,
+
+	GetLinks: `SELECT * FROM links WHERE major=$1 AND minor=$2;`,
+
+	GetLink: `SELECT * FROM links WHERE major=$1 AND minor=$2 AND linked_major=$3 AND linked_minor=$4;`,
 }

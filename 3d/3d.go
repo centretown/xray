@@ -108,7 +108,7 @@ func Run3d(runr *Runner, gpads *gpads.GPads) {
 
 		rl.DrawCircle(100, 100, 25, rl.Red)
 		for _, run := range runr.Actors {
-			run.Move(true, current)
+			run.Act(true, current)
 		}
 		rl.EndDrawing()
 

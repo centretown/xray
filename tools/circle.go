@@ -1,15 +1,19 @@
 package tools
 
 import (
+	"encoding/json"
+	"fmt"
 	"image/color"
 
 	"github.com/centretown/xray/model"
+	"github.com/centretown/xray/tools/categories"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 // const min_ball_radius = 5?
 
-var _ Drawable = (*Circle)(nil)
+var _ Drawer = (*Circle)(nil)
+var _ model.Recorder = (*Circle)(nil)
 
 type CircleItem struct {
 	Radius int32
@@ -34,16 +38,30 @@ func NewCircle(radius int32, col color.Color) *Circle {
 	circle.Radius = radius
 	circle.Color = c
 	circle.Record = model.NewRecord("circle",
-		model.Circle, &circle.CircleItem)
+		int32(categories.Circle), &circle.CircleItem)
 
 	return circle
 }
 
-func (b *Circle) GetRecord() *model.Record {
-	return b.Record
+func (b *Circle) GetRecord() *model.Record { return b.Record }
+func (b *Circle) GetItem() any             { return &b.CircleItem }
+
+func (b *Circle) Decode(rec *model.Record) (err error) {
+	b.Record = rec
+	cat := categories.Category(rec.Category)
+	if cat == categories.Circle {
+		err = json.Unmarshal([]byte(rec.Content), &b.CircleItem)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		err = fmt.Errorf("wrong category want %s have %s",
+			categories.Circle, cat)
+	}
+	return
 }
 
-func (b *Circle) Rect() rl.RectangleInt32 {
+func (b *Circle) Bounds() rl.RectangleInt32 {
 	width := b.Radius << 1
 	return rl.RectangleInt32{
 		X:      0,

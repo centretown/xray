@@ -6,22 +6,16 @@ import (
 	"path/filepath"
 )
 
-type ResourceItem struct {
+type Resource struct {
 	Name   string
 	Path   string
 	Scheme Scheme
 	IsDir  bool
 	Size   int64
-	Item   any
+	Err    error
 }
 
-type Resource struct {
-	*Record
-	ResourceItem
-	Err error
-}
-
-func NewFileResource(path string, category Category, content any) (res *Resource) {
+func NewFileResource(path string, category int32, content any) (res *Resource) {
 	var (
 		abs  string
 		info fs.FileInfo
@@ -30,7 +24,6 @@ func NewFileResource(path string, category Category, content any) (res *Resource
 	)
 
 	res = &Resource{}
-	res.Item = content
 	res.Scheme = File
 
 	defer func() {
@@ -46,13 +39,8 @@ func NewFileResource(path string, category Category, content any) (res *Resource
 			res.Name = info.Name()
 			res.Size = info.Size()
 			res.IsDir = info.IsDir()
-			res.Record = NewRecord(res.Name, category, &res.ResourceItem)
 		}
 	}
 
 	return
-}
-
-func (res *Resource) GetRecord() *Record {
-	return res.Record
 }

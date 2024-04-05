@@ -9,8 +9,8 @@ import (
 func (gs *Game) Run() {
 
 	defer func() {
-		for _, actor := range gs.Actors() {
-			t, ok := actor.Drawer().(*Picture)
+		for _, actor := range gs.Movers() {
+			t, ok := actor.GetDrawer().(*Texture)
 			if ok {
 				fmt.Println("UnloadTexture")
 				t.Unload()
@@ -31,8 +31,8 @@ func (gs *Game) Run() {
 
 		rl.ClearBackground(gs.backGround)
 
-		for _, actor := range gs.Actors() {
-			actor.Move(!gs.Paused, gs.Current)
+		for _, actor := range gs.Movers() {
+			actor.Act(!gs.Paused, gs.Current)
 		}
 
 		gs.DrawStatus()

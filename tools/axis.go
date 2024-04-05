@@ -4,7 +4,7 @@ import (
 	"github.com/centretown/xray/try"
 )
 
-var _ Action = (*Axis)(nil)
+var _ Motor = (*Axis)(nil)
 
 type Axis struct {
 	Pos  int32
@@ -26,7 +26,7 @@ func (ax *Axis) Refresh(now float64, max int32) {
 	ax.Max = max
 }
 
-func (ax *Axis) Next(current, rate float64) int32 {
+func (ax *Axis) Move(current, rate float64) int32 {
 	var (
 		delta    = current - ax.Last
 		deltaPos = int32(delta * rate)

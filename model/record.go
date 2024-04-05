@@ -9,9 +9,20 @@ import (
 
 const IN_HOUSE = "018e9522-01c9-77c0-be6c-65526f21ec1a"
 
+// Decode(rec *model.Record) (err error)
+type Linker interface {
+	Link(...*Record)
+}
+
+type Recorder interface {
+	GetRecord() *Record
+	GetItem() any
+	Decode(rec *Record) (err error)
+}
+
 var (
 	origin                   uuid.UUID
-	originMajor, originMinor uint64
+	originMajor, originMinor int64
 )
 
 func init() {
@@ -19,15 +30,15 @@ func init() {
 	originMajor, originMinor = RecordID(origin)
 }
 
-func RecordID(id uuid.UUID) (major, minor uint64) {
+func RecordID(id uuid.UUID) (major, minor int64) {
 	for i := range 8 {
-		major |= uint64(id[i]) << (i * 8)
-		minor |= uint64(id[i+8]) << (i * 8)
+		major |= int64(id[i]) << (i * 8)
+		minor |= int64(id[i+8]) << (i * 8)
 	}
 	return
 }
 
-func RecordUUID(major, minor uint64) (id uuid.UUID) {
+func RecordUUID(major, minor int64) (id uuid.UUID) {
 	for i := range 8 {
 		id[i] = uint8(major >> (i * 8))
 		id[i+8] = uint8(minor >> (i * 8))
@@ -35,24 +46,20 @@ func RecordUUID(major, minor uint64) (id uuid.UUID) {
 	return
 }
 
-type Recordable interface {
-	GetRecord() *Record
-}
-
 type Record struct {
 	Title       string
-	Category    string
+	Category    int32
 	Content     string
 	Encoding    Encoding
-	Major       uint64
-	Minor       uint64
-	OriginMajor uint64 `db:"origin_major"`
-	OriginMinor uint64 `db:"origin_minor"`
+	Major       int64
+	Minor       int64
+	OriginMajor int64 `db:"origin_major"`
+	OriginMinor int64 `db:"origin_minor"`
 	Created     time.Time
 	Updated     time.Time
 }
 
-func NewRecord(title string, category Category, v any) *Record {
+func NewRecord(title string, category int32, v any) *Record {
 
 	id, _ := uuid.NewV7()
 	major, minor := RecordID(id)
@@ -68,7 +75,7 @@ func NewRecord(title string, category Category, v any) *Record {
 		OriginMajor: originMajor,
 		OriginMinor: originMinor,
 		Title:       title,
-		Category:    category.String(),
+		Category:    category,
 		Created:     time.Now(),
 		Updated:     time.Now(),
 		Encoding:    JSON,

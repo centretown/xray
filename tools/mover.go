@@ -1,12 +1,18 @@
 package tools
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/centretown/xray/model"
+	"github.com/centretown/xray/tools/categories"
 	"github.com/centretown/xray/try"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-var _ Moveable = (*Mover)(nil)
+var _ Actor = (*Mover)(nil)
+var _ model.Recorder = (*Mover)(nil)
+var _ model.Linker = (*Mover)(nil)
 
 const (
 	XAxis int = iota
@@ -21,8 +27,8 @@ type MoverItem struct {
 	PixelRateX   float64
 	Rotation     float32
 	RotationRate float32
-	Actions      []Action
-	drawer       Drawable
+	Axes         []*Axis
+	drawer       Drawer
 }
 
 type Mover struct {
@@ -30,28 +36,42 @@ type Mover struct {
 	Record *model.Record
 }
 
-func NewMover(drawer Drawable, bounds rl.RectangleInt32,
+func NewMover(drawer Drawer, bounds rl.RectangleInt32,
 	pixelRateX, pixelRateY float64, rotationRate float32) *Mover {
 
 	mv := &Mover{}
-	mv.Source = drawer.Rect()
+	mv.Source = drawer.Bounds()
 	mv.Bounds = bounds
 	mv.PixelRateX = pixelRateX
 	mv.PixelRateY = pixelRateY
 	mv.Rotation = 0
 	mv.RotationRate = rotationRate
-	mv.Actions = make([]Action, 2)
+	mv.Axes = make([]*Axis, 2)
 	mv.drawer = drawer
 
 	mv.adjustBounds()
-	mv.Actions[0] = NewAxis(rl.GetTime(), mv.Bounds.Width)
-	mv.Actions[1] = NewAxis(rl.GetTime(), mv.Bounds.Height)
-	mv.Record = model.NewRecord("mover", model.Mover, &mv.MoverItem)
+	mv.Axes[0] = NewAxis(rl.GetTime(), mv.Bounds.Width)
+	mv.Axes[1] = NewAxis(rl.GetTime(), mv.Bounds.Height)
+	mv.Record = model.NewRecord("motor", int32(categories.Mover), &mv.MoverItem)
 	return mv
 }
 
-func (mv *Mover) Drawer() Drawable         { return mv.drawer }
+func (mv *Mover) GetDrawer() Drawer        { return mv.drawer }
 func (mv *Mover) GetRecord() *model.Record { return mv.Record }
+func (mv *Mover) GetItem() any             { return &mv.MoverItem }
+
+func (mv *Mover) Decode(rec *model.Record) (err error) {
+	mv.Record = rec
+	cat := categories.Category(rec.Category)
+	if cat == categories.Mover {
+		err = json.Unmarshal([]byte(rec.Content), &mv.MoverItem)
+	} else {
+		err = fmt.Errorf("wrong category want %s have %s",
+			categories.Mover, cat)
+	}
+
+	return
+}
 
 func (mv *Mover) adjustBounds() {
 	mv.Bounds.X += mv.Source.Width / 2
@@ -72,20 +92,46 @@ func (mv *Mover) GetPixelRate() (float64, float64) {
 func (mv *Mover) Refresh(now float64, bounds rl.RectangleInt32) {
 	mv.Bounds = bounds
 	mv.adjustBounds()
-	mv.Actions[0].Refresh(now, bounds.Width-mv.Source.Width)
-	mv.Actions[1].Refresh(now, bounds.Height-mv.Source.Height)
+	mv.Axes[0].Refresh(now, bounds.Width-mv.Source.Width)
+	mv.Axes[1].Refresh(now, bounds.Height-mv.Source.Height)
 }
 
-func (mv *Mover) Move(can_move bool, now float64) {
-	x, y := mv.Actions[0], mv.Actions[1]
+func (mv *Mover) Act(can_move bool, now float64) {
+	x, y := mv.Axes[0], mv.Axes[1]
 	mv.drawer.Draw(rl.Vector3{X: float32(mv.Bounds.X + x.Position()),
 		Y: float32(mv.Bounds.Y + y.Position()),
 		Z: float32(mv.Rotation)})
 
 	m := try.As[float64](can_move)
-	y.Next(now, mv.PixelRateY*m)
+	y.Move(now, mv.PixelRateY*m)
 
 	p := x.Position()
-	p -= x.Next(now, mv.PixelRateX*m)
+	p -= x.Move(now, mv.PixelRateX*m)
 	mv.Rotation += mv.RotationRate * float32(p)
+}
+
+func (mv *Mover) Link(recs ...*model.Record) {
+	if len(recs) < 1 {
+		return
+	}
+	var err error
+
+	rec := recs[0]
+	cat := categories.Category(rec.Category)
+	if cat == categories.Circle {
+		circle := &Circle{}
+		err = circle.Decode(rec)
+		mv.drawer = circle
+	} else if cat == categories.Texture {
+		tex := &Texture{}
+		err = tex.Decode(rec)
+		mv.drawer = tex
+	} else {
+		err = fmt.Errorf("wrong category want %s or %s have %s",
+			categories.Circle, categories.Texture, cat)
+	}
+
+	if err != nil {
+		fmt.Println(err)
+	}
 }
