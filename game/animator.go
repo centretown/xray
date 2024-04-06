@@ -1,4 +1,4 @@
-package tools
+package game
 
 import rl "github.com/gen2brain/raylib-go/raylib"
 

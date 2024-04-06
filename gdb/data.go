@@ -11,26 +11,26 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type GameData struct {
+type Data struct {
 	Schema *Schema
 	Access *access.Access
 	dbx    *sqlx.DB
 	Err    error
 }
 
-func NewGameData(driver, path string) *GameData {
-	return &GameData{Schema: SchemaGame, Access: access.NewAccess(driver, path)}
+func NewGameData(driver, path string) *Data {
+	return &Data{Schema: SchemaGame, Access: access.NewAccess(driver, path)}
 }
 
-func (gdb *GameData) Open() {
+func (gdb *Data) Open() {
 	gdb.dbx, gdb.Err = sqlx.Connect(gdb.Access.Driver, gdb.Access.Path)
 }
 
-func (gdb *GameData) Close() {
+func (gdb *Data) Close() {
 	gdb.Err = gdb.dbx.Close()
 }
 
-func (gdb *GameData) Create() {
+func (gdb *Data) Create() {
 	for _, sch := range gdb.Schema.Create {
 		fmt.Println(sch)
 		gdb.dbx.MustExec(sch)
@@ -40,7 +40,7 @@ func (gdb *GameData) Create() {
 	gdb.Err = tx.Commit()
 }
 
-func (gdb *GameData) InsertItem(item model.Recorder) {
+func (gdb *Data) InsertItems(items ...model.Recorder) {
 	tx := gdb.dbx.MustBegin()
 	defer func() {
 		tx.Commit()
@@ -48,11 +48,15 @@ func (gdb *GameData) InsertItem(item model.Recorder) {
 			fmt.Println("InsertItem", gdb.Err)
 		}
 	}()
-
-	_, gdb.Err = tx.NamedExec(gdb.Schema.InsertItem, item.GetRecord())
+	for _, item := range items {
+		_, gdb.Err = tx.NamedExec(gdb.Schema.InsertItem, item.GetRecord())
+		if gdb.Err != nil {
+			return
+		}
+	}
 }
 
-func (gdb *GameData) InsertLink(link *model.Link) {
+func (gdb *Data) InsertLinks(links ...*model.Link) {
 	tx := gdb.dbx.MustBegin()
 	defer func() {
 		tx.Commit()
@@ -60,11 +64,15 @@ func (gdb *GameData) InsertLink(link *model.Link) {
 			fmt.Println("InsertLink", gdb.Err)
 		}
 	}()
-
-	_, gdb.Err = tx.NamedExec(gdb.Schema.InsertLink, &link)
+	for _, link := range links {
+		_, gdb.Err = tx.NamedExec(gdb.Schema.InsertLink, link)
+		if gdb.Err != nil {
+			return
+		}
+	}
 }
 
-func (gdb *GameData) GetItemID(id string) *model.Record {
+func (gdb *Data) GetItemID(id string) *model.Record {
 	var uid uuid.UUID
 	uid, gdb.Err = uuid.Parse((id))
 	if gdb.Err != nil {
@@ -73,27 +81,26 @@ func (gdb *GameData) GetItemID(id string) *model.Record {
 	return gdb.GetItemUUID(uid)
 }
 
-func (gdb *GameData) GetItemUUID(uid uuid.UUID) *model.Record {
+func (gdb *Data) GetItemUUID(uid uuid.UUID) *model.Record {
 	major, minor := model.RecordID(uid)
 	return gdb.GetItem(major, minor)
 }
 
-func (gdb *GameData) GetItemRecord(item model.Recorder) *model.Record {
+func (gdb *Data) GetItemRecord(item model.Recorder) *model.Record {
 	rec := item.GetRecord()
 	return gdb.GetItem(rec.Major, rec.Minor)
 }
 
-func (gdb *GameData) GetItem(major, minor int64) *model.Record {
+func (gdb *Data) GetItem(major, minor int64) *model.Record {
 	item := &model.Record{}
 	gdb.Err = gdb.dbx.Get(item, gdb.Schema.GetItem, major, minor)
 	return item
 }
 
-func (gdb *GameData) GetLinks(rec *model.Record) (recs []*model.Record) {
+func (gdb *Data) GetLinks(rec *model.Record) (recs []*model.Record) {
 	recs = make([]*model.Record, 0)
 	var (
 		rows  *sqlx.Rows
-		link  model.Link
 		links = make([]*model.Link, 0)
 	)
 
@@ -103,11 +110,12 @@ func (gdb *GameData) GetLinks(rec *model.Record) (recs []*model.Record) {
 	}
 
 	for rows.Next() {
-		gdb.Err = rows.StructScan(&link)
+		link := &model.Link{}
+		gdb.Err = rows.StructScan(link)
 		if gdb.Err != nil {
 			return
 		}
-		links = append(links, &link)
+		links = append(links, link)
 	}
 
 	for _, l := range links {

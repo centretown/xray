@@ -5,7 +5,7 @@ import (
 
 	"github.com/centretown/gpads/gpads"
 	"github.com/centretown/gpads/pad"
-	"github.com/centretown/xray/tools"
+	"github.com/centretown/xray/game"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -15,34 +15,41 @@ func main() {
 	gs.Run()
 }
 
-func setup(gp pad.Pad) *tools.Game {
+func setup(gp pad.Pad) *game.Game {
 
 	rl.SetTraceLogLevel(rl.LogWarning)
 	rl.InitWindow(screenWidth, screenHeight, "2d")
 	rl.SetWindowState(rl.FlagWindowResizable)
 
-	gs := tools.NewGame(gp, fps)
-	viewPort := gs.GetViewPort()
+	gs := game.NewGame(gp, screenWidth, screenHeight, fps)
+	viewPort := gs.SetViewPortFromWindow()
 
-	hole := tools.NewTexture("polar.png").Load()
-	bouncer := tools.NewMover(hole, viewPort, 10, 10, 10)
+	hole := game.NewTexture("polar.png").
+		Load()
+	bouncer := game.NewMover(viewPort, 10, 10, 10).
+		AddDrawer(hole)
 	gs.AddMover(bouncer, 6)
 
-	ball := tools.NewCircle(20, tools.Cyan)
-	bouncer = tools.NewMover(ball, viewPort, 200, 100, 0)
+	ball := game.NewCircle(20, game.Cyan)
+	bouncer = game.NewMover(viewPort, 200, 100, 0).
+		AddDrawer(ball)
 	gs.AddMover(bouncer, 1)
 
-	head := tools.NewTexture("head_300.png").Load()
-	bouncer = tools.NewMover(head, viewPort, 70, 140, 1.75)
+	head := game.NewTexture("head_300.png").
+		Load()
+	bouncer = game.NewMover(viewPort, 70, 140, 1.75).
+		AddDrawer(head)
 	gs.AddMover(bouncer, 8)
 
-	gander := tools.NewTexture("gander.png").Load()
-	bouncer = tools.NewMover(gander, viewPort, 300, 300, 0.5)
+	gander := game.NewTexture("gander.png").
+		Load()
+	bouncer = game.NewMover(viewPort, 300, 300, 0.5).
+		AddDrawer(gander)
 	gs.AddMover(bouncer, 4)
 
 	// generate palette and color map for paletted images
 	pal, colorMap :=
-		tools.CreatePaletteFromTextures(color.RGBA{}, fixedPalette, gs.Movers()...)
+		game.CreatePaletteFromTextures(color.RGBA{}, fixedPalette, gs.Movers()...)
 	gs.SetColors(color.RGBA{}, pal, colorMap)
 
 	rl.SetTargetFPS(gs.FPS)
@@ -76,12 +83,12 @@ const (
 
 var fixedPalette = color.Palette{
 	color.Transparent,
-	tools.White,
-	tools.Black,
-	tools.Red,
-	tools.Yellow,
-	tools.Green,
-	tools.Cyan,
-	tools.Blue,
-	tools.Magenta,
+	game.White,
+	game.Black,
+	game.Red,
+	game.Yellow,
+	game.Green,
+	game.Cyan,
+	game.Blue,
+	game.Magenta,
 }

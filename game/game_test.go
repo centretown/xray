@@ -1,14 +1,14 @@
-package tools
+package game
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/centretown/gpads/pad"
+	"github.com/centretown/xray/game/categories"
 	"github.com/centretown/xray/gdb"
 	"github.com/centretown/xray/model"
-	"github.com/centretown/xray/tools/categories"
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -89,61 +89,42 @@ func create_mem_game(t *testing.T) {
 		captureFps   = 25
 	)
 
-	game := NewGame(gp, fps)
-
-	viewPort := rl.RectangleInt32{X: 0, Y: 0, Width: 1000, Height: 500}
-
-	itm := func(f func(model.Recorder), i model.Recorder) {
-		f(i)
-		if data.Err != nil {
-			t.Fatal(data.Err)
-		}
-		fmt.Println("inserted")
-	}
-
-	lnk := func(f func(*model.Link), i *model.Link) {
-		f(i)
-		if data.Err != nil {
-			t.Fatal(data.Err)
-		}
-		fmt.Println("linked")
-	}
+	game := NewGame(gp, screenWidth, screenHeight, fps)
+	viewPort := game.GetViewPort()
 
 	hole := NewTexture(picd + "polar.png")
-	hole_mv := NewMover(hole, viewPort, 10, 10, 10)
+	hole_mv := NewMover(viewPort, 10, 10, 10).AddDrawer(hole)
 	game.AddMover(hole_mv, 6)
 
 	ball := NewCircle(20, Cyan)
-	ball_mv := NewMover(ball, viewPort, 200, 100, 0)
+	ball_mv := NewMover(viewPort, 200, 100, 0).AddDrawer(ball)
 	game.AddMover(ball_mv, 1)
 
 	head := NewTexture(picd + "head_300.png")
-	head_mv := NewMover(head, viewPort, 70, 140, 1.75)
+	head_mv := NewMover(viewPort, 70, 140, 1.75).AddDrawer(head)
 	game.AddMover(head_mv, 8)
 
 	gander := NewTexture(picd + "gander.png")
-	gander_mv := NewMover(gander, viewPort, 300, 300, 0.5)
+	gander_mv := NewMover(viewPort, 300, 300, 0.5).AddDrawer(gander)
 	game.AddMover(gander_mv, 4)
 
-	itm(data.InsertItem, ball)
-	itm(data.InsertItem, ball_mv)
-	itm(data.InsertItem, hole)
-	itm(data.InsertItem, hole_mv)
-	itm(data.InsertItem, head)
-	itm(data.InsertItem, head_mv)
-	itm(data.InsertItem, gander)
-	itm(data.InsertItem, gander_mv)
+	data.InsertItems(ball, ball_mv,
+		hole, hole_mv,
+		head, head_mv,
+		gander, gander_mv)
+	if data.Err != nil {
+		t.Fatal(data.Err)
+	}
+	data.InsertLinks(model.NewLink(ball_mv, ball, 1, 1),
+		model.NewLink(hole_mv, hole, 1, 1),
+		model.NewLink(head_mv, head, 1, 1),
+		model.NewLink(gander_mv, gander, 1, 1),
+		model.NewLink(game, hole_mv, 1, 1),
+		model.NewLink(game, ball_mv, 1, 1),
+		model.NewLink(game, head_mv, 1, 1),
+		model.NewLink(game, gander_mv, 1, 1))
 
-	lnk(data.InsertLink, model.NewLink(ball_mv, ball, 1, 1))
-	lnk(data.InsertLink, model.NewLink(hole_mv, hole, 1, 1))
-	lnk(data.InsertLink, model.NewLink(head_mv, head, 1, 1))
-	lnk(data.InsertLink, model.NewLink(gander_mv, gander, 1, 1))
-	lnk(data.InsertLink, model.NewLink(game, hole_mv, 1, 1))
-	lnk(data.InsertLink, model.NewLink(game, ball_mv, 1, 1))
-	lnk(data.InsertLink, model.NewLink(game, head_mv, 1, 1))
-	lnk(data.InsertLink, model.NewLink(game, gander_mv, 1, 1))
-
-	data.InsertItem(game)
+	data.InsertItems(game)
 	if data.Err != nil {
 		t.Fatal(data.Err)
 	}
@@ -151,8 +132,12 @@ func create_mem_game(t *testing.T) {
 	read_game(t, game, data)
 }
 
-func read_game(t *testing.T, game *Game, data *gdb.GameData) {
-	fmt.Println(game)
+func read_game(t *testing.T, game *Game, data *gdb.Data) {
+	buf, _ := yaml.Marshal(game)
+	fmt.Println("---------")
+	fmt.Println("read game")
+	fmt.Println(string(buf))
+
 	gameRec := data.GetItemRecord(game)
 	if data.Err != nil {
 		t.Fatal(data.Err)
@@ -165,6 +150,7 @@ func read_game(t *testing.T, game *Game, data *gdb.GameData) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	linkRecs := data.GetLinks(gameRec)
 
 	if data.Err != nil {
@@ -178,15 +164,15 @@ func read_game(t *testing.T, game *Game, data *gdb.GameData) {
 	gs.Link(linkRecs...)
 	fmt.Println(gs)
 
-	for i, a := range gs.Movers() {
+	for _, a := range gs.Movers() {
 		linkRecs = data.GetLinks(a.GetRecord())
 		for i, l := range linkRecs {
 			fmt.Println(i, l)
 		}
 		a.Link(linkRecs...)
-		fmt.Println(i, a)
 	}
 
-	// fmt.Println(game)
-	// fmt.Println(gameS)
+	buf, _ = yaml.Marshal(gs)
+	fmt.Println(string(buf))
+
 }

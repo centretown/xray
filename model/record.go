@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
@@ -12,6 +11,7 @@ const IN_HOUSE = "018e9522-01c9-77c0-be6c-65526f21ec1a"
 // Decode(rec *model.Record) (err error)
 type Linker interface {
 	Link(...*Record)
+	Children() []Recorder
 }
 
 type Recorder interface {
@@ -19,6 +19,10 @@ type Recorder interface {
 	GetItem() any
 	Decode(rec *Record) (err error)
 }
+
+// type Encoder interface {
+// 	Encode(any) (string, error)
+// }
 
 var (
 	origin                   uuid.UUID
@@ -59,15 +63,17 @@ type Record struct {
 	Updated     time.Time
 }
 
-func NewRecord(title string, category int32, v any) *Record {
+func NewRecord(title string, category int32,
+	v any, encoding Encoding) *Record {
 
 	id, _ := uuid.NewV7()
 	major, minor := RecordID(id)
 
-	content, err := json.Marshal(v)
+	buf, err := encoding.Encode(v)
 	if err != nil {
-		content = []byte(err.Error())
+		buf, _ = encoding.Encode(err.Error())
 	}
+	content := string(buf)
 
 	return &Record{
 		Major:       major,
@@ -78,7 +84,16 @@ func NewRecord(title string, category int32, v any) *Record {
 		Category:    category,
 		Created:     time.Now(),
 		Updated:     time.Now(),
-		Encoding:    JSON,
-		Content:     string(content),
+		Encoding:    encoding,
+		Content:     content,
 	}
+}
+
+func (rec *Record) UpdateContent(v any) string {
+	buf, err := rec.Encoding.Encode(v)
+	if err != nil {
+		buf, _ = rec.Encoding.Encode(err.Error())
+	}
+	rec.Content = string(buf)
+	return rec.Content
 }

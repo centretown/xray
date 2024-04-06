@@ -1,4 +1,4 @@
-package tools
+package game
 
 import (
 	"fmt"
@@ -36,30 +36,29 @@ func (gs *Game) DrawStatus() {
 }
 
 func (gs *Game) Refresh(current float64) {
-	viewPort := gs.GetViewPort()
+	viewPort := gs.SetViewPortFromWindow()
 	for _, run := range gs.movers {
 		run.Refresh(current, viewPort)
 	}
 }
 
+func (gs *Game) SetViewPortFromWindow() rl.RectangleInt32 {
+	return gs.SetViewPort(int32(rl.GetRenderWidth()),
+		int32(rl.GetRenderHeight()))
+}
+
+func (gs *Game) SetViewPort(rw, rh int32) rl.RectangleInt32 {
+	gs.Width = rw
+	gs.Height = rh - msg_height
+	return gs.GetViewPort()
+}
+
 func (gs *Game) GetViewPort() rl.RectangleInt32 {
-	rw := rl.GetRenderWidth()
-	rh := rl.GetRenderHeight()
-
-	if rw >= min_width && rh >= min_height {
-		return rl.RectangleInt32{
-			X:      0,
-			Y:      0,
-			Width:  int32(rw),
-			Height: int32(rh - msg_height),
-		}
-	}
-
 	return rl.RectangleInt32{
 		X:      0,
 		Y:      0,
-		Width:  min_width,
-		Height: min_height - msg_height,
+		Width:  gs.Width,
+		Height: gs.Height,
 	}
 }
 

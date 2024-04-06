@@ -1,4 +1,4 @@
-package tools
+package game
 
 import (
 	"github.com/centretown/xray/try"

@@ -1,4 +1,4 @@
-package tools
+package game
 
 import (
 	"github.com/centretown/gpads/gpads"
@@ -31,6 +31,8 @@ func (gs *Game) ProcessInput() {
 
 func (gs *Game) CheckPad(i int) {
 	var is_multiply, down bool
+	// gs.gamepad.GetPadButtonPressed()
+
 	for b := range PAD_STATES {
 		switch b {
 		case TIMES_TEN:

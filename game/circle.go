@@ -1,12 +1,12 @@
-package tools
+package game
 
 import (
 	"encoding/json"
 	"fmt"
 	"image/color"
 
+	"github.com/centretown/xray/game/categories"
 	"github.com/centretown/xray/model"
-	"github.com/centretown/xray/tools/categories"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -38,7 +38,7 @@ func NewCircle(radius int32, col color.Color) *Circle {
 	circle.Radius = radius
 	circle.Color = c
 	circle.Record = model.NewRecord("circle",
-		int32(categories.Circle), &circle.CircleItem)
+		int32(categories.Circle), &circle.CircleItem, model.JSON)
 
 	return circle
 }

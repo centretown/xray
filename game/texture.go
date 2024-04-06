@@ -1,11 +1,11 @@
-package tools
+package game
 
 import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/centretown/xray/game/categories"
 	"github.com/centretown/xray/model"
-	"github.com/centretown/xray/tools/categories"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -26,7 +26,7 @@ func NewTexture(path string) (tex *Texture) {
 	tex = &Texture{}
 	tex.Resource = model.NewFileResource(path, int32(categories.Texture), &tex.TextureItem)
 	tex.Record = model.NewRecord("texture",
-		int32(categories.Texture), &tex.TextureItem)
+		int32(categories.Texture), &tex.TextureItem, model.JSON)
 	return tex
 }
 
@@ -75,5 +75,5 @@ func (tex *Texture) Draw(v rl.Vector3) {
 
 func (tex *Texture) Bounds() rl.RectangleInt32 {
 	return rl.RectangleInt32{X: 0, Y: 0,
-		Width: tex.texture2D.Width, Height: tex.texture2D.Width}
+		Width: tex.Resource.Width, Height: tex.Resource.Height}
 }

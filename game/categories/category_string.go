@@ -16,7 +16,7 @@ func _() {
 	_ = x[COUNT-5]
 }
 
-const _Category_name = "TextureCircleMotorGamePlayerCOUNT"
+const _Category_name = "TextureCircleMoverGamePlayerCOUNT"
 
 var _Category_index = [...]uint8{0, 7, 13, 18, 22, 28, 33}
 

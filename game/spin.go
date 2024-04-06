@@ -1,4 +1,4 @@
-package tools
+package game
 
 // var _ Action = (*Spin)(nil)
 

@@ -1,11 +1,11 @@
-package tools
+package game
 
 import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/centretown/xray/game/categories"
 	"github.com/centretown/xray/model"
-	"github.com/centretown/xray/tools/categories"
 	"github.com/centretown/xray/try"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -36,23 +36,27 @@ type Mover struct {
 	Record *model.Record
 }
 
-func NewMover(drawer Drawer, bounds rl.RectangleInt32,
+func NewMover(bounds rl.RectangleInt32,
 	pixelRateX, pixelRateY float64, rotationRate float32) *Mover {
 
 	mv := &Mover{}
-	mv.Source = drawer.Bounds()
 	mv.Bounds = bounds
 	mv.PixelRateX = pixelRateX
 	mv.PixelRateY = pixelRateY
 	mv.Rotation = 0
 	mv.RotationRate = rotationRate
 	mv.Axes = make([]*Axis, 2)
-	mv.drawer = drawer
 
 	mv.adjustBounds()
 	mv.Axes[0] = NewAxis(rl.GetTime(), mv.Bounds.Width)
 	mv.Axes[1] = NewAxis(rl.GetTime(), mv.Bounds.Height)
-	mv.Record = model.NewRecord("motor", int32(categories.Mover), &mv.MoverItem)
+	mv.Record = model.NewRecord("motor", int32(categories.Mover), &mv.MoverItem, model.JSON)
+	return mv
+}
+func (mv *Mover) AddDrawer(dr Drawer) *Mover {
+	mv.drawer = dr
+	mv.Source = dr.Bounds()
+	mv.Record.UpdateContent(&mv.MoverItem)
 	return mv
 }
 
@@ -110,9 +114,21 @@ func (mv *Mover) Act(can_move bool, now float64) {
 	mv.Rotation += mv.RotationRate * float32(p)
 }
 
+func (mv *Mover) Children() (rcds []model.Recorder) {
+	rcds = make([]model.Recorder, 0)
+	r, ok := mv.drawer.(model.Recorder)
+	if ok {
+		rcds = append(rcds, r)
+	}
+	return
+}
+
 func (mv *Mover) Link(recs ...*model.Record) {
 	if len(recs) < 1 {
 		return
+	}
+	if len(recs) > 1 {
+		fmt.Println("Mover.Link too many links want 1 have", len(recs))
 	}
 	var err error
 
@@ -121,11 +137,11 @@ func (mv *Mover) Link(recs ...*model.Record) {
 	if cat == categories.Circle {
 		circle := &Circle{}
 		err = circle.Decode(rec)
-		mv.drawer = circle
+		mv.AddDrawer(circle)
 	} else if cat == categories.Texture {
 		tex := &Texture{}
 		err = tex.Decode(rec)
-		mv.drawer = tex
+		mv.AddDrawer(tex)
 	} else {
 		err = fmt.Errorf("wrong category want %s or %s have %s",
 			categories.Circle, categories.Texture, cat)

@@ -1,4 +1,4 @@
-package tools
+package game
 
 type Player struct {
 }
