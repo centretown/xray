@@ -1,12 +1,11 @@
-package game
+package gizmo
 
 import (
 	"fmt"
+	"image/color"
 	"testing"
 
-	"github.com/centretown/gpads/pad"
-	"github.com/centretown/xray/gdb"
-	"github.com/centretown/xray/model"
+	"github.com/centretown/xray/dbg"
 	"gopkg.in/yaml.v3"
 )
 
@@ -48,8 +47,19 @@ func TestSave(t *testing.T) {
 	dbcur = savedb
 }
 
+var fixedPalette = []color.RGBA{
+	White,
+	Black,
+	Red,
+	Yellow,
+	Green,
+	Cyan,
+	Blue,
+	Magenta,
+}
+
 func create_mem_game(t *testing.T) {
-	data := gdb.NewGameData("sqlite3", dbcur)
+	data := dbg.NewGameData("sqlite3", dbcur)
 	data.Open()
 	if data.Err != nil {
 		t.Fatal(data.Err)
@@ -62,10 +72,6 @@ func create_mem_game(t *testing.T) {
 
 	data.Create()
 
-	var (
-		gp pad.Pad
-	)
-
 	const (
 		baseInterval = .02
 		screenWidth  = 1280
@@ -74,7 +80,7 @@ func create_mem_game(t *testing.T) {
 		captureFps   = 25
 	)
 
-	game := NewGame(gp, screenWidth, screenHeight, fps)
+	game := NewGameSetup(screenWidth, screenHeight, fps)
 	viewPort := game.GetViewPort()
 
 	hole := NewTexture(picd + "polar.png")
@@ -93,45 +99,30 @@ func create_mem_game(t *testing.T) {
 	gander_mv := NewMover(viewPort, 300, 300, 0.5).AddDrawer(gander)
 	game.AddMover(gander_mv, 4)
 
-	data.InsertItems(ball, ball_mv,
-		hole, hole_mv,
-		head, head_mv,
-		gander, gander_mv)
+	game.FixedPalette = fixedPalette
+	data.Save(game)
 	if data.Err != nil {
 		t.Fatal(data.Err)
 	}
-	data.InsertLinks(model.NewLink(ball_mv, ball, 1, 1),
-		model.NewLink(hole_mv, hole, 1, 1),
-		model.NewLink(head_mv, head, 1, 1),
-		model.NewLink(gander_mv, gander, 1, 1),
-		model.NewLink(game, hole_mv, 1, 1),
-		model.NewLink(game, ball_mv, 1, 1),
-		model.NewLink(game, head_mv, 1, 1),
-		model.NewLink(game, gander_mv, 1, 1))
-
-	data.InsertItems(game)
-	if data.Err != nil {
-		t.Fatal(data.Err)
-	}
-
-	read_game(t, game, data)
+	// read_game(t, game, data)
+	load_game(t, game, data)
 }
 
-func read_game(t *testing.T, game *Game, data *gdb.Data) {
-	buf, _ := yaml.Marshal(game)
+func read_game(t *testing.T, saved *Game, data *dbg.Data) {
+	buf, _ := yaml.Marshal(saved)
 	fmt.Println("---------")
 	fmt.Println("read game")
 	fmt.Println(string(buf))
 
-	gameRec := data.GetItemRecord(game)
+	gameRec := data.GetItemRecord(saved)
 	if data.Err != nil {
 		t.Fatal(data.Err)
 	}
 
 	fmt.Println(gameRec)
 
-	gs := &Game{}
-	err := gs.Decode(gameRec)
+	game := &Game{}
+	err := game.Decode(gameRec)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -146,10 +137,10 @@ func read_game(t *testing.T, game *Game, data *gdb.Data) {
 		fmt.Println(i, l)
 	}
 
-	gs.Link(linkRecs...)
-	fmt.Println(gs)
+	game.Link(linkRecs...)
+	fmt.Println(game)
 
-	for _, a := range gs.Movers() {
+	for _, a := range game.Movers() {
 		linkRecs = data.GetLinks(a.GetRecord())
 		for i, l := range linkRecs {
 			fmt.Println(i, l)
@@ -157,7 +148,21 @@ func read_game(t *testing.T, game *Game, data *gdb.Data) {
 		a.Link(linkRecs...)
 	}
 
-	buf, _ = yaml.Marshal(gs)
+	buf, _ = yaml.Marshal(game)
 	fmt.Println(string(buf))
 
+}
+
+func load_game(t *testing.T, saved *Game, data *dbg.Data) {
+
+	game := &Game{
+		Record: saved.Record,
+	}
+
+	data.Load(game)
+	if data.Err != nil {
+		t.Fatal(data.Err)
+	}
+
+	game.Dump()
 }

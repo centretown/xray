@@ -1,10 +1,11 @@
-package game
+package gizmo
 
 import (
 	"fmt"
 	"image/color"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -72,5 +73,14 @@ func (gs *Game) GetMessageBox() (rect rl.RectangleInt32) {
 	return
 }
 
-func (gs *Game) Dump() {
+func (game *Game) Dump() {
+	buf, _ := yaml.Marshal(game)
+	fmt.Println(string(buf))
+
+	for _, mv := range game.Movers() {
+		buf, _ = yaml.Marshal(mv)
+		fmt.Println(string(buf))
+		buf, _ = yaml.Marshal(mv.drawer)
+		fmt.Println(string(buf))
+	}
 }

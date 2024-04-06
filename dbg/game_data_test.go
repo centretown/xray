@@ -1,4 +1,4 @@
-package gdb
+package dbg
 
 import (
 	"testing"

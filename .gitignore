@@ -7,3 +7,5 @@ proto
 *.db
 font
 rayl
+TestSave.txt
+TestSchema.txt

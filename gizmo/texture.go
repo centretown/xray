@@ -1,10 +1,10 @@
-package game
+package gizmo
 
 import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/centretown/xray/game/categories"
+	"github.com/centretown/xray/gizmo/categories"
 	"github.com/centretown/xray/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )

@@ -1,4 +1,4 @@
-package game
+package gizmo
 
 import "image/color"
 

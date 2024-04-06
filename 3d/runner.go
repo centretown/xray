@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/centretown/xray/game"
+	"github.com/centretown/xray/gizmo"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -15,20 +15,20 @@ const (
 type Runner struct {
 	Width  int32
 	Height int32
-	Actors []game.Actor
+	Actors []gizmo.Actor
 }
 
 func NewRunner(width int32, height int32) *Runner {
 	runr := &Runner{
 		Height: height,
 		Width:  width,
-		Actors: make([]game.Actor, 0),
+		Actors: make([]gizmo.Actor, 0),
 	}
 
 	return runr
 }
 
-func (runr *Runner) Add(a game.Actor, after float64) {
+func (runr *Runner) Add(a gizmo.Actor, after float64) {
 	runr.Actors = append(runr.Actors, a)
 }
 

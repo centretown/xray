@@ -9,15 +9,16 @@ import (
 const IN_HOUSE = "018e9522-01c9-77c0-be6c-65526f21ec1a"
 
 // Decode(rec *model.Record) (err error)
-type Linker interface {
-	Link(...*Record)
-	Children() []Recorder
-}
-
 type Recorder interface {
 	GetRecord() *Record
 	GetItem() any
 	Decode(rec *Record) (err error)
+}
+
+type Linker interface {
+	Recorder
+	Link(...*Record)
+	Children() []Recorder
 }
 
 // type Encoder interface {

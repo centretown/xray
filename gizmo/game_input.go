@@ -1,4 +1,4 @@
-package game
+package gizmo
 
 import (
 	"github.com/centretown/gpads/gpads"

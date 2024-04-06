@@ -1,4 +1,4 @@
-package game
+package gizmo
 
 type Category int32
 

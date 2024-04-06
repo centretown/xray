@@ -1,4 +1,4 @@
-package game
+package gizmo
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 
 	"github.com/centretown/gpads/gpads"
 	"github.com/centretown/gpads/pad"
-	"github.com/centretown/xray/game/categories"
+	"github.com/centretown/xray/gizmo/categories"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -29,6 +29,7 @@ type GameItem struct {
 	CaptureInterval float64
 	Capturing       bool
 	Paused          bool
+	FixedPalette    []color.RGBA
 
 	backGround color.RGBA
 	palette    color.Palette
@@ -51,13 +52,18 @@ type Game struct {
 	Record *model.Record
 }
 
-func NewGame(gp pad.Pad, width, height, fps int32) *Game {
-	gs := &Game{}
-	gs.Start = 0
-	gs.Current = rl.GetTime()
+func NewGameSetup(width, height, fps int32) *Game {
+	gs := NewGame()
 	gs.Width = width
 	gs.Height = height
 	gs.FPS = fps
+	return gs
+}
+
+func NewGame() *Game {
+	gs := &Game{}
+	gs.Start = 0
+	gs.Current = rl.GetTime()
 	gs.InputInterval = .2
 
 	gs.CaptureCount = 0
@@ -78,6 +84,9 @@ func NewGame(gp pad.Pad, width, height, fps int32) *Game {
 
 func (gs *Game) GetRecord() *model.Record { return gs.Record }
 func (gs *Game) GetItem() any             { return &gs.GameItem }
+func (gs *Game) SetPad(pad pad.Pad) {
+	gs.gamepad = pad
+}
 
 func (gs *Game) AddMover(mv *Mover, after float64) {
 	gs.movers = append(gs.movers, mv)
@@ -87,18 +96,32 @@ func (gs *Game) Movers() []*Mover {
 	return gs.movers
 }
 
-func (gs *Game) Children() (rcds []model.Recorder) {
-	rcds = make([]model.Recorder, len(gs.movers))
+func (gs *Game) Children() (children []model.Recorder) {
+	children = make([]model.Recorder, len(gs.movers))
 	for i := range gs.movers {
-		rcds[i] = gs.movers[i]
+		children[i] = gs.movers[i]
 	}
 	return
 }
 
-func (gs *Game) SetColors(BG color.RGBA, pal color.Palette, m map[color.Color]uint8) {
-	gs.backGround = BG
-	gs.palette = pal
-	gs.colorMap = m
+func (gs *Game) SetColors() {
+	palette := make(color.Palette, 0, len(gs.FixedPalette)+1)
+	for _, c := range gs.FixedPalette {
+		palette = append(palette, c)
+	}
+	gs.palette, gs.colorMap =
+		CreatePaletteFromTextures(color.RGBA{0, 0, 0, 255}, palette, gs)
+}
+
+func (gs *Game) SetColorPalette(backGround color.RGBA,
+	palette color.Palette,
+	colorMap map[color.Color]uint8) {
+
+	palette = append(palette, color.Transparent)
+
+	gs.backGround = backGround
+	gs.palette = palette
+	gs.colorMap = colorMap
 }
 
 func (gs *Game) Link(recs ...*model.Record) {

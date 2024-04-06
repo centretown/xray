@@ -5,7 +5,7 @@ import (
 
 	"github.com/centretown/gpads/gpads"
 	"github.com/centretown/gpads/pad"
-	"github.com/centretown/xray/game"
+	"github.com/centretown/xray/gizmo"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -15,43 +15,43 @@ func main() {
 	gs.Run()
 }
 
-func setup(gp pad.Pad) *game.Game {
+func setup(gp pad.Pad) *gizmo.Game {
 	picd := "/home/dave/xray/test/pic/"
 
 	rl.SetTraceLogLevel(rl.LogWarning)
 	rl.InitWindow(screenWidth, screenHeight, "2d")
 	rl.SetWindowState(rl.FlagWindowResizable)
 
-	gs := game.NewGame(gp, screenWidth, screenHeight, fps)
+	gs := gizmo.NewGameSetup(screenWidth, screenHeight, fps)
+	gs.SetPad(gp)
 	viewPort := gs.SetViewPortFromWindow()
 
-	hole := game.NewTexture(picd + "polar.png").
+	hole := gizmo.NewTexture(picd + "polar.png").
 		Load()
-	bouncer := game.NewMover(viewPort, 10, 10, 10).
+	bouncer := gizmo.NewMover(viewPort, 10, 10, 10).
 		AddDrawer(hole)
 	gs.AddMover(bouncer, 6)
 
-	ball := game.NewCircle(20, game.Cyan)
-	bouncer = game.NewMover(viewPort, 200, 100, 0).
+	ball := gizmo.NewCircle(20, gizmo.Cyan)
+	bouncer = gizmo.NewMover(viewPort, 200, 100, 0).
 		AddDrawer(ball)
 	gs.AddMover(bouncer, 1)
 
-	head := game.NewTexture(picd + "head_300.png").
+	head := gizmo.NewTexture(picd + "head_300.png").
 		Load()
-	bouncer = game.NewMover(viewPort, 70, 140, 1.75).
+	bouncer = gizmo.NewMover(viewPort, 70, 140, 1.75).
 		AddDrawer(head)
 	gs.AddMover(bouncer, 8)
 
-	gander := game.NewTexture(picd + "gander.png").
+	gander := gizmo.NewTexture(picd + "gander.png").
 		Load()
-	bouncer = game.NewMover(viewPort, 300, 300, 0.5).
+	bouncer = gizmo.NewMover(viewPort, 300, 300, 0.5).
 		AddDrawer(gander)
 	gs.AddMover(bouncer, 4)
 
 	// generate palette and color map for paletted images
-	pal, colorMap :=
-		game.CreatePaletteFromTextures(color.RGBA{}, fixedPalette, gs.Movers()...)
-	gs.SetColors(color.RGBA{}, pal, colorMap)
+	pal, colorMap := gizmo.CreatePaletteFromTextures(color.RGBA{}, fixedPalette, gs)
+	gs.SetColorPalette(color.RGBA{R: 0, G: 0, B: 0, A: 255}, pal, colorMap)
 
 	rl.SetTargetFPS(gs.FPS)
 	gs.Refresh(rl.GetTime())
@@ -84,12 +84,12 @@ const (
 
 var fixedPalette = color.Palette{
 	color.Transparent,
-	game.White,
-	game.Black,
-	game.Red,
-	game.Yellow,
-	game.Green,
-	game.Cyan,
-	game.Blue,
-	game.Magenta,
+	gizmo.White,
+	gizmo.Black,
+	gizmo.Red,
+	gizmo.Yellow,
+	gizmo.Green,
+	gizmo.Cyan,
+	gizmo.Blue,
+	gizmo.Magenta,
 }

@@ -1,4 +1,4 @@
-package game
+package gizmo
 
 import rl "github.com/gen2brain/raylib-go/raylib"
 

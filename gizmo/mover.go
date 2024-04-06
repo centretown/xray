@@ -1,10 +1,10 @@
-package game
+package gizmo
 
 import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/centretown/xray/game/categories"
+	"github.com/centretown/xray/gizmo/categories"
 	"github.com/centretown/xray/model"
 	"github.com/centretown/xray/try"
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -50,7 +50,7 @@ func NewMover(bounds rl.RectangleInt32,
 	mv.adjustBounds()
 	mv.Axes[0] = NewAxis(rl.GetTime(), mv.Bounds.Width)
 	mv.Axes[1] = NewAxis(rl.GetTime(), mv.Bounds.Height)
-	mv.Record = model.NewRecord("motor", int32(categories.Mover), &mv.MoverItem, model.JSON)
+	mv.Record = model.NewRecord("mover", int32(categories.Mover), &mv.MoverItem, model.JSON)
 	return mv
 }
 func (mv *Mover) AddDrawer(dr Drawer) *Mover {
