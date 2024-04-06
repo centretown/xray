@@ -1,8 +1,6 @@
 package gizmo
 
 import (
-	"fmt"
-
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -12,7 +10,6 @@ func (gs *Game) Run() {
 		for _, actor := range gs.Movers() {
 			t, ok := actor.GetDrawer().(*Texture)
 			if ok {
-				fmt.Println("UnloadTexture")
 				t.Unload()
 			}
 		}

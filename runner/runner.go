@@ -16,6 +16,6 @@ func main() {
 		Minor: -854626809563736956}
 
 	game := gizmo.LoadGame("sqlite3", dbfile, record)
-	game.Dump()
+	// game.Dump()
 	game.Run()
 }
