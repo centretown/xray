@@ -31,6 +31,7 @@ type GameItem struct {
 	Paused          bool
 	FixedPalette    []color.RGBA
 
+	path       string
 	backGround color.RGBA
 	palette    color.Palette
 	colorMap   map[color.Color]uint8

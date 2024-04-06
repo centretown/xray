@@ -15,15 +15,16 @@ import (
 )
 
 var fileCounter = 0
-var path = "/home/dave/src/xray/testimg"
+
+// var path = "/home/dave/src/xray/testimg"
 var namePrefix = "capture"
 
-func NextFileName(ext string) string {
+func NextFileName(ext, path string) string {
 	return fmt.Sprintf("%s/%s%d.%s", path, namePrefix, fileCounter, ext)
 }
 
-func createFile(ext string) (*os.File, error) {
-	fname := NextFileName(ext)
+func createFile(ext string, path string) (*os.File, error) {
+	fname := NextFileName(ext, path)
 	fileCounter++
 
 	w, err := os.Create(fname)
@@ -33,18 +34,14 @@ func createFile(ext string) (*os.File, error) {
 	return w, err
 }
 
-func CapturePNG(img image.Image) {
-	w, err := createFile("png")
+func CapturePNG(path string, img image.Image) {
+	w, err := createFile("png", path)
 	if err != nil {
 		return
 	}
 	defer w.Close()
 	png.Encode(w, img)
 }
-
-// func CaptureGIF(stop <-chan int, scr <-chan image.Image,
-// 	colorMap map[color.Color]uint8, pal color.Palette) {
-// 	fmt.Println("Capturing...")
 
 type Cheap struct {
 	pal      color.Palette
@@ -80,7 +77,7 @@ func WriteGIFFrame(w io.Writer, pic image.Image, cheap *Cheap) {
 	})
 }
 
-func CaptureGIF(done <-chan int,
+func CaptureGIF(path string, done <-chan int,
 	img <-chan image.Image,
 	pal color.Palette,
 	delay int,
@@ -97,7 +94,7 @@ func CaptureGIF(done <-chan int,
 
 		case <-done:
 			fmt.Println("Writing...")
-			WriteGIF(pics, pal, colorMap, delay)
+			WriteGIF(path, pics, pal, colorMap, delay)
 			fmt.Println("Done.")
 			return
 
@@ -144,7 +141,7 @@ func ExtendPalette(pal color.Palette, img image.Image,
 // vf – MP4 videos using H.264 need to have a dimensions that are divisible by 2. This option ensures that’s the case.
 // Source: http://rigor.com/blog/2015/12/optimizing-animated-gifs-with-html5-video
 
-func WriteGIF(pics []image.Image, pal color.Palette,
+func WriteGIF(path string, pics []image.Image, pal color.Palette,
 	colorMap map[color.Color]uint8, delay int) {
 
 	imageCount := len(pics)
@@ -166,7 +163,7 @@ func WriteGIF(pics []image.Image, pal color.Palette,
 		images[i] = img
 	}
 
-	w, err := createFile("gif")
+	w, err := createFile("gif", path)
 	if err != nil {
 		return
 	}

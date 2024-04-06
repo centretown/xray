@@ -75,7 +75,7 @@ func (gs *Game) CheckPad(i int) {
 
 		case CAPTURE_PNG:
 			if gs.gamepad.IsPadButtonDown(i, gpads.RL_MiddleRight) {
-				capture.CapturePNG(rl.LoadImageFromScreen().ToImage())
+				capture.CapturePNG(gs.path, rl.LoadImageFromScreen().ToImage())
 			}
 		case PAUSED:
 			if gs.gamepad.IsPadButtonDown(i, gpads.RL_RightFaceLeft) {

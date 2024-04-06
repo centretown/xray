@@ -22,8 +22,9 @@ func NewGameData(driver, path string) *Data {
 	return &Data{Schema: SchemaGame, Access: access.NewAccess(driver, path)}
 }
 
-func (data *Data) Open() {
+func (data *Data) Open() *Data {
 	data.dbx, data.Err = sqlx.Connect(data.Access.Driver, data.Access.Path)
+	return data
 }
 
 func (data *Data) Close() {

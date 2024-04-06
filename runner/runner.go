@@ -6,8 +6,7 @@ import (
 )
 
 var (
-	dir    = "/home/dave/xray/test/"
-	dbfile = dir + "db/xray_game.db"
+	path = "/home/dave/xray/game_01/"
 )
 
 func main() {
@@ -15,7 +14,7 @@ func main() {
 		Major: -8107658525041914367,
 		Minor: -854626809563736956}
 
-	game := gizmo.LoadGame("sqlite3", dbfile, record)
+	game := gizmo.LoadGame(path, record)
 	// game.Dump()
 	game.Run()
 }
