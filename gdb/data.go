@@ -49,7 +49,10 @@ func (gdb *Data) InsertItems(items ...model.Recorder) {
 		}
 	}()
 	for _, item := range items {
-		_, gdb.Err = tx.NamedExec(gdb.Schema.InsertItem, item.GetRecord())
+		item.GetRecord().UpdateContent(item.GetItem())
+		if gdb.Err == nil {
+			_, gdb.Err = tx.NamedExec(gdb.Schema.InsertItem, item.GetRecord())
+		}
 		if gdb.Err != nil {
 			return
 		}

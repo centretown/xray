@@ -56,7 +56,6 @@ func NewMover(bounds rl.RectangleInt32,
 func (mv *Mover) AddDrawer(dr Drawer) *Mover {
 	mv.drawer = dr
 	mv.Source = dr.Bounds()
-	mv.Record.UpdateContent(&mv.MoverItem)
 	return mv
 }
 

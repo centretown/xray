@@ -16,6 +16,7 @@ func main() {
 }
 
 func setup(gp pad.Pad) *game.Game {
+	picd := "/home/dave/xray/test/pic/"
 
 	rl.SetTraceLogLevel(rl.LogWarning)
 	rl.InitWindow(screenWidth, screenHeight, "2d")
@@ -24,7 +25,7 @@ func setup(gp pad.Pad) *game.Game {
 	gs := game.NewGame(gp, screenWidth, screenHeight, fps)
 	viewPort := gs.SetViewPortFromWindow()
 
-	hole := game.NewTexture("polar.png").
+	hole := game.NewTexture(picd + "polar.png").
 		Load()
 	bouncer := game.NewMover(viewPort, 10, 10, 10).
 		AddDrawer(hole)
@@ -35,13 +36,13 @@ func setup(gp pad.Pad) *game.Game {
 		AddDrawer(ball)
 	gs.AddMover(bouncer, 1)
 
-	head := game.NewTexture("head_300.png").
+	head := game.NewTexture(picd + "head_300.png").
 		Load()
 	bouncer = game.NewMover(viewPort, 70, 140, 1.75).
 		AddDrawer(head)
 	gs.AddMover(bouncer, 8)
 
-	gander := game.NewTexture("gander.png").
+	gander := game.NewTexture(picd + "gander.png").
 		Load()
 	bouncer = game.NewMover(viewPort, 300, 300, 0.5).
 		AddDrawer(gander)

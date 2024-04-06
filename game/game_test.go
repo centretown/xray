@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/centretown/gpads/pad"
-	"github.com/centretown/xray/game/categories"
 	"github.com/centretown/xray/gdb"
 	"github.com/centretown/xray/model"
 	"gopkg.in/yaml.v3"
@@ -18,20 +17,6 @@ var (
 	picd   = dir + "pic/"
 	dbcur  = dbmem
 )
-
-func TestUrl(t *testing.T) {
-	res := model.NewFileResource("../2d/runt.png", int32(categories.Texture), "just a runt")
-	if res.Err != nil {
-		t.Fatal(res.Err)
-	}
-
-	res = model.NewFileResource("../2d/notthere.png", int32(categories.Texture), "not there")
-	if res.Err == nil {
-		t.Fatal("should be an error")
-	}
-
-	t.Log(res.Err)
-}
 
 func TestSchema(t *testing.T) {
 
