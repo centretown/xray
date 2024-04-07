@@ -24,6 +24,7 @@ type GameItem struct {
 	Height        int32
 	FPS           int32
 	InputInterval float64
+	FramesCounter int32
 
 	CaptureCount    int
 	CaptureInterval float64
@@ -61,6 +62,28 @@ func NewGameSetup(width, height, fps int32) *Game {
 	return gs
 }
 
+func (gs *Game) Setup(record *model.Record, path string) *Game {
+	gs.Record = record
+	gs.path = path
+
+	gs.Start = 0
+	gs.Current = rl.GetTime()
+	gs.InputInterval = .2
+
+	gs.CaptureCount = 0
+	gs.CaptureInterval = float64(rl.GetFrameTime()) * 2
+	gs.Capturing = false
+	gs.Paused = false
+
+	gs.stopChan = make(chan int)
+	gs.scrChan = make(chan image.Image)
+	gs.gamepad = gpads.NewGPads()
+	gs.captureStart = 250
+	gs.captureDelay = 4
+	gs.movers = make([]*Mover, 0)
+	return gs
+}
+
 func NewGame() *Game {
 	gs := &Game{}
 	gs.Start = 0
@@ -83,19 +106,11 @@ func NewGame() *Game {
 	return gs
 }
 
-func (gs *Game) GetRecord() *model.Record { return gs.Record }
-func (gs *Game) GetItem() any             { return &gs.GameItem }
-func (gs *Game) SetPad(pad pad.Pad) {
-	gs.gamepad = pad
-}
-
-func (gs *Game) AddMover(mv *Mover, after float64) {
-	gs.movers = append(gs.movers, mv)
-}
-
-func (gs *Game) Movers() []*Mover {
-	return gs.movers
-}
+func (gs *Game) GetRecord() *model.Record          { return gs.Record }
+func (gs *Game) GetItem() any                      { return &gs.GameItem }
+func (gs *Game) SetPad(pad pad.Pad)                { gs.gamepad = pad }
+func (gs *Game) AddMover(mv *Mover, after float64) { gs.movers = append(gs.movers, mv) }
+func (gs *Game) Movers() []*Mover                  { return gs.movers }
 
 func (gs *Game) Children() (children []model.Recorder) {
 	children = make([]model.Recorder, len(gs.movers))
@@ -127,8 +142,8 @@ func (gs *Game) SetColorPalette(backGround color.RGBA,
 
 func (gs *Game) Link(recs ...*model.Record) {
 	for _, rec := range recs {
-		mv := &Mover{}
-		err := mv.Decode(rec)
+		mv := &Mover{Record: rec}
+		err := model.Decode(mv)
 		if err == nil {
 			gs.movers = append(gs.movers, mv)
 		} else {

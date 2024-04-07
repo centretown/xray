@@ -133,11 +133,7 @@ func (data *Data) GetLinks(rec *model.Record) (recs []*model.Record) {
 }
 
 func (data *Data) Load(item model.Recorder) {
-	rec := data.GetItemRecord(item)
-	if data.Err != nil {
-		return
-	}
-	data.Err = item.Decode(rec)
+	data.Err = model.Decode(item)
 	if data.Err != nil {
 		return
 	}

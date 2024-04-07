@@ -1,29 +1,14 @@
 package model
 
 import (
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 const IN_HOUSE = "018e9522-01c9-77c0-be6c-65526f21ec1a"
-
-// Decode(rec *model.Record) (err error)
-type Recorder interface {
-	GetRecord() *Record
-	GetItem() any
-	Decode(rec *Record) (err error)
-}
-
-type Linker interface {
-	Recorder
-	Link(...*Record)
-	Children() []Recorder
-}
-
-// type Encoder interface {
-// 	Encode(any) (string, error)
-// }
 
 var (
 	origin                   uuid.UUID
@@ -33,6 +18,27 @@ var (
 func init() {
 	origin, _ = uuid.Parse(IN_HOUSE)
 	originMajor, originMinor = RecordID(origin)
+}
+
+type Recorder interface {
+	GetRecord() *Record
+	GetItem() any
+}
+
+func Decode(recorder Recorder) (err error) {
+	rec := recorder.GetRecord()
+	err = json.Unmarshal([]byte(rec.Content), recorder.GetItem())
+	if err != nil {
+		fmt.Println(rec.Content)
+		panic(err)
+	}
+	return
+}
+
+type Linker interface {
+	Recorder
+	Link(...*Record)
+	Children() []Recorder
 }
 
 func RecordID(id uuid.UUID) (major, minor int64) {

@@ -1,9 +1,6 @@
 package gizmo
 
 import (
-	"encoding/json"
-	"fmt"
-
 	"github.com/centretown/xray/gizmo/categories"
 	"github.com/centretown/xray/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -33,21 +30,26 @@ func NewTexture(path string) (tex *Texture) {
 func (tex *Texture) GetRecord() *model.Record { return tex.Record }
 func (tex *Texture) GetItem() any             { return &tex.TextureItem }
 
-func (tex *Texture) Decode(rec *model.Record) (err error) {
-	tex.Record = rec
-	cat := categories.Category(rec.Category)
-	if cat == categories.Texture {
-		err = json.Unmarshal([]byte(rec.Content), &tex.TextureItem)
-		if err != nil {
-			panic(err)
-		}
-	} else {
-		err = fmt.Errorf("wrong category want %s have %s",
-			categories.Texture, cat)
-	}
+// func (tex *Texture) Decode(rec *model.Record) (err error) {
+// 	tex.Record = rec
+// 	return Decode(tex)
+// }
 
-	return
-}
+// func (tex *Texture) Decode(rec *model.Record) (err error) {
+// 	tex.Record = rec
+// 	cat := categories.Category(rec.Category)
+// 	if cat == categories.Texture {
+// 		err = json.Unmarshal([]byte(rec.Content), &tex.TextureItem)
+// 		if err != nil {
+// 			panic(err)
+// 		}
+// 	} else {
+// 		err = fmt.Errorf("wrong category want %s have %s",
+// 			categories.Texture, cat)
+// 	}
+
+// 	return
+// }
 
 func (tex *Texture) Load() *Texture {
 	if tex.Resource != nil && tex.Resource.Err == nil {

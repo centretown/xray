@@ -134,12 +134,12 @@ func (mv *Mover) Link(recs ...*model.Record) {
 	rec := recs[0]
 	cat := categories.Category(rec.Category)
 	if cat == categories.Circle {
-		circle := &Circle{}
-		err = circle.Decode(rec)
+		circle := &Circle{Record: rec}
+		err = model.Decode(circle)
 		mv.AddDrawer(circle)
 	} else if cat == categories.Texture {
-		tex := &Texture{}
-		err = tex.Decode(rec)
+		tex := &Texture{Record: rec}
+		err = model.Decode(tex)
 		mv.AddDrawer(tex)
 	} else {
 		err = fmt.Errorf("wrong category want %s or %s have %s",

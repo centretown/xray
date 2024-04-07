@@ -6,8 +6,6 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-var def_dir = "/home/dave/xray/"
-
 func LoadGame(path string, record *model.Record) *Game {
 	data := dbg.NewGameData("sqlite3", path+"xray_game.db")
 	if data.Open().Err != nil {
@@ -15,14 +13,13 @@ func LoadGame(path string, record *model.Record) *Game {
 	}
 	defer data.Close()
 
+	record = data.GetItem(record.Major, record.Minor)
 	if data.Err != nil {
 		panic(data.Err)
 	}
 
-	game := NewGame()
-	game.Record = record
-	game.path = path
-
+	game := &Game{}
+	game.Setup(record, path)
 	data.Load(game)
 	if data.Err != nil {
 		panic(data.Err)
