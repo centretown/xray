@@ -13,6 +13,12 @@ func (gs *Game) Run() {
 				t.Unload()
 			}
 		}
+		for _, dr := range gs.Drawers() {
+			t, ok := dr.(*Texture)
+			if ok {
+				t.Unload()
+			}
+		}
 		rl.CloseWindow()
 	}()
 
@@ -27,6 +33,10 @@ func (gs *Game) Run() {
 		rl.BeginDrawing()
 
 		rl.ClearBackground(gs.backGround)
+
+		for _, dr := range gs.Drawers() {
+			dr.Draw(rl.Vector3{X: 0, Y: 0, Z: 0})
+		}
 
 		for _, actor := range gs.Movers() {
 			actor.Act(!gs.Paused, gs.Current)

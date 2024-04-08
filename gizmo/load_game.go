@@ -6,31 +6,37 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func LoadGame(path string, record *model.Record) *Game {
+func LoadGame(path string, record *model.Record) (game *Game, err error) {
 	data := dbg.NewGameData("sqlite3", path+"xray_game.db")
 	if data.Open().Err != nil {
-		panic(data.Err)
+		err = data.Err
+		return
 	}
 	defer data.Close()
 
 	record = data.GetItem(record.Major, record.Minor)
 	if data.Err != nil {
-		panic(data.Err)
+		err = data.Err
+		return
 	}
 
-	game := &Game{}
+	game = &Game{}
 	game.Setup(record, path)
 	data.Load(game)
 	if data.Err != nil {
-		panic(data.Err)
+		err = data.Err
+		return
 	}
 
 	rl.SetTraceLogLevel(rl.LogWarning)
 	rl.InitWindow(game.Width, game.Height, game.Record.Title)
-	rl.SetWindowState(rl.FlagWindowResizable)
-	rl.SetTargetFPS(game.FPS)
+	if !game.FixedSize {
+		rl.SetWindowState(rl.FlagWindowResizable)
+	}
+	rl.SetTargetFPS(game.FrameRate)
+	// fmt.Println("game.FrameRate", game.FrameRate)
 
 	game.SetColors()
 	game.Refresh(rl.GetTime())
-	return game
+	return
 }

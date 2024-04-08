@@ -1,7 +1,7 @@
 filippo.io/edwards25519 v1.1.0 h1:FNf4tywRC1HmFuKW5xopWpigGjJKiJSV0Cqo0cJWDaA=
 filippo.io/edwards25519 v1.1.0/go.mod h1:BxyFTGdWcka3PhytdK4V28tE5sGfRvvvRV7EaN4VDT4=
-github.com/centretown/gpads v0.0.0-20240402230758-ef7882263b71 h1:Ad/6fuGxG+TVAM/pBcwWIC3sTfKLHSe55dQYTeXhHho=
-github.com/centretown/gpads v0.0.0-20240402230758-ef7882263b71/go.mod h1:CuOki+cHwsOu+HmoIfaCSIzwQnd8DM45cHpQDvbsEaI=
+github.com/centretown/gpads v0.0.0-20240407230358-021ea85cec36 h1:lCWd2mVNbZx1dgTMlk3wbRkbinKbNCT5+LVE+bBTUiA=
+github.com/centretown/gpads v0.0.0-20240407230358-021ea85cec36/go.mod h1:CuOki+cHwsOu+HmoIfaCSIzwQnd8DM45cHpQDvbsEaI=
 github.com/ebitengine/purego v0.6.0-alpha.1.0.20231122024802-192c5e846faa h1:Ik7QikRgeH+bFOfAcMpttCbs6XxWXxCLXMm4awxtOXk=
 github.com/ebitengine/purego v0.6.0-alpha.1.0.20231122024802-192c5e846faa/go.mod h1:ah1In8AOtksoNK6yk5z1HTJeUkC1Ez4Wk2idgGslMwQ=
 github.com/ericpauley/go-quantize v0.0.0-20200331213906-ae555eb2afa4 h1:BBade+JlV/f7JstZ4pitd4tHhpN+w+6I+LyOS7B4fyU=
@@ -11,8 +11,6 @@ github.com/gen2brain/raylib-go/raylib v0.0.0-20240227114648-c3665eb9abf8/go.mod 
 github.com/go-sql-driver/mysql v1.6.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
 github.com/go-sql-driver/mysql v1.8.1 h1:LedoTUt/eveggdHS9qUFC1EFSa8bU2+1pZjSRpvNJ1Y=
 github.com/go-sql-driver/mysql v1.8.1/go.mod h1:wEBSXgmK//2ZFJyE+qWnIsVGmvmEKlqwuVSjsCm7DZg=
-github.com/goki/freetype v1.0.5 h1:yi2lQeUhXnBgSMqYd0vVmPw6RnnfIeTP3N4uvaJXd7A=
-github.com/goki/freetype v1.0.5/go.mod h1:wKmKxddbzKmeci9K96Wknn5kjTWLyfC8tKOqAFbEX8E=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/holoplot/go-evdev v0.0.0-20240306072622-217e18f17db1 h1:92OsBIf5KB1Tatx+uUGOhah73jyNUrt7DmfDRXXJ5Xo=

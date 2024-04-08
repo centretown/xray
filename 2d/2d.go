@@ -15,7 +15,7 @@ func main() {
 	gs.Run()
 }
 
-func setup(gp pad.Pad) *gizmo.Game {
+func setup(gp pad.PadG) *gizmo.Game {
 	picd := "/home/dave/xray/test/pic/"
 
 	rl.SetTraceLogLevel(rl.LogWarning)
@@ -53,7 +53,7 @@ func setup(gp pad.Pad) *gizmo.Game {
 	pal, colorMap := gizmo.CreatePaletteFromTextures(color.RGBA{}, fixedPalette, gs)
 	gs.SetColorPalette(color.RGBA{R: 0, G: 0, B: 0, A: 255}, pal, colorMap)
 
-	rl.SetTargetFPS(gs.FPS)
+	rl.SetTargetFPS(gs.FrameRate)
 	gs.Refresh(rl.GetTime())
 	gs.Dump()
 

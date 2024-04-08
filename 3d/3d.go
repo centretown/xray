@@ -122,26 +122,26 @@ var nextTime float64
 func PadPosXYZ(gpad *gpads.GPads, obj, pos *rl.Vector3, current float64) {
 	count := gpad.GetPadCount()
 	for pi := range count {
-		x, y := gpad.GetPadAxisMovement(pi, rl.GamepadAxisLeftX),
-			gpad.GetPadAxisMovement(pi, rl.GamepadAxisLeftY)
+		x, y := gpad.GetGamepadAxisMovement(pi, rl.GamepadAxisLeftX),
+			gpad.GetGamepadAxisMovement(pi, rl.GamepadAxisLeftY)
 
 		const delta float32 = 1.0 / 16.0
 		pos.X += delta * x
 		pos.Y += delta * y
 
-		x, y = gpad.GetPadAxisMovement(pi, rl.GamepadAxisRightX),
-			gpad.GetPadAxisMovement(pi, rl.GamepadAxisRightY)
+		x, y = gpad.GetGamepadAxisMovement(pi, rl.GamepadAxisRightX),
+			gpad.GetGamepadAxisMovement(pi, rl.GamepadAxisRightY)
 		obj.X += delta * x
 		obj.Y -= delta * y
 
-		obj.Z += try.As[float32]((gpad.IsPadButtonDown(pi, rl.GamepadButtonLeftFaceDown))) / 4
-		obj.Z -= try.As[float32]((gpad.IsPadButtonDown(pi, rl.GamepadButtonLeftFaceUp))) / 4
-		obj.X += try.As[float32]((gpad.IsPadButtonDown(pi, rl.GamepadButtonLeftFaceRight))) / 4
-		obj.X -= try.As[float32]((gpad.IsPadButtonDown(pi, rl.GamepadButtonLeftFaceLeft))) / 4
-		home := try.As[float32](gpad.IsPadButtonUp(pi, rl.GamepadButtonRightFaceLeft))
+		obj.Z += try.As[float32]((gpad.IsGamepadButtonDown(pi, rl.GamepadButtonLeftFaceDown))) / 4
+		obj.Z -= try.As[float32]((gpad.IsGamepadButtonDown(pi, rl.GamepadButtonLeftFaceUp))) / 4
+		obj.X += try.As[float32]((gpad.IsGamepadButtonDown(pi, rl.GamepadButtonLeftFaceRight))) / 4
+		obj.X -= try.As[float32]((gpad.IsGamepadButtonDown(pi, rl.GamepadButtonLeftFaceLeft))) / 4
+		home := try.As[float32](gpad.IsGamepadButtonUp(pi, rl.GamepadButtonRightFaceLeft))
 		obj.X, obj.Y, obj.Z = home*obj.X, home*obj.Y, home*obj.Z
 
-		if current > nextTime && gpad.IsPadButtonDown(pi, rl.GamepadButtonMiddleLeft) {
+		if current > nextTime && gpad.IsGamepadButtonDown(pi, rl.GamepadButtonMiddleLeft) {
 			capture.CapturePNG("", rl.LoadImageFromScreen().ToImage())
 			nextTime = current + .5
 		}

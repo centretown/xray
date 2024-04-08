@@ -1,10 +1,14 @@
 package gizmo
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	"github.com/centretown/xray/model"
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
 
 type Drawer interface {
 	Bounds() rl.RectangleInt32
 	Draw(rl.Vector3)
+	model.Recorder
 }
 
 type Actor interface {

@@ -1,0 +1,113 @@
+=== RUN   TestLifeSave
+CREATE TABLE version (
+major SMALLINT,
+minor SMALLINT,
+patch SMALLINT,
+extension SMALLINT);
+CREATE TABLE items (
+title VARCHAR(80) NOT NULL,
+category VARCHAR(16) NOT NULL,
+content TEXT,
+major BIGINT, minor BIGINT,			
+origin_major BIGINT, origin_minor BIGINT,
+created TIMESTAMP, updated TIMESTAMP,
+encoding SMALLINT,
+PRIMARY KEY (major,minor));
+CREATE INDEX items_title ON items (title,category,origin_major,origin_minor);
+CREATE INDEX items_category ON items (category,title,origin_major,origin_minor);
+CREATE INDEX items_origin_t ON items (origin_major,origin_minor,title,category);
+CREATE INDEX items_origin_c ON items (origin_major,origin_minor,category,title);
+CREATE TABLE tags (
+name VARCHAR(32) NOT NULL,
+weight DOUBLE PRECISION,
+major BIGINT, minor BIGINT,
+PRIMARY KEY (name,major,minor));
+CREATE INDEX tags_id ON tags (major,minor,weight);
+CREATE INDEX tags_name ON tags (name,weight,major,minor);
+CREATE TABLE links (
+major BIGINT, minor BIGINT,
+linked_major BIGINT, linked_minor BIGINT,
+repeated SMALLINT, weight DOUBLE PRECISION,
+PRIMARY KEY (major,minor,linked_major,linked_minor));
+CREATE INDEX links_weight ON links (major,minor,weight);
+CREATE INDEX links_weight_link ON links (linked_major,linked_minor,weight);
+CELLS SETUP[0xc000153c40]
+[0xc00013c4b0]
+gameitem:
+    start: 0
+    current: 0
+    width: 800
+    height: 450
+    framerate: 20
+    inputinterval: 0.2
+    framescounter: 0
+    fixedsize: true
+    capturecount: 0
+    captureinterval: 0
+    capturing: false
+    paused: false
+    fixedpalette:
+        - r: 255
+          g: 255
+          b: 255
+          a: 255
+        - r: 0
+          g: 0
+          b: 0
+          a: 255
+        - r: 255
+          g: 0
+          b: 0
+          a: 255
+        - r: 255
+          g: 255
+          b: 0
+          a: 255
+        - r: 0
+          g: 255
+          b: 0
+          a: 255
+        - r: 0
+          g: 255
+          b: 255
+          a: 255
+        - r: 0
+          g: 0
+          b: 255
+          a: 255
+        - r: 255
+          g: 0
+          b: 255
+          a: 255
+record:
+    title: game
+    category: 3
+    content: '{"Start":0,"Current":0,"Width":800,"Height":450,"FrameRate":20,"InputInterval":0.2,"FramesCounter":0,"FixedSize":true,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"FixedPalette":[{"R":255,"G":255,"B":255,"A":255},{"R":0,"G":0,"B":0,"A":255},{"R":255,"G":0,"B":0,"A":255},{"R":255,"G":255,"B":0,"A":255},{"R":0,"G":255,"B":0,"A":255},{"R":0,"G":255,"B":255,"A":255},{"R":0,"G":0,"B":255,"A":255},{"R":255,"G":0,"B":255,"A":255}]}'
+    encoding: 1
+    major: -7316587727477305855
+    minor: -4065651591770192760
+    originmajor: -4577969489486443007
+    originminor: 1939962301497306302
+    created: 2024-04-07T20:15:21.154538887-04:00
+    updated: 2024-04-07T20:15:21.154538946-04:00
+
+cellitems:
+    cols: 100
+    rows: 56
+    width: 800
+    height: 450
+record:
+    title: cells
+    category: 5
+    content: '{"Cols":100,"Rows":56,"Width":800,"Height":450}'
+    encoding: 1
+    major: 4645959144748846593
+    minor: -7267706706075405943
+    originmajor: -4577969489486443007
+    originminor: 1939962301497306302
+    created: 2024-04-07T20:15:21.283677149-04:00
+    updated: 2024-04-07T20:15:21.28367734-04:00
+
+--- PASS: TestLifeSave (0.45s)
+PASS
+ok  	github.com/centretown/xray/gizmo	0.955s

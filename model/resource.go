@@ -21,7 +21,7 @@ type Resource struct {
 	Size   int64
 	Width  int32
 	Height int32
-	Err    error
+	Err    error `json:"-"`
 }
 
 func NewFileResource(path string, category int32, content any) (res *Resource) {

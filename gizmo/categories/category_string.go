@@ -13,12 +13,13 @@ func _() {
 	_ = x[Mover-2]
 	_ = x[Game-3]
 	_ = x[Player-4]
-	_ = x[COUNT-5]
+	_ = x[Cells-5]
+	_ = x[COUNT-6]
 }
 
-const _Category_name = "TextureCircleMoverGamePlayerCOUNT"
+const _Category_name = "TextureCircleMoverGamePlayerCellsCOUNT"
 
-var _Category_index = [...]uint8{0, 7, 13, 18, 22, 28, 33}
+var _Category_index = [...]uint8{0, 7, 13, 18, 22, 28, 33, 38}
 
 func (i Category) String() string {
 	if i < 0 || i >= Category(len(_Category_index)-1) {

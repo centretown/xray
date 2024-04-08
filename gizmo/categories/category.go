@@ -10,6 +10,7 @@ const (
 	Mover
 	Game
 	Player
+	Cells
 	COUNT
 )
 

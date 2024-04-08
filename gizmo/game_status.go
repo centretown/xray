@@ -83,4 +83,9 @@ func (game *Game) Dump() {
 		buf, _ = yaml.Marshal(mv.drawer)
 		fmt.Println(string(buf))
 	}
+
+	for _, dr := range game.Drawers() {
+		buf, _ = yaml.Marshal(dr)
+		fmt.Println(string(buf))
+	}
 }

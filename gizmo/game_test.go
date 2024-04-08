@@ -6,16 +6,18 @@ import (
 	"testing"
 
 	"github.com/centretown/xray/dbg"
+	"github.com/centretown/xray/model"
 	"gopkg.in/yaml.v3"
 )
 
-var (
+const (
 	dbmem  = ":memory:"
-	dir    = "/home/dave/xray/test/"
-	dbfile = dir + "db/xray_game.db"
+	dir    = "/home/dave/xray/game_01/"
+	dbfile = dir + "xray_game.db"
 	picd   = dir + "pic/"
-	dbcur  = dbmem
 )
+
+var dbcur = dbmem
 
 func TestSchema(t *testing.T) {
 
@@ -121,8 +123,8 @@ func read_game(t *testing.T, saved *Game, data *dbg.Data) {
 
 	fmt.Println(gameRec)
 
-	game := &Game{}
-	err := game.Decode(gameRec)
+	game := &Game{Record: gameRec}
+	err := model.Decode(game)
 	if err != nil {
 		t.Fatal(err)
 	}
