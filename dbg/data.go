@@ -13,17 +13,18 @@ import (
 
 type Data struct {
 	Schema *Schema
-	Access *access.Access
+	Keys   *access.DataKeys
 	dbx    *sqlx.DB
 	Err    error
 }
 
 func NewGameData(driver, path string) *Data {
-	return &Data{Schema: SchemaGame, Access: access.NewAccess(driver, path)}
+	return &Data{Schema: SchemaGame,
+		Keys: access.NewDataKeys(driver, path)}
 }
 
 func (data *Data) Open() *Data {
-	data.dbx, data.Err = sqlx.Connect(data.Access.Driver, data.Access.Path)
+	data.dbx, data.Err = sqlx.Connect(data.Keys.Driver, data.Keys.Path)
 	return data
 }
 

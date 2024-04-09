@@ -26,28 +26,25 @@ func setup(gp pad.PadG) *gizmo.Game {
 	gs.SetPad(gp)
 	viewPort := gs.SetViewPortFromWindow()
 
-	hole := gizmo.NewTexture(picd + "polar.png").
-		Load()
-	bouncer := gizmo.NewMover(viewPort, 10, 10, 10).
-		AddDrawer(hole)
-	gs.AddMover(bouncer, 6)
+	hole := gizmo.NewTexture(picd + "polar.png").Load()
+	bouncer := gizmo.NewMover(viewPort, 10, 10, 10)
+	bouncer.AddDrawer(hole)
+	gs.AddActor(bouncer, 6)
 
 	ball := gizmo.NewCircle(20, gizmo.Cyan)
-	bouncer = gizmo.NewMover(viewPort, 200, 100, 0).
-		AddDrawer(ball)
-	gs.AddMover(bouncer, 1)
+	bouncer = gizmo.NewMover(viewPort, 200, 100, 0)
+	bouncer.AddDrawer(ball)
+	gs.AddActor(bouncer, 1)
 
-	head := gizmo.NewTexture(picd + "head_300.png").
-		Load()
-	bouncer = gizmo.NewMover(viewPort, 70, 140, 1.75).
-		AddDrawer(head)
-	gs.AddMover(bouncer, 8)
+	head := gizmo.NewTexture(picd + "head_300.png").Load()
+	bouncer = gizmo.NewMover(viewPort, 70, 140, 1.75)
+	bouncer.AddDrawer(head)
+	gs.AddActor(bouncer, 8)
 
-	gander := gizmo.NewTexture(picd + "gander.png").
-		Load()
-	bouncer = gizmo.NewMover(viewPort, 300, 300, 0.5).
-		AddDrawer(gander)
-	gs.AddMover(bouncer, 4)
+	gander := gizmo.NewTexture(picd + "gander.png").Load()
+	bouncer = gizmo.NewMover(viewPort, 300, 300, 0.5)
+	bouncer.AddDrawer(gander)
+	gs.AddActor(bouncer, 4)
 
 	// generate palette and color map for paletted images
 	pal, colorMap := gizmo.CreatePaletteFromTextures(color.RGBA{}, fixedPalette, gs)

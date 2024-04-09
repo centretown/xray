@@ -13,11 +13,10 @@ type Axis struct {
 	Max  int32
 }
 
-func NewAxis(now float64, max int32) *Axis {
+func NewAxis(max int32) *Axis {
 	return &Axis{
-		Last: now,
-		Max:  max,
-		Dir:  1,
+		Max: max,
+		Dir: 1,
 	}
 }
 

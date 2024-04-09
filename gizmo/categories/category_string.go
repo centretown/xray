@@ -10,16 +10,17 @@ func _() {
 	var x [1]struct{}
 	_ = x[Texture-0]
 	_ = x[Circle-1]
-	_ = x[Mover-2]
-	_ = x[Game-3]
-	_ = x[Player-4]
-	_ = x[Cells-5]
-	_ = x[COUNT-6]
+	_ = x[Cells-2]
+	_ = x[Mover-3]
+	_ = x[Game-4]
+	_ = x[CellsMover-5]
+	_ = x[Player-6]
+	_ = x[COUNT-7]
 }
 
-const _Category_name = "TextureCircleMoverGamePlayerCellsCOUNT"
+const _Category_name = "TextureCircleCellsMoverGameCellsMoverPlayerCOUNT"
 
-var _Category_index = [...]uint8{0, 7, 13, 18, 22, 28, 33, 38}
+var _Category_index = [...]uint8{0, 7, 13, 18, 23, 27, 37, 43, 48}
 
 func (i Category) String() string {
 	if i < 0 || i >= Category(len(_Category_index)-1) {

@@ -1,10 +1,20 @@
 package gizmo
 
 import (
+	"github.com/centretown/xray/access"
 	"github.com/centretown/xray/dbg"
 	"github.com/centretown/xray/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
+
+func LoadGameKeys(path string) (game *Game, err error) {
+	gameKeys, _ := access.LoadGameKeys(path + "game_keys.yaml")
+	var record = &model.Record{
+		Major: gameKeys.Major,
+		Minor: gameKeys.Minor,
+	}
+	return LoadGame(path, record)
+}
 
 func LoadGame(path string, record *model.Record) (game *Game, err error) {
 	data := dbg.NewGameData("sqlite3", path+"xray_game.db")

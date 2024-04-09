@@ -27,6 +27,15 @@ func (gs *Game) ProcessInput() {
 			gs.CheckPad(i)
 		}
 	}
+
+	for _, ch := range gs.Children() {
+		t, ok := ch.(Inputer)
+		if ok {
+			t.Input()
+		}
+	}
+
+	gs.FramesCounter++
 }
 
 func (gs *Game) CheckPad(i int32) {

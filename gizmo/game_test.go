@@ -86,20 +86,24 @@ func create_mem_game(t *testing.T) {
 	viewPort := game.GetViewPort()
 
 	hole := NewTexture(picd + "polar.png")
-	hole_mv := NewMover(viewPort, 10, 10, 10).AddDrawer(hole)
-	game.AddMover(hole_mv, 6)
+	hole_mv := NewMover(viewPort, 10, 10, 10)
+	hole_mv.AddDrawer(hole)
+	game.AddActor(hole_mv, 6)
 
 	ball := NewCircle(20, Cyan)
-	ball_mv := NewMover(viewPort, 200, 100, 0).AddDrawer(ball)
-	game.AddMover(ball_mv, 1)
+	ball_mv := NewMover(viewPort, 200, 100, 0)
+	ball_mv.AddDrawer(ball)
+	game.AddActor(ball_mv, 1)
 
 	head := NewTexture(picd + "head_300.png")
-	head_mv := NewMover(viewPort, 70, 140, 1.75).AddDrawer(head)
-	game.AddMover(head_mv, 8)
+	head_mv := NewMover(viewPort, 70, 140, 1.75)
+	head_mv.AddDrawer(head)
+	game.AddActor(head_mv, 8)
 
 	gander := NewTexture(picd + "gander.png")
-	gander_mv := NewMover(viewPort, 300, 300, 0.5).AddDrawer(gander)
-	game.AddMover(gander_mv, 4)
+	gander_mv := NewMover(viewPort, 300, 300, 0.5)
+	gander_mv.AddDrawer(gander)
+	game.AddActor(gander_mv, 4)
 
 	game.FixedPalette = fixedPalette
 	data.Save(game)
@@ -142,12 +146,14 @@ func read_game(t *testing.T, saved *Game, data *dbg.Data) {
 	game.Link(linkRecs...)
 	fmt.Println(game)
 
-	for _, a := range game.Movers() {
-		linkRecs = data.GetLinks(a.GetRecord())
-		for i, l := range linkRecs {
-			fmt.Println(i, l)
+	for _, a := range game.actors {
+		if linker, ok := a.(model.Linker); ok {
+			linkRecs = data.GetLinks(a.GetRecord())
+			for i, l := range linkRecs {
+				fmt.Println(i, l)
+			}
+			linker.Link(linkRecs...)
 		}
-		a.Link(linkRecs...)
 	}
 
 	buf, _ = yaml.Marshal(game)

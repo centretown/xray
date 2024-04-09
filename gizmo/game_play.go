@@ -7,7 +7,7 @@ import (
 func (gs *Game) Run() {
 
 	defer func() {
-		for _, actor := range gs.Movers() {
+		for _, actor := range gs.Actors() {
 			t, ok := actor.GetDrawer().(*Texture)
 			if ok {
 				t.Unload()
@@ -38,7 +38,7 @@ func (gs *Game) Run() {
 			dr.Draw(rl.Vector3{X: 0, Y: 0, Z: 0})
 		}
 
-		for _, actor := range gs.Movers() {
+		for _, actor := range gs.Actors() {
 			actor.Act(!gs.Paused, gs.Current)
 		}
 

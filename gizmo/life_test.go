@@ -47,7 +47,7 @@ func createLife(t *testing.T, fname string) {
 	game := NewGameSetup(screenWidth, screenHeight, fps)
 	viewPort := game.GetViewPort()
 
-	cells := NewCells(viewPort.Width, viewPort.Height)
+	cells := NewCells(viewPort.Width, viewPort.Height, 8)
 	game.AddDrawer(cells)
 	game.FixedPalette = fixedPalette
 	game.FrameRate = fps

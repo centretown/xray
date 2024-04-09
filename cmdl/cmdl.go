@@ -1,4 +1,4 @@
-package cmd
+package cmdl
 
 import "flag"
 
@@ -19,7 +19,7 @@ var (
 	flagKey   = "key"
 	flagK     = "k"
 	flagP     = "p"
-	flagPath  = "file path"
+	flagPath  = "path"
 )
 
 func Setup() {

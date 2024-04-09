@@ -45,9 +45,10 @@ type GameItem struct {
 	stopChan chan int
 	scrChan  chan image.Image
 
-	movers  []*Mover
-	drawers []Drawer
-	gamepad pad.PadG
+	actors    []Actor
+	drawers   []Drawer
+	inputters []Inputer
+	gamepad   pad.PadG
 }
 
 type Game struct {
@@ -88,28 +89,33 @@ func (gs *Game) Setup(record *model.Record, path string) *Game {
 	gs.gamepad = gpads.NewGPads()
 	gs.captureStart = 250
 	gs.captureDelay = 4
-	gs.movers = make([]*Mover, 0)
+	gs.actors = make([]Actor, 0)
 	gs.drawers = make([]Drawer, 0)
+	gs.inputters = make([]Inputer, 0)
 	return gs
 }
 
-func (gs *Game) GetRecord() *model.Record          { return gs.Record }
-func (gs *Game) GetItem() any                      { return &gs.GameItem }
-func (gs *Game) SetPad(pad pad.PadG)               { gs.gamepad = pad }
-func (gs *Game) AddMover(mv *Mover, after float64) { gs.movers = append(gs.movers, mv) }
-func (gs *Game) Movers() []*Mover                  { return gs.movers }
-func (gs *Game) AddDrawer(dr Drawer)               { gs.drawers = append(gs.drawers, dr) }
-func (gs *Game) Drawers() []Drawer                 { return gs.drawers }
+func (gs *Game) GetRecord() *model.Record        { return gs.Record }
+func (gs *Game) GetItem() any                    { return &gs.GameItem }
+func (gs *Game) SetPad(pad pad.PadG)             { gs.gamepad = pad }
+func (gs *Game) AddActor(a Actor, after float64) { gs.actors = append(gs.actors, a) }
+func (gs *Game) Actors() []Actor                 { return gs.actors }
+func (gs *Game) AddDrawer(dr Drawer)             { gs.drawers = append(gs.drawers, dr) }
+func (gs *Game) Drawers() []Drawer               { return gs.drawers }
 
 func (gs *Game) Children() (children []model.Recorder) {
-	children = make([]model.Recorder, 0, len(gs.movers)+len(gs.drawers))
-	for i := range gs.movers {
-		children = append(children, gs.movers[i])
+	children = make([]model.Recorder, 0, len(gs.actors)+len(gs.drawers))
+	for i := range gs.actors {
+		children = append(children, gs.actors[i])
 	}
 	for i := range gs.drawers {
 		children = append(children, gs.drawers[i])
 	}
 	return
+}
+
+func (gs *Game) AddColors(clrs []color.RGBA) {
+	gs.FixedPalette = append(gs.FixedPalette, clrs...)
 }
 
 func (gs *Game) SetColors() {
@@ -133,28 +139,24 @@ func (gs *Game) SetColorPalette(backGround color.RGBA,
 }
 
 func (gs *Game) Link(recs ...*model.Record) {
+	var err error
+	defer func() {
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
+
 	for _, rec := range recs {
 		cat := categories.Category(rec.Category)
-		switch cat {
-		case categories.Mover:
-			{
-				mv := &Mover{Record: rec}
-				err := model.Decode(mv)
-				if err == nil {
-					gs.movers = append(gs.movers, mv)
-				} else {
-					fmt.Println(err)
-				}
-			}
-		case categories.Cells:
-			{
-				cs := &Cells{Record: rec}
-				err := model.Decode(cs)
-				if err == nil {
-					gs.drawers = append(gs.drawers, cs)
-				} else {
-					fmt.Println(err)
-				}
+		el := MakeCategory(cat, rec)
+		err = model.Decode(el)
+		if err == nil {
+
+			switch t := el.(type) {
+			case Actor:
+				gs.actors = append(gs.actors, t)
+			case Drawer:
+				gs.drawers = append(gs.drawers, Drawer(t))
 			}
 		}
 	}

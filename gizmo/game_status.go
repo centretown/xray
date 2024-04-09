@@ -38,7 +38,7 @@ func (gs *Game) DrawStatus() {
 
 func (gs *Game) Refresh(current float64) {
 	viewPort := gs.SetViewPortFromWindow()
-	for _, run := range gs.movers {
+	for _, run := range gs.actors {
 		run.Refresh(current, viewPort)
 	}
 }
@@ -50,7 +50,7 @@ func (gs *Game) SetViewPortFromWindow() rl.RectangleInt32 {
 
 func (gs *Game) SetViewPort(rw, rh int32) rl.RectangleInt32 {
 	gs.Width = rw
-	gs.Height = rh - msg_height
+	gs.Height = rh
 	return gs.GetViewPort()
 }
 
@@ -59,7 +59,7 @@ func (gs *Game) GetViewPort() rl.RectangleInt32 {
 		X:      0,
 		Y:      0,
 		Width:  gs.Width,
-		Height: gs.Height,
+		Height: gs.Height - msg_height,
 	}
 }
 
@@ -77,10 +77,10 @@ func (game *Game) Dump() {
 	buf, _ := yaml.Marshal(game)
 	fmt.Println(string(buf))
 
-	for _, mv := range game.Movers() {
+	for _, mv := range game.Actors() {
 		buf, _ = yaml.Marshal(mv)
 		fmt.Println(string(buf))
-		buf, _ = yaml.Marshal(mv.drawer)
+		buf, _ = yaml.Marshal(mv.GetDrawer())
 		fmt.Println(string(buf))
 	}
 
