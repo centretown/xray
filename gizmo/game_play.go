@@ -22,6 +22,17 @@ func (gs *Game) Run() {
 		rl.CloseWindow()
 	}()
 
+	rl.SetTraceLogLevel(rl.LogWarning)
+	rl.InitWindow(gs.Width, gs.Height, gs.Record.Title)
+	if !gs.FixedSize {
+		rl.SetWindowState(rl.FlagWindowResizable)
+	}
+	rl.SetTargetFPS(gs.FrameRate)
+	// fmt.Println("game.FrameRate", game.FrameRate)
+	gs.SetColors()
+	gs.Current = rl.GetTime()
+	gs.Refresh(gs.Current)
+
 	for !rl.WindowShouldClose() {
 
 		gs.Current = rl.GetTime()
@@ -49,7 +60,7 @@ func (gs *Game) Run() {
 		gs.ProcessInput()
 
 		if gs.Capturing {
-			gs.GIFCapture()
+			gs.gifCapture()
 		}
 	}
 }

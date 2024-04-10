@@ -7,12 +7,12 @@ import (
 
 func TestVersion(t *testing.T) {
 	list := []Version{
-		{0, 0, 0, 0, time.Now(), time.Now(), IN_HOUSE},
-		{0, 1, 0, 0, time.Now(), time.Now(), IN_HOUSE},
-		{0, 1, 1, 0, time.Now(), time.Now(), IN_HOUSE},
-		{0, 1, 1, 1, time.Now(), time.Now(), IN_HOUSE},
-		{1, 1, 1, 1, time.Now(), time.Now(), IN_HOUSE},
-		{1, 2, 1, 1, time.Now(), time.Now(), IN_HOUSE},
+		{0, 0, 0, 0, 0, 0, time.Now(), time.Now()},
+		{0, 0, 0, 1, 0, 0, time.Now(), time.Now()},
+		{0, 0, 0, 1, 1, 0, time.Now(), time.Now()},
+		{0, 0, 0, 1, 1, 1, time.Now(), time.Now()},
+		{0, 0, 1, 1, 1, 1, time.Now(), time.Now()},
+		{0, 0, 1, 2, 1, 1, time.Now(), time.Now()},
 	}
 
 	ids := make([]uint64, len(list))

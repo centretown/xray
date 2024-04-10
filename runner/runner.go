@@ -4,26 +4,30 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/centretown/xray/cmdl"
 	"github.com/centretown/xray/gizmo"
 )
 
 var (
-	path     = "/home/dave/xray/game_01/"
-	lifepath = "/home/dave/xray/life_01/"
-	gameName = "game"
-	lifeName = "life"
+	installBase = "/home/dave/xray/"
 )
 
 func init() {
-	cmdl.Setup()
+	cmdl.Setup("test", "path", "version")
 }
 
 func main() {
 	flag.Parse()
-
-	fmt.Println(cmdl.Path, cmdl.MajorKey, cmdl.MinorKey, cmdl.Key)
+	cmd := cmdl.Cmdl
+	var path string
+	if cmd.Test {
+		path = filepath.Clean(cmd.Path)
+	} else {
+		path = filepath.Join(installBase, cmd.Path)
+	}
+	fmt.Println(path, cmd.MajorKey, cmd.MinorKey, cmd.Key)
 	var (
 		err  error
 		game *gizmo.Game
@@ -35,12 +39,6 @@ func main() {
 			os.Exit(1)
 		}
 	}()
-
-	if len(cmdl.Path) > 0 {
-		if cmdl.Path == "life" {
-			path = lifepath
-		}
-	}
 
 	game, err = gizmo.LoadGameKeys(path)
 	if err != nil {

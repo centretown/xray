@@ -3,13 +3,14 @@ package model
 import "time"
 
 type Version struct {
+	ItemMajor int64
+	ItemMinor int64
 	Major     uint16
 	Minor     uint16
 	Patch     uint16
 	Extension uint16
 	Created   time.Time
 	Updated   time.Time
-	Origin    string
 }
 
 func (ver *Version) ToUint64() uint64 {

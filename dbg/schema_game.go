@@ -14,16 +14,17 @@ var SchemaGame = &Schema{
 		Extension: 0,
 		Created:   time.Now(),
 		Updated:   time.Now(),
-		Origin:    model.IN_HOUSE,
 	},
 
 	Create: []string{
 
 		`CREATE TABLE version (
+itemMajor BIGINT, itemMinor BIGINT,			
 major SMALLINT,
 minor SMALLINT,
 patch SMALLINT,
-extension SMALLINT);`,
+extension SMALLINT,
+PRIMARY KEY (itemMajor,itemMajor,major,minor));`,
 
 		`CREATE TABLE items (
 title VARCHAR(80) NOT NULL,
@@ -71,6 +72,8 @@ VALUES (:major, :minor, :linked_major, :linked_minor, :repeated, :weight);`,
 
 	InsertTag: `INSERT INTO tags (name, weight, major, minor)
 VALUES (:name, :weight, :major, :minor);`,
+
+	GetVersion: `SELECT * FROM version WHERE major=$1 AND minor=$2;`,
 
 	GetItem: `SELECT * FROM items WHERE major=$1 AND minor=$2;`,
 

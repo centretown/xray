@@ -63,16 +63,14 @@ var fixedPalette = []color.RGBA{
 func create_mem_game(t *testing.T) {
 	data := dbg.NewGameData("sqlite3", dbcur)
 	data.Open()
-	if data.Err != nil {
+	if data.HasErrors() {
 		t.Fatal(data.Err)
 	}
 	defer data.Close()
 
-	if data.Err != nil {
+	if data.HasErrors() {
 		t.Fatal(data.Err)
 	}
-
-	data.Create()
 
 	const (
 		baseInterval = .02
@@ -83,6 +81,14 @@ func create_mem_game(t *testing.T) {
 	)
 
 	game := NewGameSetup(screenWidth, screenHeight, fps)
+	data.Create(game.Record, &model.Version{
+		Major: 0,
+		Minor: 1,
+	})
+
+	if data.HasErrors() {
+		t.Fatal(data.Err)
+	}
 	viewPort := game.GetViewPort()
 
 	hole := NewTexture(picd + "polar.png")
@@ -107,7 +113,7 @@ func create_mem_game(t *testing.T) {
 
 	game.FixedPalette = fixedPalette
 	data.Save(game)
-	if data.Err != nil {
+	if data.HasErrors() {
 		t.Fatal(data.Err)
 	}
 	// read_game(t, game, data)
@@ -121,7 +127,7 @@ func read_game(t *testing.T, saved *Game, data *dbg.Data) {
 	fmt.Println(string(buf))
 
 	gameRec := data.GetItemRecord(saved)
-	if data.Err != nil {
+	if data.HasErrors() {
 		t.Fatal(data.Err)
 	}
 
@@ -135,7 +141,7 @@ func read_game(t *testing.T, saved *Game, data *dbg.Data) {
 
 	linkRecs := data.GetLinks(gameRec)
 
-	if data.Err != nil {
+	if data.HasErrors() {
 		t.Fatal(data.Err)
 	}
 	fmt.Println("linkRecs")
@@ -168,7 +174,7 @@ func load_game(t *testing.T, saved *Game, data *dbg.Data) {
 	}
 
 	data.Load(game)
-	if data.Err != nil {
+	if data.HasErrors() {
 		t.Fatal(data.Err)
 	}
 

@@ -63,35 +63,36 @@ func ping(t *testing.T) {
 }
 
 func ping_mem_gamedata(t *testing.T) {
-	gd := NewGameData("sqlite3", ":memory:")
-	gd.Open()
-	if gd.Err != nil {
-		t.Fatal(gd.Err)
+	data := NewGameData("sqlite3", ":memory:")
+	data.Open()
+	if data.HasErrors() {
+		t.Fatal(data.Err)
 	}
-	defer gd.Close()
+	defer data.Close()
 
-	gd.Err = gd.dbx.Ping()
+	data.Err = data.dbx.Ping()
 
-	if gd.Err != nil {
-		t.Fatal(gd.Err)
+	if data.HasErrors() {
+		t.Fatal(data.Err)
 	}
 }
 
 func create_mem_gamedata(t *testing.T) {
-	gd := NewGameData("sqlite3", ":memory:")
-	gd.Open()
-	if gd.Err != nil {
-		t.Fatal(gd.Err)
+	data := NewGameData("sqlite3", ":memory:")
+	data.Open()
+	if data.HasErrors() {
+		t.Fatal(data.Err)
 	}
-	defer gd.Close()
+	defer data.Close()
 
-	gd.Err = gd.dbx.Ping()
+	data.Err = data.dbx.Ping()
 
-	if gd.Err != nil {
-		t.Fatal(gd.Err)
+	if data.HasErrors() {
+		t.Fatal(data.Err)
 	}
 
-	gd.Create()
+	data.Create(&model.Record{}, &model.Version{})
+
 }
 
 func create_mem_game(t *testing.T) {
@@ -109,7 +110,7 @@ func create_mem_game(t *testing.T) {
 		t.Fatal(gd.Err)
 	}
 
-	gd.Create()
+	gd.Create(&model.Record{}, &model.Version{})
 
 	var paths = []string{
 		"../2d/head.png",

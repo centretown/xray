@@ -8,16 +8,18 @@ import (
 	"github.com/google/uuid"
 )
 
-const IN_HOUSE = "018e9522-01c9-77c0-be6c-65526f21ec1a"
-
 var (
 	origin                   uuid.UUID
 	originMajor, originMinor int64
+	inMajor, inMinor         int64
 )
+
+const IN_HOUSE = "018e9522-01c9-77c0-be6c-65526f21ec1a"
 
 func init() {
 	origin, _ = uuid.Parse(IN_HOUSE)
 	originMajor, originMinor = RecordID(origin)
+	inMajor, inMinor = originMajor, originMinor
 }
 
 type Recorder interface {

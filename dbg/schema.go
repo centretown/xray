@@ -13,9 +13,10 @@ type Schema struct {
 	InsertLink    string
 	InsertTag     string
 
-	GetItem  string
-	GetLink  string
-	GetLinks string
+	GetVersion string
+	GetItem    string
+	GetLink    string
+	GetLinks   string
 }
 
 func NewSchema() *Schema {

@@ -36,7 +36,7 @@ func (gs *Game) BeginGIFCapture() {
 		gs.captureDelay, gs.colorMap)
 }
 
-func (gs *Game) GIFCapture() {
+func (gs *Game) gifCapture() {
 	if !gs.Capturing {
 		fmt.Println("not supposed to capture")
 		return

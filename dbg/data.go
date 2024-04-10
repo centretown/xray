@@ -28,34 +28,44 @@ func (data *Data) Open() *Data {
 	return data
 }
 
+func (data *Data) HasErrors() bool {
+	return data.Err != nil
+}
+
 func (data *Data) Close() {
 	data.Err = data.dbx.Close()
 }
 
-func (data *Data) Create() {
-	for _, sch := range data.Schema.Create {
-		fmt.Println(sch)
-		data.dbx.MustExec(sch)
+func (data *Data) Create(game *model.Record, version *model.Version) {
+	version.ItemMajor = game.Major
+	version.ItemMinor = game.Minor
+	data.GetVersion(version)
+
+	if data.HasErrors() {
+		for _, sch := range data.Schema.Create {
+			fmt.Println(sch)
+			data.dbx.MustExec(sch)
+		}
+		tx := data.dbx.MustBegin()
+		tx.NamedExec(data.Schema.InsertVersion, &data.Schema.Version)
+		data.Err = tx.Commit()
 	}
-	tx := data.dbx.MustBegin()
-	tx.NamedExec(data.Schema.InsertVersion, &data.Schema.Version)
-	data.Err = tx.Commit()
 }
 
 func (data *Data) InsertItems(items ...model.Recorder) {
 	tx := data.dbx.MustBegin()
 	defer func() {
 		tx.Commit()
-		if data.Err != nil {
+		if data.HasErrors() {
 			fmt.Println("InsertItem", data.Err)
 		}
 	}()
 	for _, item := range items {
 		item.GetRecord().UpdateContent(item.GetItem())
-		if data.Err == nil {
+		if !data.HasErrors() {
 			_, data.Err = tx.NamedExec(data.Schema.InsertItem, item.GetRecord())
 		}
-		if data.Err != nil {
+		if data.HasErrors() {
 			return
 		}
 	}
@@ -65,13 +75,13 @@ func (data *Data) InsertLinks(links ...*model.Link) {
 	tx := data.dbx.MustBegin()
 	defer func() {
 		tx.Commit()
-		if data.Err != nil {
+		if data.HasErrors() {
 			fmt.Println("InsertLink", data.Err)
 		}
 	}()
 	for _, link := range links {
 		_, data.Err = tx.NamedExec(data.Schema.InsertLink, link)
-		if data.Err != nil {
+		if data.HasErrors() {
 			return
 		}
 	}
@@ -80,7 +90,7 @@ func (data *Data) InsertLinks(links ...*model.Link) {
 func (data *Data) GetItemID(id string) *model.Record {
 	var uid uuid.UUID
 	uid, data.Err = uuid.Parse((id))
-	if data.Err != nil {
+	if data.HasErrors() {
 		return &model.Record{}
 	}
 	return data.GetItemUUID(uid)
@@ -102,6 +112,12 @@ func (data *Data) GetItem(major, minor int64) *model.Record {
 	return item
 }
 
+func (data *Data) GetVersion(version *model.Version) *model.Version {
+	data.Err = data.dbx.Get(version, data.Schema.GetVersion,
+		version.ItemMajor, version.ItemMinor, version.Major, version.Minor)
+	return version
+}
+
 func (data *Data) GetLinks(rec *model.Record) (recs []*model.Record) {
 	recs = make([]*model.Record, 0)
 	var (
@@ -110,14 +126,14 @@ func (data *Data) GetLinks(rec *model.Record) (recs []*model.Record) {
 	)
 
 	rows, data.Err = data.dbx.Queryx(data.Schema.GetLinks, rec.Major, rec.Minor)
-	if data.Err != nil {
+	if data.HasErrors() {
 		return
 	}
 
 	for rows.Next() {
 		link := &model.Link{}
 		data.Err = rows.StructScan(link)
-		if data.Err != nil {
+		if data.HasErrors() {
 			return
 		}
 		links = append(links, link)
@@ -125,7 +141,7 @@ func (data *Data) GetLinks(rec *model.Record) (recs []*model.Record) {
 
 	for _, l := range links {
 		rec = data.GetItem(l.LinkedMajor, l.LinkedMinor)
-		if data.Err != nil {
+		if data.HasErrors() {
 			return
 		}
 		recs = append(recs, rec)
@@ -135,7 +151,7 @@ func (data *Data) GetLinks(rec *model.Record) (recs []*model.Record) {
 
 func (data *Data) Load(item model.Recorder) {
 	data.Err = model.Decode(item)
-	if data.Err != nil {
+	if data.HasErrors() {
 		return
 	}
 
@@ -147,7 +163,7 @@ func (data *Data) Load(item model.Recorder) {
 
 func (data *Data) addLinks(item model.Linker) {
 	linkRecs := data.GetLinks(item.GetRecord())
-	if data.Err != nil {
+	if data.HasErrors() {
 		return
 	}
 
@@ -163,18 +179,18 @@ func (data *Data) addLinks(item model.Linker) {
 
 func (data *Data) Save(rec model.Recorder) {
 	data.InsertItems(rec)
-	if data.Err == nil {
+	if !data.HasErrors() {
 		linker, isLinker := rec.(model.Linker)
 		if isLinker {
 			list, links := data.addLists(linker)
 			fmt.Println(list)
 			fmt.Println(links)
 			data.InsertItems(list...)
-			if data.Err != nil {
+			if data.HasErrors() {
 				return
 			}
 			data.InsertLinks(links...)
-			if data.Err != nil {
+			if data.HasErrors() {
 				return
 			}
 		}
