@@ -2,6 +2,8 @@ package dbg
 
 import (
 	"fmt"
+	"log"
+	"strings"
 
 	"github.com/centretown/xray/access"
 	"github.com/centretown/xray/model"
@@ -32,24 +34,45 @@ func (data *Data) HasErrors() bool {
 	return data.Err != nil
 }
 
+func (data *Data) HasError(err error) bool {
+	return data.Err == err
+}
+
 func (data *Data) Close() {
 	data.Err = data.dbx.Close()
 }
 
-func (data *Data) Create(game *model.Record, version *model.Version) {
-	version.ItemMajor = game.Major
-	version.ItemMinor = game.Minor
-	data.GetVersion(version)
+var ErrNotCreated = fmt.Errorf("no such")
 
-	if data.HasErrors() {
+func (data *Data) Create(game *model.Record, version *model.Version) {
+
+	version.Item = game.Major
+	version.Itemn = game.Minor
+
+	versions := make([]*model.Version, 0)
+
+	data.GetVersions()
+
+	fmt.Println(versions, data.Err)
+
+	if data.Err != nil {
+		text := data.Err.Error()
+		if strings.Index(text, ErrNotCreated.Error()) != 0 {
+			log.Panicln("something else", data.Err)
+		}
+		// first time create
+		data.Err = ErrNotCreated
+	}
+
+	if data.HasError(ErrNotCreated) {
 		for _, sch := range data.Schema.Create {
 			fmt.Println(sch)
 			data.dbx.MustExec(sch)
 		}
-		tx := data.dbx.MustBegin()
-		tx.NamedExec(data.Schema.InsertVersion, &data.Schema.Version)
-		data.Err = tx.Commit()
 	}
+	tx := data.dbx.MustBegin()
+	tx.NamedExec(data.Schema.InsertVersion, version)
+	data.Err = tx.Commit()
 }
 
 func (data *Data) InsertItems(items ...model.Recorder) {
@@ -114,8 +137,14 @@ func (data *Data) GetItem(major, minor int64) *model.Record {
 
 func (data *Data) GetVersion(version *model.Version) *model.Version {
 	data.Err = data.dbx.Get(version, data.Schema.GetVersion,
-		version.ItemMajor, version.ItemMinor, version.Major, version.Minor)
+		version.Item, version.Itemn, version.Major, version.Minor)
 	return version
+}
+
+func (data *Data) GetVersions() error {
+	rows := data.dbx.QueryRow(data.Schema.GetVersions)
+	data.Err = rows.Err()
+	return data.Err
 }
 
 func (data *Data) GetLinks(rec *model.Record) (recs []*model.Record) {
@@ -140,7 +169,7 @@ func (data *Data) GetLinks(rec *model.Record) (recs []*model.Record) {
 	}
 
 	for _, l := range links {
-		rec = data.GetItem(l.LinkedMajor, l.LinkedMinor)
+		rec = data.GetItem(l.Linked, l.Linkedn)
 		if data.HasErrors() {
 			return
 		}

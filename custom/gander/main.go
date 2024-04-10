@@ -30,9 +30,14 @@ func build_gander(game *gizmo.Game, resourcePath string) {
 	viewPort := game.GetViewPort()
 
 	hole := gizmo.NewTexture(filepath.Join(resourcePath, "polar.png"))
-	hole_mv := gizmo.NewMover(viewPort, 10, 10, 10)
+	hole_mv := gizmo.NewMover(viewPort, 2, 1, 2)
 	hole_mv.AddDrawer(hole)
 	game.AddActor(hole_mv, 6)
+
+	moon := gizmo.NewTexture(filepath.Join(resourcePath, "moon-solo-300.png"))
+	moon_mv := gizmo.NewMover(viewPort, 15, 15, 10)
+	moon_mv.AddDrawer(moon)
+	game.AddActor(moon_mv, 6)
 
 	ball := gizmo.NewCircle(20, gizmo.Cyan)
 	ball_mv := gizmo.NewMover(viewPort, 200, 100, 0)

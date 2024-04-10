@@ -3,8 +3,8 @@ package model
 import "time"
 
 type Version struct {
-	ItemMajor int64
-	ItemMinor int64
+	Item      int64
+	Itemn     int64
 	Major     uint16
 	Minor     uint16
 	Patch     uint16

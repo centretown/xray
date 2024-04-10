@@ -80,7 +80,7 @@ func create_mem_game(t *testing.T) {
 		captureFps   = 25
 	)
 
-	game := NewGameSetup(screenWidth, screenHeight, fps)
+	game := NewGameSetup(dir, screenWidth, screenHeight, fps)
 	data.Create(game.Record, &model.Version{
 		Major: 0,
 		Minor: 1,

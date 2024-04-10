@@ -36,9 +36,8 @@ func Build(builder func(*gizmo.Game, string)) (*gizmo.Game, error) {
 	if pathLen > 0 {
 		if cmd.Install {
 			path = filepath.Join(installBase, cmd.Path)
-		} else {
-			path = filepath.Clean(cmd.Path)
 		}
+		path, _ = filepath.Abs(cmd.Path)
 		memory = false
 	}
 
@@ -83,7 +82,8 @@ func create(path string, cmd *cmdl.CmdLineFlags,
 		captureFps   = 25
 	)
 
-	game = gizmo.NewGameSetup(screenWidth, screenHeight, fps)
+	game = gizmo.NewGameSetup(path, screenWidth, screenHeight, fps)
+
 	data.Create(game.Record, &model.Version{Major: 0, Minor: 1})
 	if data.HasErrors() {
 		return

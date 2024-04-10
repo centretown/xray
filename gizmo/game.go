@@ -56,11 +56,12 @@ type Game struct {
 	Record *model.Record
 }
 
-func NewGameSetup(width, height, fps int32) *Game {
+func NewGameSetup(path string, width, height, fps int32) *Game {
 	gs := NewGame()
 	gs.Width = width
 	gs.Height = height
 	gs.FrameRate = fps
+	gs.path = path
 	return gs
 }
 

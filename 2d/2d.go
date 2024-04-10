@@ -22,7 +22,7 @@ func setup(gp pad.PadG) *gizmo.Game {
 	rl.InitWindow(screenWidth, screenHeight, "2d")
 	rl.SetWindowState(rl.FlagWindowResizable)
 
-	gs := gizmo.NewGameSetup(screenWidth, screenHeight, fps)
+	gs := gizmo.NewGameSetup("/home/dave/xray/test", screenWidth, screenHeight, fps)
 	gs.SetPad(gp)
 	viewPort := gs.SetViewPortFromWindow()
 

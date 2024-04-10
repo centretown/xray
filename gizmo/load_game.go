@@ -1,6 +1,7 @@
 package gizmo
 
 import (
+	"log"
 	"path/filepath"
 
 	"github.com/centretown/xray/access"
@@ -17,25 +18,37 @@ func LoadGameKeys(path string) (game *Game, err error) {
 	return LoadGame(path, record)
 }
 
-func LoadGame(path string, record *model.Record) (game *Game, err error) {
-	data := dbg.NewGameData("sqlite3", filepath.Join(path, "xray_game.db"))
-	if data.Open().Err != nil {
-		err = data.Err
+func LoadGame(folder string, record *model.Record) (game *Game, err error) {
+	game = &Game{}
+
+	var path string
+	path, err = filepath.Abs(folder)
+	if err != nil {
+		log.Println(err)
 		return
 	}
-	defer data.Close()
+
+	data := dbg.NewGameData("sqlite3", filepath.Join(path, "xray_game.db"))
+	data.Open()
+
+	defer func() {
+		if data.Err != nil {
+			err = data.Err
+			log.Println(data.Err)
+			return
+		}
+		data.Close()
+	}()
 
 	record = data.GetItem(record.Major, record.Minor)
 	if data.HasErrors() {
-		err = data.Err
 		return
 	}
 
-	game = &Game{}
 	game.Setup(record, path)
+
 	data.Load(game)
 	if data.HasErrors() {
-		err = data.Err
 		return
 	}
 

@@ -9,29 +9,38 @@ import (
 	"image/png"
 	"io"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/ericpauley/go-quantize/quantize"
+	"github.com/google/uuid"
+	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
-var fileCounter = 0
-
-// var path = "/home/dave/src/xray/testimg"
-var namePrefix = "capture"
-
 func NextFileName(ext, path string) string {
-	return fmt.Sprintf("%s/%s%d.%s", path, namePrefix, fileCounter, ext)
+	var namePrefix = "capture"
+	id := uuid.New()
+	name := fmt.Sprintf("%s_%s.%s", namePrefix, id.String(), ext)
+	return filepath.Join(path, name)
 }
 
 func createFile(ext string, path string) (*os.File, error) {
 	fname := NextFileName(ext, path)
-	fileCounter++
 
 	w, err := os.Create(fname)
 	if err != nil {
 		fmt.Println("Create", fname, err)
 	}
 	return w, err
+}
+
+func CaptureMPG() {
+	err := ffmpeg.Input("./sample_data/in1.mp4").
+		Output("./sample_data/out1.mp4", ffmpeg.KwArgs{"c:v": "libx265"}).
+		OverWriteOutput().ErrorToStdOut().Run()
+	if err != nil {
+		return
+	}
 }
 
 func CapturePNG(path string, img image.Image) {
