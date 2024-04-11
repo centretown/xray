@@ -9,8 +9,8 @@ import (
 	"github.com/centretown/xray/model"
 )
 
-func LoadGameKeys(path string) (game *Game, err error) {
-	gameKeys, _ := access.LoadGameKeys(filepath.Join(path, "game_keys.yaml"))
+func LoadGameKey(path string) (game *Game, err error) {
+	gameKeys, _ := access.LoadGameKey(filepath.Join(path, "game_keys.yaml"))
 	var record = &model.Record{
 		Major: gameKeys.Major,
 		Minor: gameKeys.Minor,
@@ -20,14 +20,7 @@ func LoadGameKeys(path string) (game *Game, err error) {
 
 func LoadGame(folder string, record *model.Record) (game *Game, err error) {
 	game = &Game{}
-
-	var path string
-	path, err = filepath.Abs(folder)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
+	path := filepath.Clean(folder)
 	data := dbg.NewGameData("sqlite3", filepath.Join(path, "xray_game.db"))
 	data.Open()
 

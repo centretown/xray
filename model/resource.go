@@ -1,11 +1,11 @@
 package model
 
 import (
-	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
 	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -26,10 +26,10 @@ type Resource struct {
 
 func NewFileResource(path string, category int32, content any) (res *Resource) {
 	var (
-		abs  string
-		info fs.FileInfo
-		err  error
-		errp = &err
+		clean string
+		info  fs.FileInfo
+		err   error
+		errp  = &err
 	)
 
 	res = &Resource{}
@@ -39,23 +39,21 @@ func NewFileResource(path string, category int32, content any) (res *Resource) {
 		res.Err = *errp
 	}()
 
-	abs, err = filepath.Abs(path)
+	clean = filepath.Clean(path)
+	i := strings.LastIndexByte(clean, '.')
+	if i > 0 {
+		ext := clean[i+1:]
+		log.Println("NewFileResource", clean, ext)
+		res.Width, res.Height = GetDimensions(clean, ext)
+	}
+
+	res.Path = clean
+	info, err = os.Stat(clean)
+
 	if err == nil {
-		i := strings.LastIndexByte(abs, '.')
-		if i > 0 {
-			ext := abs[i+1:]
-			fmt.Println("NewFileResource", abs, ext)
-			res.Width, res.Height = GetDimensions(abs, ext)
-		}
-
-		res.Path = abs
-		info, err = os.Stat(abs)
-
-		if err == nil {
-			res.Name = info.Name()
-			res.Size = info.Size()
-			res.IsDir = info.IsDir()
-		}
+		res.Name = info.Name()
+		res.Size = info.Size()
+		res.IsDir = info.IsDir()
 	}
 
 	return

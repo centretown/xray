@@ -2,7 +2,7 @@ package cmdl
 
 import (
 	"flag"
-	"fmt"
+	"log"
 
 	"gopkg.in/yaml.v3"
 )
@@ -19,7 +19,7 @@ type CmdLineFlags struct {
 func (cmdl *CmdLineFlags) Dump() {
 	buf, err := yaml.Marshal(cmdl)
 	if err == nil {
-		fmt.Println(string(buf))
+		log.Println(string(buf))
 	}
 }
 

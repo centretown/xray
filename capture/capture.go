@@ -8,6 +8,7 @@ import (
 	"image/gif"
 	"image/png"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -29,7 +30,7 @@ func createFile(ext string, path string) (*os.File, error) {
 
 	w, err := os.Create(fname)
 	if err != nil {
-		fmt.Println("Create", fname, err)
+		log.Println("Create", fname, err)
 	}
 	return w, err
 }
@@ -92,7 +93,7 @@ func CaptureGIF(path string, done <-chan int,
 	delay int,
 	colorMap map[color.Color]uint8) {
 
-	fmt.Println("Capturing...")
+	log.Println("Capturing...")
 
 	var pics = make([]image.Image, 0)
 	for {
@@ -102,9 +103,9 @@ func CaptureGIF(path string, done <-chan int,
 			pics = append(pics, pic)
 
 		case <-done:
-			fmt.Println("Writing...")
+			log.Println("Writing...")
 			WriteGIF(path, pics, pal, colorMap, delay)
-			fmt.Println("Done.")
+			log.Println("Done.")
 			return
 
 		default:
@@ -200,6 +201,6 @@ func WriteGIF(path string, pics []image.Image, pal color.Palette,
 
 	err = gif.EncodeAll(w, opts)
 	if err != nil {
-		fmt.Println("EncodeAll", w.Name(), err)
+		log.Println("EncodeAll", w.Name(), err)
 	}
 }

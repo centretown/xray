@@ -1,9 +1,9 @@
 package gizmo
 
 import (
-	"fmt"
 	"image"
 	"image/color"
+	"log"
 
 	"github.com/centretown/xray/model"
 
@@ -143,7 +143,7 @@ func (gs *Game) Link(recs ...*model.Record) {
 	var err error
 	defer func() {
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}()
 

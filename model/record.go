@@ -2,7 +2,7 @@ package model
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -95,7 +95,7 @@ func Decode(recorder Recorder) (err error) {
 	rec := recorder.GetRecord()
 	err = json.Unmarshal([]byte(rec.Content), recorder.GetItem())
 	if err != nil {
-		fmt.Println(rec.Content)
+		log.Println(rec.Content)
 		panic(err)
 	}
 	return

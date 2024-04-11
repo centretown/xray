@@ -1,8 +1,8 @@
 package gizmo
 
 import (
-	"fmt"
 	"image/color"
+	"log"
 	"testing"
 
 	"github.com/centretown/xray/dbg"
@@ -122,16 +122,16 @@ func create_mem_game(t *testing.T) {
 
 func read_game(t *testing.T, saved *Game, data *dbg.Data) {
 	buf, _ := yaml.Marshal(saved)
-	fmt.Println("---------")
-	fmt.Println("read game")
-	fmt.Println(string(buf))
+	log.Println("---------")
+	log.Println("read game")
+	log.Println(string(buf))
 
 	gameRec := data.GetItemRecord(saved)
 	if data.HasErrors() {
 		t.Fatal(data.Err)
 	}
 
-	fmt.Println(gameRec)
+	log.Println(gameRec)
 
 	game := &Game{Record: gameRec}
 	err := model.Decode(game)
@@ -144,26 +144,26 @@ func read_game(t *testing.T, saved *Game, data *dbg.Data) {
 	if data.HasErrors() {
 		t.Fatal(data.Err)
 	}
-	fmt.Println("linkRecs")
+	log.Println("linkRecs")
 	for i, l := range linkRecs {
-		fmt.Println(i, l)
+		log.Println(i, l)
 	}
 
 	game.Link(linkRecs...)
-	fmt.Println(game)
+	log.Println(game)
 
 	for _, a := range game.actors {
 		if linker, ok := a.(model.Linker); ok {
 			linkRecs = data.GetLinks(a.GetRecord())
 			for i, l := range linkRecs {
-				fmt.Println(i, l)
+				log.Println(i, l)
 			}
 			linker.Link(linkRecs...)
 		}
 	}
 
 	buf, _ = yaml.Marshal(game)
-	fmt.Println(string(buf))
+	log.Println(string(buf))
 
 }
 

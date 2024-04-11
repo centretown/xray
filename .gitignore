@@ -10,3 +10,6 @@ rayl
 TestSave.txt
 TestSchema.txt
 capture_*
+game_keys.yaml
+custom/gander/game01/game_keys.yaml
+custom/life01/life01/game_keys.yaml

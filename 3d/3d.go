@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
+	"log"
 
 	"github.com/centretown/xray/capture"
 	"github.com/centretown/xray/try"
@@ -114,7 +114,7 @@ func Run3d(runr *Runner, gpads *gpads.GPads) {
 
 	}
 	rl.CloseWindow()
-	fmt.Println("THREE D.")
+	log.Println("THREE D.")
 }
 
 var nextTime float64

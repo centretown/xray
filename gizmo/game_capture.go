@@ -1,7 +1,7 @@
 package gizmo
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/centretown/xray/capture"
 	"github.com/centretown/xray/try"
@@ -17,7 +17,7 @@ func (gs *Game) CanCapture() bool {
 
 func (gs *Game) BeginGIFCapture() {
 	if gs.Capturing {
-		fmt.Println("already capturing...")
+		log.Println("already capturing...")
 		return
 	}
 	gs.CaptureCount = gs.captureStart
@@ -38,7 +38,7 @@ func (gs *Game) BeginGIFCapture() {
 
 func (gs *Game) gifCapture() {
 	if !gs.Capturing {
-		fmt.Println("not supposed to capture")
+		log.Println("not supposed to capture")
 		return
 	}
 
@@ -51,10 +51,10 @@ func (gs *Game) gifCapture() {
 
 func (gs *Game) EndGIFCapture() {
 	if !gs.Capturing {
-		fmt.Println("nothing to end. not capturing!")
+		log.Println("nothing to end. not capturing!")
 		return
 	}
-	fmt.Println("end capturing!")
+	log.Println("end capturing!")
 	gs.CaptureCount = -1
 	gs.Capturing = false
 	gs.stopChan <- 1

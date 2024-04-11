@@ -3,6 +3,7 @@ package gizmo
 import (
 	"fmt"
 	"image/color"
+	"log"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"gopkg.in/yaml.v3"
@@ -75,17 +76,17 @@ func (gs *Game) GetMessageBox() (rect rl.RectangleInt32) {
 
 func (game *Game) Dump() {
 	buf, _ := yaml.Marshal(game)
-	fmt.Println(string(buf))
+	log.Println(string(buf))
 
 	for _, mv := range game.Actors() {
 		buf, _ = yaml.Marshal(mv)
-		fmt.Println(string(buf))
+		log.Println(string(buf))
 		buf, _ = yaml.Marshal(mv.GetDrawer())
-		fmt.Println(string(buf))
+		log.Println(string(buf))
 	}
 
 	for _, dr := range game.Drawers() {
 		buf, _ = yaml.Marshal(dr)
-		fmt.Println(string(buf))
+		log.Println(string(buf))
 	}
 }

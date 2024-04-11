@@ -28,7 +28,7 @@ func (gs *Game) Run() {
 		rl.SetWindowState(rl.FlagWindowResizable)
 	}
 	rl.SetTargetFPS(gs.FrameRate)
-	// fmt.Println("game.FrameRate", game.FrameRate)
+	// log.Println("game.FrameRate", game.FrameRate)
 	gs.SetColors()
 	gs.Current = rl.GetTime()
 	gs.Refresh(gs.Current)

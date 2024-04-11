@@ -53,7 +53,7 @@ func (data *Data) Create(game *model.Record, version *model.Version) {
 
 	data.GetVersions()
 
-	fmt.Println(versions, data.Err)
+	log.Println(versions, data.Err)
 
 	if data.Err != nil {
 		text := data.Err.Error()
@@ -66,7 +66,7 @@ func (data *Data) Create(game *model.Record, version *model.Version) {
 
 	if data.HasError(ErrNotCreated) {
 		for _, sch := range data.Schema.Create {
-			fmt.Println(sch)
+			log.Println(sch)
 			data.dbx.MustExec(sch)
 		}
 	}
@@ -80,7 +80,7 @@ func (data *Data) InsertItems(items ...model.Recorder) {
 	defer func() {
 		tx.Commit()
 		if data.HasErrors() {
-			fmt.Println("InsertItem", data.Err)
+			log.Println("InsertItem", data.Err)
 		}
 	}()
 	for _, item := range items {
@@ -99,7 +99,7 @@ func (data *Data) InsertLinks(links ...*model.Link) {
 	defer func() {
 		tx.Commit()
 		if data.HasErrors() {
-			fmt.Println("InsertLink", data.Err)
+			log.Println("InsertLink", data.Err)
 		}
 	}()
 	for _, link := range links {
@@ -212,8 +212,8 @@ func (data *Data) Save(rec model.Recorder) {
 		linker, isLinker := rec.(model.Linker)
 		if isLinker {
 			list, links := data.addLists(linker)
-			fmt.Println(list)
-			fmt.Println(links)
+			log.Println(list)
+			log.Println(links)
 			data.InsertItems(list...)
 			if data.HasErrors() {
 				return

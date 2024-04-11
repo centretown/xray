@@ -8,9 +8,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func Load[T any](path string, src *T) (dest *T, err error) {
-	dest = src
-
+func Load[T any](path string, dest *T) (err error) {
 	var rdr *os.File
 	rdr, err = os.Open(path)
 	if err != nil {
@@ -24,7 +22,7 @@ func Load[T any](path string, src *T) (dest *T, err error) {
 		return
 	}
 
-	err = yaml.Unmarshal(buf, src)
+	err = yaml.Unmarshal(buf, dest)
 	return
 }
 
@@ -34,6 +32,6 @@ func Save[T any](path string, src *T) (err error) {
 	if err != nil {
 		return
 	}
-	err = os.WriteFile(path, buf, os.ModePerm)
+	err = os.WriteFile(path, buf, os.ModeType)
 	return
 }

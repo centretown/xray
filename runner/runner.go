@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -15,21 +15,31 @@ var (
 )
 
 func init() {
-	cmdl.Setup("test", "path", "version")
+	cmdl.Setup("path")
 }
 
 func main() {
 	flag.Parse()
 	cmd := cmdl.Cmdl
-	var path string
-	if cmd.Test {
-		path = filepath.Clean(cmd.Path)
-	} else {
-		path = filepath.Join(installBase, cmd.Path)
-	}
-	fmt.Println(path, cmd.MajorKey, cmd.MinorKey, cmd.Key)
 	var (
-		err  error
+		path, dir string
+		err       error
+	)
+
+	path = filepath.Join(installBase, cmd.Path)
+	dir, err = filepath.Abs(installBase)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = os.Chdir(dir)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Println(path, cmd.MajorKey, cmd.MinorKey, cmd.Key)
+
+	var (
 		game *gizmo.Game
 	)
 
@@ -40,25 +50,13 @@ func main() {
 		}
 	}()
 
-	game, err = gizmo.LoadGameKeys(path)
+	game, err = gizmo.LoadGameKey(path)
 	if err != nil {
-		fmt.Println("Loading game:", err)
+		log.Println("Loading game:", err)
 		j, n, k := game.Keys()
-		fmt.Println(path, j, n, k)
+		log.Println(path, j, n, k)
 		return
 	}
-	// game.Dump()
 
 	game.Run()
 }
-
-// if cmdl.MajorKey != 0 {
-// 	record.Major, record.Minor = cmdl.MajorKey, cmdl.MinorKey
-// } else {
-// 	id, err = uuid.Parse(cmdl.Key)
-// 	if err != nil {
-// 		fmt.Println("Wrong key", err, cmdl.Key)
-// 		return
-// 	}
-// 	record.Major, record.Minor = model.RecordID(id)
-// }

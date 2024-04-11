@@ -2,7 +2,6 @@ package builder
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"path/filepath"
 
@@ -18,47 +17,48 @@ var (
 	installBase = "/home/dave/xray/"
 	gameName    = "xray_game.db"
 	gameKeys    = "game_keys.yaml"
+	memoryPath  = ":memory:"
 )
 
 func init() {
-	cmdl.Setup("install", "path", "resource", "major", "minor")
+	cmdl.Setup("install", "test", "path", "resource", "major", "minor")
 }
 
 func Build(builder func(*gizmo.Game, string)) (*gizmo.Game, error) {
 
 	flag.Parse()
 
-	cmd := &cmdl.Cmdl
+	var (
+		cmd          = &cmdl.Cmdl
+		currentPath  = filepath.Clean(cmd.Path)
+		databasePath = currentPath
+		resourcePath = filepath.Clean(cmd.Resource)
+		inMemory     = false
+	)
 
-	path := ":memory:"
-	memory := true
-	pathLen := len(cmd.Path)
-	if pathLen > 0 {
-		if cmd.Install {
-			path = filepath.Join(installBase, cmd.Path)
-		}
-		path, _ = filepath.Abs(cmd.Path)
-		memory = false
-	}
-
-	if len(cmdl.Cmdl.Resource) == 0 {
-		cmd.Resource = path
+	// test and install conflict. test has higher priority
+	// because it is the safest option
+	if cmd.Test {
+		inMemory = true
+		databasePath = memoryPath
+	} else if cmd.Install {
+		databasePath = filepath.Join(installBase, currentPath)
 	}
 
 	buf, _ := yaml.Marshal(&cmd)
 
-	fmt.Printf("path: %s, memory: %v\nCommand Line: \n%s",
-		path, memory, string(buf))
-
-	return create(path, cmd, builder, memory)
+	game, err := create(databasePath, resourcePath, cmd, builder, inMemory)
+	log.Printf("currentPath: %s, memory: %v, databasePath: %s, resourcePath: %s\nCommand Line: \n%s",
+		currentPath, inMemory, databasePath, resourcePath, string(buf))
+	return game, err
 }
 
-func create(path string, cmd *cmdl.CmdLineFlags,
+func create(databasePath, resourcePath string, cmd *cmdl.CmdLineFlags,
 	builder func(*gizmo.Game, string), memory bool) (game *gizmo.Game, err error) {
 
-	fname := path
+	fname := databasePath
 	if !memory {
-		fname = filepath.Join(path, gameName)
+		fname = filepath.Join(databasePath, gameName)
 	}
 
 	data := dbg.NewGameData("sqlite3", fname)
@@ -82,14 +82,14 @@ func create(path string, cmd *cmdl.CmdLineFlags,
 		captureFps   = 25
 	)
 
-	game = gizmo.NewGameSetup(path, screenWidth, screenHeight, fps)
+	game = gizmo.NewGameSetup(databasePath, screenWidth, screenHeight, fps)
 
 	data.Create(game.Record, &model.Version{Major: 0, Minor: 1})
 	if data.HasErrors() {
 		return
 	}
 
-	builder(game, cmdl.Cmdl.Resource)
+	builder(game, resourcePath)
 
 	data.Save(game)
 	if data.HasErrors() {
@@ -97,7 +97,7 @@ func create(path string, cmd *cmdl.CmdLineFlags,
 	}
 
 	if !memory {
-		access.SaveGameKeys(filepath.Join(path, gameKeys),
+		access.SaveGameKey(filepath.Join(databasePath, gameKeys),
 			access.NewGameKeys(game.Record.Major,
 				game.Record.Minor))
 	}

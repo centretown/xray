@@ -42,7 +42,8 @@ func NewDataKeys(driver, path string) *DataKeys {
 }
 
 func LoadDataKeys(path string) (dk *DataKeys, err error) {
-	return Load(path, &DataKeys{})
+	dk, err = &DataKeys{}, Load(path, dk)
+	return
 }
 
 func SaveDataKeys(path string, dk *DataKeys) (err error) {
