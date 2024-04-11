@@ -12,7 +12,7 @@ type CmdLineFlags struct {
 	Key                string
 	Path               string
 	Resource           string
-	Install            bool
+	Install            string
 	Test               bool
 }
 
@@ -30,7 +30,7 @@ var (
 	minorUsage    = "minor version number"
 	keyUsage      = "uuid key"
 	pathUsage     = "build destination folder"
-	installUsage  = "install build"
+	installUsage  = "install build to folder"
 	resourceUsage = "build resource location if different from path"
 	testUsage     = "run test version"
 
@@ -87,11 +87,11 @@ func Setup(options ...string) {
 			flag.StringVar(&Cmdl.Path, flagP, Cmdl.Path, sameAs(flagPath))
 
 		case flagInstall:
-			flag.BoolVar(&Cmdl.Install, flagInstall, Cmdl.Install, installUsage)
-			flag.BoolVar(&Cmdl.Install, flagI, Cmdl.Install, sameAs(flagInstall))
+			flag.StringVar(&Cmdl.Install, flagInstall, Cmdl.Install, installUsage)
+			flag.StringVar(&Cmdl.Install, flagI, Cmdl.Install, sameAs(flagInstall))
 		case flagI:
-			flag.BoolVar(&Cmdl.Install, flagInstall, Cmdl.Install, installUsage)
-			flag.BoolVar(&Cmdl.Install, flagI, Cmdl.Install, sameAs(flagInstall))
+			flag.StringVar(&Cmdl.Install, flagInstall, Cmdl.Install, installUsage)
+			flag.StringVar(&Cmdl.Install, flagI, Cmdl.Install, sameAs(flagInstall))
 
 		case flagTest:
 			flag.BoolVar(&Cmdl.Test, flagTest, Cmdl.Test, testUsage)

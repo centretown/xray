@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	game, err := builder.Build(build_life01)
-	if err == nil {
+	game, install, err := builder.Build(build_life01)
+	if err == nil && !install {
 		game.Run()
 	}
 }

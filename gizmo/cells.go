@@ -63,11 +63,10 @@ func NewCells(width, height, squareSize int32) *Cells {
 	cs.Cols = width / squareSize
 	cs.Rows = height / squareSize
 	cs.Colors = append(cs.Colors, gridColor, aliveColor, visitedColor)
-
+	cs.SetupCells()
 	cs.Record = model.NewRecord("cells",
 		int32(categories.Cells), &cs.CellItems, model.JSON)
 	cs.setup = false
-	cs.Setup()
 	return cs
 }
 
@@ -79,8 +78,7 @@ func (cs *Cells) SetColors(aliveColor,
 	gridColor color.RGBA) {
 }
 
-func (cs *Cells) Setup() {
-
+func (cs *Cells) SetupCells() {
 	cs.cells = make([][]*Cell, int(cs.Cols+1))
 	for x := int32(0); x <= cs.Cols; x++ {
 		cs.cells[x] = make([]*Cell, int(cs.Rows+1))
@@ -93,13 +91,13 @@ func (cs *Cells) Setup() {
 }
 
 func (cs *Cells) Bounds() rl.RectangleInt32 {
-	if !cs.setup {
-		cs.Setup()
-	}
 	return rl.RectangleInt32{X: 0, Y: 0, Width: cs.Width, Height: cs.Height}
 }
 
 func (cs *Cells) GetCells() [][]*Cell {
+	if cs.cells == nil {
+		cs.SetupCells()
+	}
 	return cs.cells
 }
 

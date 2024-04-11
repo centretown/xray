@@ -25,7 +25,7 @@ func NewCellsOrg(width, height, squareSize int32) *CellsOrg {
 	cs.Colors = append(cs.Colors, gridColor, aliveColor, visitedColor)
 
 	cs.Record = model.NewRecord("cells",
-		int32(categories.Cells), &cs.CellItems, model.JSON)
+		int32(categories.CellsOrg), &cs.CellItems, model.JSON)
 	cs.setup = false
 	cs.start()
 	return cs

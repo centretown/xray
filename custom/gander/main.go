@@ -9,8 +9,8 @@ import (
 )
 
 func main() {
-	game, err := builder.Build(build_gander)
-	if err == nil {
+	game, install, err := builder.Build(build_gander)
+	if err == nil && !install {
 		game.Run()
 	}
 }

@@ -25,7 +25,7 @@ func NextFileName(ext, path string) string {
 	return filepath.Join(path, name)
 }
 
-func createFile(ext string, path string) (*os.File, error) {
+func createFile(ext string, path string) (io.WriteCloser, error) {
 	fname := NextFileName(ext, path)
 
 	w, err := os.Create(fname)
@@ -201,6 +201,6 @@ func WriteGIF(path string, pics []image.Image, pal color.Palette,
 
 	err = gif.EncodeAll(w, opts)
 	if err != nil {
-		log.Println("EncodeAll", w.Name(), err)
+		log.Println("EncodeAll", err)
 	}
 }

@@ -7,10 +7,11 @@ type NotFound struct{}
 const (
 	Texture Category = iota
 	Circle
-	Cells
+	CellsOrg
 	Mover
 	Game
 	CellsMover
+	Cells
 	Player
 	COUNT
 )

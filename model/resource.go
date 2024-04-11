@@ -7,7 +7,6 @@ import (
 	"io/fs"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"golang.org/x/image/webp"
@@ -26,10 +25,9 @@ type Resource struct {
 
 func NewFileResource(path string, category int32, content any) (res *Resource) {
 	var (
-		clean string
-		info  fs.FileInfo
-		err   error
-		errp  = &err
+		info fs.FileInfo
+		err  error
+		errp = &err
 	)
 
 	res = &Resource{}
@@ -39,16 +37,16 @@ func NewFileResource(path string, category int32, content any) (res *Resource) {
 		res.Err = *errp
 	}()
 
-	clean = filepath.Clean(path)
-	i := strings.LastIndexByte(clean, '.')
+	// path = filepath.Clean(path)
+	i := strings.LastIndexByte(path, '.')
 	if i > 0 {
-		ext := clean[i+1:]
-		log.Println("NewFileResource", clean, ext)
-		res.Width, res.Height = GetDimensions(clean, ext)
+		ext := path[i+1:]
+		log.Println("NewFileResource", path, ext)
+		res.Width, res.Height = GetDimensions(path, ext)
 	}
 
-	res.Path = clean
-	info, err = os.Stat(clean)
+	res.Path = path
+	info, err = os.Stat(path)
 
 	if err == nil {
 		res.Name = info.Name()

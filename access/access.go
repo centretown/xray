@@ -32,6 +32,6 @@ func Save[T any](path string, src *T) (err error) {
 	if err != nil {
 		return
 	}
-	err = os.WriteFile(path, buf, os.ModeType)
+	err = os.WriteFile(path, buf, 0666)
 	return
 }

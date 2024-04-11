@@ -52,6 +52,7 @@ func NewMover(bounds rl.RectangleInt32,
 	mv.Record = model.NewRecord("mover", int32(categories.Mover), &mv.MoverItem, model.JSON)
 	return mv
 }
+
 func (mv *Mover) AddDrawer(dr Drawer) {
 	mv.drawer = dr
 	mv.Source = dr.Bounds()
