@@ -42,12 +42,10 @@ func ToInt(b bool) int {
 I then tried the generic form and inspected the results.
 
 ```go
-func As[T int | uint | int8 | int16 | int32 | int64 |
-	uint8 | uint16 | uint32 | uint64 |
-	float32 | float64](b bool) T {
-
+// Branchless way to get 1 or 0
+func As[T NumberType](condition bool) T {
 	var i int
-	if b {
+	if condition {
 		i = 1
 	} else {
 		i = 0

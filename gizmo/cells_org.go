@@ -30,6 +30,12 @@ type CellItemsOrg struct {
 	setup  bool
 }
 
+var (
+	gridColor    = rl.LightGray
+	aliveColor   = rl.Green
+	visitedColor = rl.Beige
+)
+
 var _ Drawer = (*CellsOrg)(nil)
 var _ Inputer = (*CellsOrg)(nil)
 
@@ -114,10 +120,10 @@ func (cs *CellsOrg) Draw(v rl.Vector3) {
 		for y := int32(0); y <= cs.Rows; y++ {
 			if cs.cells[x][y].Alive {
 				rl.DrawRectangleV(cs.cells[x][y].Position, cs.cells[x][y].Size,
-					cs.Colors[CellColorAlive])
+					aliveColor)
 			} else if cs.cells[x][y].Visited {
 				rl.DrawRectangleV(cs.cells[x][y].Position, cs.cells[x][y].Size,
-					cs.Colors[CellColorVisited])
+					visitedColor)
 			}
 		}
 	}
@@ -127,16 +133,14 @@ func (cs *CellsOrg) Draw(v rl.Vector3) {
 		rl.DrawLineV(
 			rl.NewVector2(float32(cs.SquareSize*i), 0),
 			rl.NewVector2(float32(cs.SquareSize*i), float32(cs.Height)),
-			cs.Colors[CellColorGrid],
-		)
+			gridColor)
 	}
 
 	for i := int32(0); i < cs.Rows+1; i++ {
 		rl.DrawLineV(
 			rl.NewVector2(0, float32(cs.SquareSize*i)),
 			rl.NewVector2(float32(cs.Width), float32(cs.SquareSize*i)),
-			cs.Colors[CellColorGrid],
-		)
+			gridColor)
 	}
 }
 

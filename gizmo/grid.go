@@ -21,40 +21,59 @@ type GridItem[T any] struct {
 	Playing    bool
 	Colors     []color.RGBA
 
-	cells  [][]*Cell[T]
-	bounds rl.RectangleInt32
+	stateCount int
+	cells      [][]*Cell[T]
+	bounds     rl.RectangleInt32
 }
 
-type CellColor int
-
 const (
-	CellColorAlive CellColor = iota
-	CellColorVisited
-	CellColorGrid
+	CellColorLineHorizontal = iota
+	CellColorLineVertical
+	CellColorOff
+	CellColorOn
+	CellColorMinimum
+	CellColorState = CellColorOn
 )
 
 var (
-	aliveColor   = rl.Blue
-	visitedColor = rl.Color{R: 128, G: 177, B: 136, A: 255}
-	gridColor    = rl.LightGray
+	gridColors = []color.RGBA{
+		rl.LightGray,
+		rl.LightGray,
+		rl.Black,
+		rl.Green,
+	}
+	colorMin = len(gridColors)
 )
 
-type Grid[T any] struct {
+type Grid[T comparable] struct {
 	GridItem[T]
 	Record *model.Record
 }
 
-func NewGrid[T any](rect rl.RectangleInt32, columns, rows int32) *Grid[T] {
+func NewGrid[T comparable](bounds rl.RectangleInt32,
+	columns, rows int32,
+	colors ...color.RGBA) *Grid[T] {
+
 	cs := &Grid[T]{}
-	cs.bounds = rect
+	cs.bounds = bounds
 	cs.Cols = columns
 	cs.Rows = rows
 	cs.CellWidth = cs.bounds.Width / columns
 	cs.CellHeight = cs.bounds.Height / rows
-	cs.Colors = append(cs.Colors, gridColor, aliveColor, visitedColor)
+
+	l := len(colors)
+	if l < colorMin {
+		cs.Colors = gridColors[l:]
+		cs.Colors = append(cs.Colors, colors...)
+	} else {
+		cs.Colors = colors
+	}
+	cs.stateCount = len(cs.Colors) - CellColorState
+
 	cs.SetupCells()
-	cs.Record = model.NewRecord("cells",
+	cs.Record = model.NewRecord("generic_grid",
 		int32(categories.Grid), &cs.GridItem, model.JSON)
+
 	return cs
 }
 
@@ -71,7 +90,9 @@ func (cs *Grid[T]) SetupCells() {
 	for x := int32(0); x <= cs.Cols; x++ {
 		cs.cells[x] = make([]*Cell[T], int(cs.Rows+1))
 		for y := int32(0); y <= cs.Rows; y++ {
-			cs.cells[x][y] = &Cell[T]{}
+			cs.cells[x][y] = &Cell[T]{
+				States: make([]T, cs.stateCount),
+			}
 		}
 	}
 }
@@ -91,35 +112,37 @@ func (cs *Grid[T]) getCell(x, y int32) *Cell[T] {
 	return cs.cells[x][y]
 }
 
-func (cs *Grid[T]) Draw(v rl.Vector3) {
+func (cs *Grid[T]) Draw(rl.Vector3) {
 	var clr color.RGBA
+	var offValue, current T
+
 	// Draw cells
 	for y := int32(0); y < cs.Rows; y++ {
 		for x := int32(0); x < cs.Cols; x++ {
-			// cell := cs.getCell(x, y)
-			alive, visited := false, false //cell.Alive, cell.Visited
-			if alive {
-				clr = cs.Colors[CellColorAlive]
-			} else if visited {
-				clr = cs.Colors[CellColorVisited]
+			cell := cs.getCell(x, y)
+			cell.SetState(0, current)
+			clr = cs.Colors[CellColorOff]
+			for i := range cs.stateCount {
+				current = cell.GetState(i)
+				if current != offValue {
+					clr = cs.Colors[i+CellColorState]
+				}
 			}
-			if alive || visited {
-				posX, posY := cs.Position(x, y)
-				rl.DrawRectangle(posX, posY, cs.CellWidth, cs.CellHeight, clr)
-			}
+			posX, posY := cs.Position(x, y)
+			rl.DrawRectangle(posX, posY, cs.CellWidth, cs.CellHeight, clr)
 		}
 	}
 
 	for x := int32(0); x < cs.Cols; x++ {
 		fromX, fromY := cs.Position(x, 0)
 		toX, toY := cs.Position(x, cs.Rows)
-		rl.DrawLine(fromX, fromY, toX, toY, cs.Colors[CellColorGrid])
+		rl.DrawLine(fromX, fromY, toX, toY, cs.Colors[CellColorLineVertical])
 	}
 
 	for y := int32(0); y < cs.Rows; y++ {
 		fromX, fromY := cs.Position(0, y)
 		toX, toY := cs.Position(cs.Cols, y)
-		rl.DrawLine(fromX, fromY, toX, toY, cs.Colors[CellColorGrid])
+		rl.DrawLine(fromX, fromY, toX, toY, cs.Colors[CellColorLineHorizontal])
 	}
 }
 

@@ -1,23 +1,34 @@
-package try
-
-// The compiler currently only optimizes this form.
+// Package try provides useful tools for branchless programming
 //
-// See issue 6011.
+// The compiler currently assembles this form:
 //
-// go build -gcflags='-l -v' tb.go
-// go tool objdump -S -s B2I tb
-// code is optimized to:  return i
+//	func ToInt(b bool) int {
+//		var i int
+//		if b {
+//			i = 1
+//		} else {
+//			i = 0
+//		}
+//		return i
+//	}
+//
+// To ths:
 //
 //	asm: MOVZX AL, AX
-//	     RET
 //
-// use for branch free conditional
-// hopefully this gets inlined (so far it does)
+// See issue 6011.
+// The As function is inlined see README.md
+package try
 
-func As[T int | uint | int8 | int16 | int32 | int64 |
-	uint8 | uint16 | uint32 | uint64 |
-	float32 | float64](condition bool) T {
+import "golang.org/x/exp/constraints"
 
+// NumberType is a constraint for all values that can be set to one or zero
+type NumberType interface {
+	constraints.Integer | constraints.Float
+}
+
+// Branchless way to get 1 or 0
+func As[T NumberType](condition bool) T {
 	var i int
 	if condition {
 		i = 1
@@ -27,8 +38,7 @@ func As[T int | uint | int8 | int16 | int32 | int64 |
 	return T(i)
 }
 
-func Or[T int | uint | int8 | int16 | int32 | int64 |
-	uint8 | uint16 | uint32 | uint64 |
-	float32 | float64](condition bool, falseVal, trueVal T) T {
+// Branchless way to get one of 2 values (that are not 1 or 0)
+func Or[T NumberType](condition bool, falseVal, trueVal T) T {
 	return falseVal + (trueVal-falseVal)*As[T](condition)
 }

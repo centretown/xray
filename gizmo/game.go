@@ -122,7 +122,7 @@ func (gs *Game) AddColors(clrs []color.RGBA) {
 	gs.FixedPalette = append(gs.FixedPalette, clrs...)
 }
 
-func (gs *Game) SetColors() {
+func (gs *Game) setColors() {
 	palette := make(color.Palette, 0, len(gs.FixedPalette))
 	for _, c := range gs.FixedPalette {
 		palette = append(palette, c)
@@ -131,16 +131,14 @@ func (gs *Game) SetColors() {
 		CreatePaletteFromTextures(color.RGBA{0, 0, 0, 255}, palette, gs)
 }
 
-func (gs *Game) SetColorPalette(backGround color.RGBA,
-	palette color.Palette,
-	colorMap map[color.Color]uint8) {
+// func (gs *Game) setColorPalette(backGround color.RGBA,
+// 	palette color.Palette,
+// 	colorMap map[color.Color]uint8) {
 
-	// palette = append(palette, color.Transparent)
-
-	gs.backGround = backGround
-	gs.palette = palette
-	gs.colorMap = colorMap
-}
+// 	gs.backGround = backGround
+// 	gs.palette = palette
+// 	gs.colorMap = colorMap
+// }
 
 func (gs *Game) Link(recs ...*model.Record) {
 	var err error

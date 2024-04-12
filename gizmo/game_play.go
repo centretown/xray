@@ -29,7 +29,7 @@ func (gs *Game) Run() {
 	}
 	rl.SetTargetFPS(gs.FrameRate)
 	// log.Println("game.FrameRate", game.FrameRate)
-	gs.SetColors()
+	gs.setColors()
 	gs.Current = rl.GetTime()
 	gs.Refresh(gs.Current)
 

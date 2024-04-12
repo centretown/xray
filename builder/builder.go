@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/centretown/xray/access"
-	"github.com/centretown/xray/cmdl"
 	"github.com/centretown/xray/dbg"
+	"github.com/centretown/xray/flagset"
 	"github.com/centretown/xray/gizmo"
 	"github.com/centretown/xray/model"
 	"gopkg.in/yaml.v3"
@@ -21,7 +21,7 @@ var (
 )
 
 func init() {
-	cmdl.Setup("install", "test")
+	flagset.Setup("install", "test")
 }
 
 func Build(builder func(*gizmo.Game, string)) (*gizmo.Game, bool, error) {
@@ -29,7 +29,7 @@ func Build(builder func(*gizmo.Game, string)) (*gizmo.Game, bool, error) {
 	flag.Parse()
 
 	var (
-		cmd          = &cmdl.Cmdl
+		flags        = &flagset.Flags
 		databasePath string
 		resourcePath string
 		inMemory     = false
@@ -37,24 +37,24 @@ func Build(builder func(*gizmo.Game, string)) (*gizmo.Game, bool, error) {
 	)
 	// test and install conflict. test has higher priority
 	// because it is the safest option
-	if cmd.Test {
+	if flags.Test {
 		inMemory = true
 		databasePath = memoryPath
-	} else if cmd.Install != "" {
+	} else if flags.Install != "" {
 		install = true
-		databasePath = filepath.Join(installBase, cmd.Install)
+		databasePath = filepath.Join(installBase, flags.Install)
 		resourcePath = filepath.Base(databasePath)
 	}
 
-	buf, _ := yaml.Marshal(&cmd)
+	buf, _ := yaml.Marshal(&flags)
 
-	game, err := create(databasePath, resourcePath, cmd, builder, inMemory)
+	game, err := create(databasePath, resourcePath, flags, builder, inMemory)
 	log.Printf("memory: %v, databasePath: %s, resourcePath: %s\nCommand Line: %s\n",
 		inMemory, databasePath, resourcePath, string(buf))
 	return game, install, err
 }
 
-func create(databasePath, resourcePath string, cmd *cmdl.CmdLineFlags,
+func create(databasePath, resourcePath string, cmd *flagset.FlagSet,
 	builder func(*gizmo.Game, string), memory bool) (game *gizmo.Game, err error) {
 
 	fname := databasePath

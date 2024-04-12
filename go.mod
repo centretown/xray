@@ -12,6 +12,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/u2takey/ffmpeg-go v0.5.0
+	golang.org/x/exp v0.0.0-20240409090435-93d18d7e34b8
 	golang.org/x/image v0.15.0
 	gopkg.in/yaml.v3 v3.0.1
 )
