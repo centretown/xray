@@ -1,7 +1,7 @@
 package main
 
-import "github.com/centretown/xray/try"
+import "github.com/centretown/xray/check"
 
 func main() {
-	try.Inspect()
+	check.Inspect()
 }

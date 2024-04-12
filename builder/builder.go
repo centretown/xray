@@ -10,7 +10,6 @@ import (
 	"github.com/centretown/xray/flagset"
 	"github.com/centretown/xray/gizmo"
 	"github.com/centretown/xray/model"
-	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -46,16 +45,17 @@ func Build(builder func(*gizmo.Game, string)) (*gizmo.Game, bool, error) {
 		resourcePath = filepath.Base(databasePath)
 	}
 
-	buf, _ := yaml.Marshal(&flags)
+	game, err := create(databasePath, resourcePath, flags, builder, inMemory, install)
 
-	game, err := create(databasePath, resourcePath, flags, builder, inMemory)
-	log.Printf("memory: %v, databasePath: %s, resourcePath: %s\nCommand Line: %s\n",
-		inMemory, databasePath, resourcePath, string(buf))
+	log.Printf("memory: %v, databasePath: %s, resourcePath: %s\n",
+		inMemory, databasePath, resourcePath)
+	flags.Dump()
+
 	return game, install, err
 }
 
 func create(databasePath, resourcePath string, cmd *flagset.FlagSet,
-	builder func(*gizmo.Game, string), memory bool) (game *gizmo.Game, err error) {
+	builder func(*gizmo.Game, string), memory bool, install bool) (game *gizmo.Game, err error) {
 
 	fname := databasePath
 	if !memory {
@@ -100,9 +100,16 @@ func create(databasePath, resourcePath string, cmd *flagset.FlagSet,
 	}
 
 	if !memory {
-		access.SaveGameKey(filepath.Join(cmd.Install, gameKeys),
-			access.NewGameKeys(game.Record.Major,
-				game.Record.Minor))
+		if install {
+			access.SaveGameKey(filepath.Join(databasePath, gameKeys),
+				access.NewGameKeys(game.Record.Major,
+					game.Record.Minor))
+
+		} else {
+			access.SaveGameKey(filepath.Join(cmd.Install, gameKeys),
+				access.NewGameKeys(game.Record.Major,
+					game.Record.Minor))
+		}
 	}
 
 	cmd.Dump()

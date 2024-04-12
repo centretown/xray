@@ -22,15 +22,13 @@ func main() {
 		err       error
 	)
 
-	selection := flag.Arg(0)
-	if len(selection) == 0 {
+	if len(flag.Args()) < 2 {
 		fmt.Println("Enter the name of the game.")
 		os.Exit(1)
 	}
-
+	selection := flag.Arg(1)
 	path = filepath.Join(installBase, selection)
-
-	dir, err = filepath.Abs(installBase)
+	dir, err = filepath.Abs(path)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -40,7 +38,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	log.Println(path) //, cmd.MajorKey, cmd.MinorKey, cmd.Key)
+	log.Println(path, dir) //, cmd.MajorKey, cmd.MinorKey, cmd.Key)
 
 	var (
 		game *gizmo.Game

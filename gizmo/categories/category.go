@@ -10,8 +10,8 @@ const (
 	CellsOrg
 	Mover
 	Game
-	CellsMover
-	Grid
+	NumberMoveri8
+	NumberGridi8
 	Player
 	COUNT
 )

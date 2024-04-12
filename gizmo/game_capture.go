@@ -4,13 +4,13 @@ import (
 	"log"
 
 	"github.com/centretown/xray/capture"
-	"github.com/centretown/xray/try"
+	"github.com/centretown/xray/check"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func (gs *Game) CanCapture() bool {
 	canCapture := gs.Current >= gs.previousCapture+gs.CaptureInterval
-	moveFloat := try.As[float64](canCapture)
+	moveFloat := check.As[float64](canCapture)
 	gs.previousCapture = moveFloat*gs.CaptureInterval + moveFloat*gs.Current
 	return canCapture
 }

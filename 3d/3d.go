@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/centretown/xray/capture"
-	"github.com/centretown/xray/try"
+	"github.com/centretown/xray/check"
 
 	"github.com/centretown/gpads/gpads"
 
@@ -84,7 +84,7 @@ func Run3d(runr *Runner, gpads *gpads.GPads) {
 
 	for !rl.WindowShouldClose() {
 		current = rl.GetTime()
-		can_move = try.As[int32](current > previous+interval)
+		can_move = check.As[int32](current > previous+interval)
 		previous = float64(can_move) * interval
 
 		if rl.IsWindowResized() {
@@ -134,11 +134,11 @@ func PadPosXYZ(gpad *gpads.GPads, obj, pos *rl.Vector3, current float64) {
 		obj.X += delta * x
 		obj.Y -= delta * y
 
-		obj.Z += try.As[float32]((gpad.IsGamepadButtonDown(pi, rl.GamepadButtonLeftFaceDown))) / 4
-		obj.Z -= try.As[float32]((gpad.IsGamepadButtonDown(pi, rl.GamepadButtonLeftFaceUp))) / 4
-		obj.X += try.As[float32]((gpad.IsGamepadButtonDown(pi, rl.GamepadButtonLeftFaceRight))) / 4
-		obj.X -= try.As[float32]((gpad.IsGamepadButtonDown(pi, rl.GamepadButtonLeftFaceLeft))) / 4
-		home := try.As[float32](gpad.IsGamepadButtonUp(pi, rl.GamepadButtonRightFaceLeft))
+		obj.Z += check.As[float32]((gpad.IsGamepadButtonDown(pi, rl.GamepadButtonLeftFaceDown))) / 4
+		obj.Z -= check.As[float32]((gpad.IsGamepadButtonDown(pi, rl.GamepadButtonLeftFaceUp))) / 4
+		obj.X += check.As[float32]((gpad.IsGamepadButtonDown(pi, rl.GamepadButtonLeftFaceRight))) / 4
+		obj.X -= check.As[float32]((gpad.IsGamepadButtonDown(pi, rl.GamepadButtonLeftFaceLeft))) / 4
+		home := check.As[float32](gpad.IsGamepadButtonUp(pi, rl.GamepadButtonRightFaceLeft))
 		obj.X, obj.Y, obj.Z = home*obj.X, home*obj.Y, home*obj.Z
 
 		if current > nextTime && gpad.IsGamepadButtonDown(pi, rl.GamepadButtonMiddleLeft) {
@@ -154,14 +154,14 @@ func KeyPosXYZ(obj, pos *rl.Vector3) {
 	down := rl.IsKeyDown(rl.KeyDown) || rl.IsKeyDown(rl.KeyLeft)
 
 	vecs := []*rl.Vector3{obj, pos}
-	i := try.As[int](rl.IsKeyDown(rl.KeyLeftShift) || rl.IsKeyDown(rl.KeyRightShift))
+	i := check.As[int](rl.IsKeyDown(rl.KeyLeftShift) || rl.IsKeyDown(rl.KeyRightShift))
 	v := vecs[i]
 
 	const delta = .25
-	v.X -= try.As[float32](up && x) * delta
-	v.X += try.As[float32](down && x) * delta
-	v.Y += try.As[float32](up && y) * delta
-	v.Y -= try.As[float32](down && y) * delta
-	v.Z -= try.As[float32](up && z) * delta
-	v.Z += try.As[float32](down && z) * delta
+	v.X -= check.As[float32](up && x) * delta
+	v.X += check.As[float32](down && x) * delta
+	v.Y += check.As[float32](up && y) * delta
+	v.Y -= check.As[float32](down && y) * delta
+	v.Z -= check.As[float32](up && z) * delta
+	v.Z += check.As[float32](down && z) * delta
 }

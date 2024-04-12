@@ -1,7 +1,7 @@
 package gizmo
 
 import (
-	"github.com/centretown/xray/try"
+	"github.com/centretown/xray/check"
 )
 
 var _ Motor = (*Axis)(nil)
@@ -35,11 +35,11 @@ func (ax *Axis) Move(current, rate float64) int32 {
 		outside  = less || more
 	)
 
-	ax.Last += delta * try.As[float64](deltaPos != 0)
-	ax.Dir *= try.As[int32](!outside) - try.As[int32](outside)
-	ax.Pos = try.As[int32](more)*(ax.Max-deltaPos) +
-		try.As[int32](less)*deltaPos +
-		try.As[int32](!outside)*newPos
+	ax.Last += delta * check.As[float64](deltaPos != 0)
+	ax.Dir *= check.As[int32](!outside) - check.As[int32](outside)
+	ax.Pos = check.As[int32](more)*(ax.Max-deltaPos) +
+		check.As[int32](less)*deltaPos +
+		check.As[int32](!outside)*newPos
 	return ax.Pos
 }
 

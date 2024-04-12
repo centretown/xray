@@ -131,15 +131,6 @@ func (gs *Game) setColors() {
 		CreatePaletteFromTextures(color.RGBA{0, 0, 0, 255}, palette, gs)
 }
 
-// func (gs *Game) setColorPalette(backGround color.RGBA,
-// 	palette color.Palette,
-// 	colorMap map[color.Color]uint8) {
-
-// 	gs.backGround = backGround
-// 	gs.palette = palette
-// 	gs.colorMap = colorMap
-// }
-
 func (gs *Game) Link(recs ...*model.Record) {
 	var err error
 	defer func() {

@@ -3,7 +3,7 @@ package gizmo
 import (
 	"github.com/centretown/gpads/gpads"
 	"github.com/centretown/xray/capture"
-	"github.com/centretown/xray/try"
+	"github.com/centretown/xray/check"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -39,23 +39,23 @@ func (gs *Game) ProcessInput() {
 }
 
 func (gs *Game) CheckPad(i int32) {
-	var is_multiply, down bool
+	var multiply_by_ten, down bool
 	// gs.gamepad.GetPadButtonPressed()
 
 	for b := range PAD_STATES {
 		switch b {
 		case TIMES_TEN:
-			is_multiply = gs.gamepad.IsGamepadButtonDown(i, gpads.RL_LeftTrigger1)
+			multiply_by_ten = gs.gamepad.IsGamepadButtonDown(i, gpads.RL_LeftTrigger1)
 			// rl.GamepadButtonLeftTrigger1)
 
 		case FPS_INC:
 			if gs.gamepad.IsGamepadButtonDown(i, gpads.RL_LeftFaceUp) {
-				gs.FrameRate += try.Or[int32](is_multiply, 1, 10)
+				gs.FrameRate += check.AsOr[int32](multiply_by_ten, 1, 10)
 				rl.SetTargetFPS(gs.FrameRate)
 			}
 		case FPS_DEC:
 			if gs.gamepad.IsGamepadButtonDown(i, gpads.RL_LeftFaceDown) {
-				gs.FrameRate -= try.Or[int32](is_multiply, 1, 10)
+				gs.FrameRate -= check.AsOr[int32](multiply_by_ten, 1, 10)
 				if gs.FrameRate < 5 {
 					gs.FrameRate = 5
 				}
@@ -64,11 +64,11 @@ func (gs *Game) CheckPad(i int32) {
 
 		case CAPTURE_COUNT_INC:
 			if gs.gamepad.IsGamepadButtonDown(i, gpads.RL_RightFaceUp) {
-				gs.captureStart += try.Or(is_multiply, 1, 10)
+				gs.captureStart += check.AsOr(multiply_by_ten, 1, 10)
 			}
 		case CAPTURE_COUNT_DEC:
 			if gs.gamepad.IsGamepadButtonDown(i, gpads.RL_RightFaceDown) {
-				gs.captureStart -= try.Or(is_multiply, 1, 10)
+				gs.captureStart -= check.AsOr(multiply_by_ten, 1, 10)
 				if gs.captureStart < 1 {
 					gs.captureStart = 1
 				}

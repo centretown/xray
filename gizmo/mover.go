@@ -3,9 +3,9 @@ package gizmo
 import (
 	"log"
 
+	"github.com/centretown/xray/check"
 	"github.com/centretown/xray/gizmo/categories"
 	"github.com/centretown/xray/model"
-	"github.com/centretown/xray/try"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -69,7 +69,7 @@ func (mv *Mover) Act(can_move bool, now float64) {
 		Y: float32(mv.Bounds.Y + y.Position()),
 		Z: float32(mv.Rotation)})
 
-	m := try.As[float64](can_move)
+	m := check.As[float64](can_move)
 	y.Move(now, mv.PixelRateY*m)
 
 	p := x.Position()
