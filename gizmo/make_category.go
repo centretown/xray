@@ -20,8 +20,8 @@ func MakeCategory(cat categories.Category, rec *model.Record) model.Recorder {
 		return &Mover{Record: rec}
 	case categories.CellsMover:
 		return &CellsMover{Record: rec}
-	case categories.Cells:
-		return &Cells{Record: rec}
+	case categories.Grid:
+		return &Grid[bool]{Record: rec}
 	}
 
 	err := fmt.Errorf("unknown category %d(%s)", cat, cat)

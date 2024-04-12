@@ -29,11 +29,11 @@ func (gs *Game) DrawStatus() {
 		gs.captureStart)
 
 	yellow := color.RGBA{255, 255, 0, 255}
-	rl.DrawText(text, mb.X, mb.Y+mb.Height-22, 16, yellow)
+	rl.DrawText(text, mb.X, mb.Y+mb.Height-38, 24, yellow)
 
 	if gs.Capturing {
 		rl.DrawText(fmt.Sprintf("Capturing... %4d", gs.CaptureCount),
-			mb.X, mb.Y+32, 16, yellow)
+			mb.X, mb.Y+mb.Height-70, 24, yellow)
 	}
 }
 

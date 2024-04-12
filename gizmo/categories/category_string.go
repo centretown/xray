@@ -14,7 +14,7 @@ func _() {
 	_ = x[Mover-3]
 	_ = x[Game-4]
 	_ = x[CellsMover-5]
-	_ = x[Cells-6]
+	_ = x[Grid-6]
 	_ = x[Player-7]
 	_ = x[COUNT-8]
 }

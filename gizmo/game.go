@@ -4,6 +4,8 @@ import (
 	"image"
 	"image/color"
 	"log"
+	"math/rand"
+	"time"
 
 	"github.com/centretown/xray/model"
 
@@ -13,6 +15,7 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+var _ = rand.New(rand.NewSource(time.Now().UnixNano()))
 var _ model.Recorder = (*Game)(nil)
 var _ model.Linker = (*Game)(nil)
 

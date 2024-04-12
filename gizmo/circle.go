@@ -32,8 +32,9 @@ func NewCircle(radius int32, colr color.Color) *Circle {
 	return circle
 }
 
-func (b *Circle) GetRecord() *model.Record { return b.Record }
-func (b *Circle) GetItem() any             { return &b.CircleItem }
+func (b *Circle) GetRecord() *model.Record                        { return b.Record }
+func (b *Circle) GetItem() any                                    { return &b.CircleItem }
+func (b *Circle) Refresh(rect rl.RectangleInt32, options ...bool) {}
 func (b *Circle) Bounds() rl.RectangleInt32 {
 	width := b.Radius << 1
 	return rl.RectangleInt32{X: 0, Y: 0, Width: width, Height: width}

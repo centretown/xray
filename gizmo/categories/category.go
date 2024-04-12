@@ -11,7 +11,7 @@ const (
 	Mover
 	Game
 	CellsMover
-	Cells
+	Grid
 	Player
 	COUNT
 )

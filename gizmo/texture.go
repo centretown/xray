@@ -30,27 +30,6 @@ func NewTexture(path string) (tex *Texture) {
 func (tex *Texture) GetRecord() *model.Record { return tex.Record }
 func (tex *Texture) GetItem() any             { return &tex.TextureItem }
 
-// func (tex *Texture) Decode(rec *model.Record) (err error) {
-// 	tex.Record = rec
-// 	return Decode(tex)
-// }
-
-// func (tex *Texture) Decode(rec *model.Record) (err error) {
-// 	tex.Record = rec
-// 	cat := categories.Category(rec.Category)
-// 	if cat == categories.Texture {
-// 		err = json.Unmarshal([]byte(rec.Content), &tex.TextureItem)
-// 		if err != nil {
-// 			panic(err)
-// 		}
-// 	} else {
-// 		err = fmt.Errorf("wrong category want %s have %s",
-// 			categories.Texture, cat)
-// 	}
-
-// 	return
-// }
-
 func (tex *Texture) Load() *Texture {
 	if tex.Resource != nil && tex.Resource.Err == nil {
 		tex.texture2D = rl.LoadTexture(tex.Resource.Path)
@@ -74,6 +53,7 @@ func (tex *Texture) Draw(v rl.Vector3) {
 	rl.DrawTexturePro(tex.texture2D, srcRec, destRec, origin,
 		rotation, White)
 }
+func (tex *Texture) Refresh(rect rl.RectangleInt32, options ...bool) {}
 
 func (tex *Texture) Bounds() rl.RectangleInt32 {
 	return rl.RectangleInt32{X: 0, Y: 0,

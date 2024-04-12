@@ -16,13 +16,12 @@ func main() {
 
 func build_life02(game *gizmo.Game, resourcePath string) {
 	viewPort := game.GetViewPort()
-	cells := gizmo.NewCells(viewPort.Width, viewPort.Height, 12)
-	cells_mv := gizmo.NewCellsMover(viewPort, 5)
-	cells_mv.AddDrawer(cells)
+	grid := gizmo.NewGrid[bool](viewPort, 10, 10)
+	grid_mv := gizmo.NewCellsMover(viewPort, 5)
+	grid_mv.AddDrawer(grid)
 
-	game.AddActor(cells_mv, 1)
+	game.AddActor(grid_mv, 1)
 	game.FrameRate = 20
-	game.FixedSize = true
-	cells.Colors = []color.RGBA{gizmo.Red, gizmo.Blue, gizmo.Yellow}
-	game.AddColors(cells.Colors)
+	grid.Colors = []color.RGBA{gizmo.Green, gizmo.Blue, gizmo.Yellow}
+	game.AddColors(grid.Colors)
 }

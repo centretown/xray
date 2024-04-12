@@ -9,8 +9,32 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+type CellOrg struct {
+	Position rl.Vector2
+	Size     rl.Vector2
+	Alive    bool
+	Next     bool
+	Visited  bool
+}
+
+type CellItemsOrg struct {
+	Cols       int32
+	Rows       int32
+	Width      int32
+	Height     int32
+	SquareSize int32
+	Playing    bool
+
+	cells  [][]*CellOrg
+	Colors []color.RGBA
+	setup  bool
+}
+
+var _ Drawer = (*CellsOrg)(nil)
+var _ Inputer = (*CellsOrg)(nil)
+
 type CellsOrg struct {
-	CellItems
+	CellItemsOrg
 	Record *model.Record
 }
 
@@ -25,14 +49,14 @@ func NewCellsOrg(width, height, squareSize int32) *CellsOrg {
 	cs.Colors = append(cs.Colors, gridColor, aliveColor, visitedColor)
 
 	cs.Record = model.NewRecord("cells",
-		int32(categories.CellsOrg), &cs.CellItems, model.JSON)
+		int32(categories.CellsOrg), &cs.CellItemsOrg, model.JSON)
 	cs.setup = false
 	cs.start()
 	return cs
 }
 
 func (cs *CellsOrg) GetRecord() *model.Record { return cs.Record }
-func (cs *CellsOrg) GetItem() any             { return &cs.CellItems }
+func (cs *CellsOrg) GetItem() any             { return &cs.CellItemsOrg }
 
 func (cs *CellsOrg) SetColors(aliveColor,
 	visitedColor,
@@ -40,11 +64,11 @@ func (cs *CellsOrg) SetColors(aliveColor,
 }
 
 func (cs *CellsOrg) start() {
-	cs.cells = make([][]*Cell, int(cs.Cols+1))
+	cs.cells = make([][]*CellOrg, int(cs.Cols+1))
 	for x := int32(0); x <= cs.Cols; x++ {
-		cs.cells[x] = make([]*Cell, int(cs.Rows+1))
+		cs.cells[x] = make([]*CellOrg, int(cs.Rows+1))
 		for y := int32(0); y <= cs.Rows; y++ {
-			cs.cells[x][y] = &Cell{}
+			cs.cells[x][y] = &CellOrg{}
 		}
 	}
 
@@ -55,7 +79,7 @@ func (cs *CellsOrg) start() {
 func (cs *CellsOrg) Init(clear bool) {
 	for x := int32(0); x <= cs.Cols; x++ {
 		for y := int32(0); y <= cs.Rows; y++ {
-			*cs.cells[x][y] = Cell{}
+			*cs.cells[x][y] = CellOrg{}
 
 			cs.cells[x][y].Position = rl.NewVector2(float32(x*cs.SquareSize),
 				float32(y*cs.SquareSize+1))
@@ -69,11 +93,12 @@ func (cs *CellsOrg) Init(clear bool) {
 	}
 }
 
+func (cs *CellsOrg) Refresh(rect rl.RectangleInt32, options ...bool) {}
 func (cs *CellsOrg) Bounds() rl.RectangleInt32 {
 	return rl.RectangleInt32{X: 0, Y: 0, Width: cs.Width, Height: cs.Height}
 }
 
-func (cs *CellsOrg) GetCells() [][]*Cell {
+func (cs *CellsOrg) GetCells() [][]*CellOrg {
 	return cs.cells
 }
 
