@@ -101,8 +101,8 @@ func Decode(recorder Recorder) (err error) {
 	return
 }
 
-type Linker interface {
+type Parent interface {
 	Recorder
-	Link(...*Record)
+	LinkChildren(...*Record)
 	Children() []Recorder
 }

@@ -5,6 +5,7 @@ import (
 )
 
 func (gs *Game) Run() {
+	gs.setColors()
 
 	defer func() {
 		for _, actor := range gs.Actors() {
@@ -24,11 +25,15 @@ func (gs *Game) Run() {
 
 	rl.SetTraceLogLevel(rl.LogWarning)
 	rl.InitWindow(gs.Width, gs.Height, gs.Record.Title)
+
+	for _, txt := range gs.listTextures() {
+		txt.Load()
+	}
+
 	if !gs.FixedSize {
 		rl.SetWindowState(rl.FlagWindowResizable)
 	}
 	rl.SetTargetFPS(gs.FrameRate)
-	gs.setColors()
 	gs.Current = rl.GetTime()
 	gs.Refresh(gs.Current)
 
@@ -42,7 +47,7 @@ func (gs *Game) Run() {
 
 		rl.BeginDrawing()
 
-		rl.ClearBackground(gs.backGround)
+		rl.ClearBackground(gs.BackGround)
 
 		for _, dr := range gs.Drawers() {
 			dr.Draw(rl.Vector3{X: 0, Y: 0, Z: 0})

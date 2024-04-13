@@ -25,7 +25,6 @@ import "golang.org/x/exp/constraints"
 // NumberType is a constraint for all values that can be set to one or zero
 type NumberType interface {
 	constraints.Integer | constraints.Float
-	comparable
 }
 
 // Branchless way to get 1 or 0
@@ -40,11 +39,15 @@ func As[T NumberType](condition bool) T {
 }
 
 // Branchless way to get one of 2 values (that are not 1 or 0)
-func AsOr[T NumberType](condition bool, falseVal, trueVal T) T {
+func AsOr[T NumberType](condition bool, trueVal, falseVal T) T {
 	return falseVal + (trueVal-falseVal)*As[T](condition)
 }
 
 func Is[T NumberType](value T) bool {
 	var none T
 	return value != none
+}
+
+func Or[T any](condition bool, vals [2]T) T {
+	return vals[As[int](!condition)]
 }

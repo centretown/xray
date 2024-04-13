@@ -184,22 +184,22 @@ func (data *Data) Load(item model.Recorder) {
 		return
 	}
 
-	linker, isLinker := item.(model.Linker)
+	linker, isLinker := item.(model.Parent)
 	if isLinker {
 		data.addLinks(linker)
 	}
 }
 
-func (data *Data) addLinks(item model.Linker) {
+func (data *Data) addLinks(item model.Parent) {
 	linkRecs := data.GetLinks(item.GetRecord())
 	if data.HasErrors() {
 		return
 	}
 
-	item.Link(linkRecs...)
+	item.LinkChildren(linkRecs...)
 
 	for _, child := range item.Children() {
-		linker, isLinker := child.(model.Linker)
+		linker, isLinker := child.(model.Parent)
 		if isLinker {
 			data.addLinks(linker)
 		}
@@ -209,7 +209,7 @@ func (data *Data) addLinks(item model.Linker) {
 func (data *Data) Save(rec model.Recorder) {
 	data.InsertItems(rec)
 	if !data.HasErrors() {
-		linker, isLinker := rec.(model.Linker)
+		linker, isLinker := rec.(model.Parent)
 		if isLinker {
 			list, links := data.addLists(linker)
 			log.Println(list)
@@ -226,7 +226,7 @@ func (data *Data) Save(rec model.Recorder) {
 	}
 }
 
-func (data *Data) addLists(parent model.Linker) (list []model.Recorder, links []*model.Link) {
+func (data *Data) addLists(parent model.Parent) (list []model.Recorder, links []*model.Link) {
 	children := len(parent.Children())
 	list = make([]model.Recorder, 0, children)
 	list = append(list, parent.Children()...)
@@ -235,7 +235,7 @@ func (data *Data) addLists(parent model.Linker) (list []model.Recorder, links []
 	for _, item := range parent.Children() {
 		link := model.NewLink(parent, item, 1, 1)
 		links = append(links, link)
-		linker, isLinker := item.(model.Linker)
+		linker, isLinker := item.(model.Parent)
 		if isLinker {
 			r, l := data.addLists(linker)
 			list = append(list, r...)

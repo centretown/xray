@@ -1,0 +1,6 @@
+total 252
+-rw-rw-r-- 1 dave dave  27035 Apr 10 09:44 doorstop.png
+-rw-rw-r-- 1 dave dave   6549 Apr  6 07:19 gander.png
+-rw-rw-r-- 1 dave dave  17734 Apr  6 07:19 head_300.png
+-rw-rw-r-- 1 dave dave 139294 Apr 10 13:36 moon-solo-300.png
+-rw-rw-r-- 1 dave dave  54923 Apr  2 08:03 polar.png

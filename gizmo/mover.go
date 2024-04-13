@@ -10,7 +10,7 @@ import (
 )
 
 var _ Actor = (*Mover)(nil)
-var _ model.Linker = (*Mover)(nil)
+var _ model.Parent = (*Mover)(nil)
 
 const (
 	XAxis int = iota
@@ -87,7 +87,7 @@ func (mv *Mover) Refresh(now float64, bounds rl.RectangleInt32) {
 	mv.Axes[1].Refresh(now, mv.Bounds.Height)
 }
 
-func (mv *Mover) Link(recs ...*model.Record) {
+func (mv *Mover) LinkChildren(recs ...*model.Record) {
 	err := MakeLink(mv.AddDrawer, 1, 1, recs...)
 	if err != nil {
 		log.Fatal(err)

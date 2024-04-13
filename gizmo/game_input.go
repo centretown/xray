@@ -50,12 +50,12 @@ func (gs *Game) CheckPad(i int32) {
 
 		case FPS_INC:
 			if gs.gamepad.IsGamepadButtonDown(i, gpads.RL_LeftFaceUp) {
-				gs.FrameRate += check.AsOr[int32](multiply_by_ten, 1, 10)
+				gs.FrameRate += check.AsOr[int32](multiply_by_ten, 10, 1)
 				rl.SetTargetFPS(gs.FrameRate)
 			}
 		case FPS_DEC:
 			if gs.gamepad.IsGamepadButtonDown(i, gpads.RL_LeftFaceDown) {
-				gs.FrameRate -= check.AsOr[int32](multiply_by_ten, 1, 10)
+				gs.FrameRate -= check.AsOr[int32](multiply_by_ten, 10, 1)
 				if gs.FrameRate < 5 {
 					gs.FrameRate = 5
 				}
@@ -64,11 +64,11 @@ func (gs *Game) CheckPad(i int32) {
 
 		case CAPTURE_COUNT_INC:
 			if gs.gamepad.IsGamepadButtonDown(i, gpads.RL_RightFaceUp) {
-				gs.captureStart += check.AsOr(multiply_by_ten, 1, 10)
+				gs.captureStart += check.AsOr(multiply_by_ten, 10, 1)
 			}
 		case CAPTURE_COUNT_DEC:
 			if gs.gamepad.IsGamepadButtonDown(i, gpads.RL_RightFaceDown) {
-				gs.captureStart -= check.AsOr(multiply_by_ten, 1, 10)
+				gs.captureStart -= check.AsOr(multiply_by_ten, 10, 1)
 				if gs.captureStart < 1 {
 					gs.captureStart = 1
 				}

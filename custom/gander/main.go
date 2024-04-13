@@ -27,7 +27,7 @@ func build_gander(game *gizmo.Game, resourcePath string) {
 		gizmo.Magenta,
 	}
 
-	viewPort := game.GetViewPort()
+	viewPort := game.SetViewPort(1600, 800)
 
 	hole := gizmo.NewTexture(filepath.Join(resourcePath, "polar.png"))
 	hole_mv := gizmo.NewMover(viewPort, 5, 5, 5)
@@ -54,13 +54,11 @@ func build_gander(game *gizmo.Game, resourcePath string) {
 	gander_mv.AddDrawer(gander)
 	game.AddActor(gander_mv, 4)
 
-	door := gizmo.NewTexture(filepath.Join(resourcePath, "doorstop.png"))
+	door := gizmo.NewTexture(filepath.Join(resourcePath, "doorstop_01.png"))
 	door_mv := gizmo.NewMover(viewPort, 100, 100, .5)
 	door_mv.AddDrawer(door)
 	game.AddActor(door_mv, 10)
 
 	game.FixedPalette = fixedPalette
-	game.Width = 1280
-	game.Height = 720
-	game.FrameRate = 50
+	game.FrameRate = 30
 }

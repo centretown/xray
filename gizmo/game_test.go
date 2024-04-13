@@ -149,16 +149,16 @@ func read_game(t *testing.T, saved *Game, data *dbg.Data) {
 		log.Println(i, l)
 	}
 
-	game.Link(linkRecs...)
+	game.LinkChildren(linkRecs...)
 	log.Println(game)
 
 	for _, a := range game.actors {
-		if linker, ok := a.(model.Linker); ok {
+		if linker, ok := a.(model.Parent); ok {
 			linkRecs = data.GetLinks(a.GetRecord())
 			for i, l := range linkRecs {
 				log.Println(i, l)
 			}
-			linker.Link(linkRecs...)
+			linker.LinkChildren(linkRecs...)
 		}
 	}
 

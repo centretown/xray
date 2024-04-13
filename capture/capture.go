@@ -112,35 +112,20 @@ func CaptureGIF(path string, done <-chan int,
 			time.Sleep(time.Millisecond)
 		}
 	}
-
 }
 
-func ExtendPalette(pal color.Palette, img image.Image,
+func PackImages(imgs []image.Image) (combined image.Image) {
+	// for _, img := range imgs {
+	// 	pt := img.Bounds().Size()
+	// 	width, height := pt.X, pt.Y
+	// }
+
+	return
+}
+
+func ExtendPalette(pal color.Palette, imgs []image.Image,
 	count int) (color.Palette, map[color.Color]uint8) {
-
-	newPal := make(color.Palette, 0, count)
-	newPal = append(newPal, pal...)
-	q := quantize.MedianCutQuantizer{}
-	newPal = q.Quantize(newPal, img)
-	colorMap := make(map[color.Color]uint8)
-	for v, c := range newPal {
-		colorMap[c] = uint8(v)
-	}
-
-	paletted := image.NewPaletted(img.Bounds(), newPal)
-	model := paletted.ColorModel()
-	rect := img.Bounds()
-
-	for y := range rect.Max.Y {
-		for x := range rect.Max.X {
-			c := img.At(x, y)
-			cv := model.Convert(c)
-			ix := colorMap[cv]
-			colorMap[c] = ix
-		}
-	}
-
-	return newPal, colorMap
+	return extendPalette(pal, imgs, count)
 }
 
 // https://unix.stackexchange.com/questions/40638/how-to-do-i-convert-an-animated-gif-to-an-mp4-or-mv4-on-the-command-line
@@ -203,4 +188,95 @@ func WriteGIF(path string, pics []image.Image, pal color.Palette,
 	if err != nil {
 		log.Println("EncodeAll", err)
 	}
+}
+
+func extendPalette(fixedPal color.Palette, imgs []image.Image,
+	count int) (color.Palette, map[color.Color]uint8) {
+	var (
+		bigImg        *image.RGBA
+		newPal        = make(color.Palette, 0, count)
+		quant         = quantize.MedianCutQuantizer{}
+		colorMap      = make(map[color.Color]uint8)
+		colorCountMap = make(map[color.RGBA]int)
+		// ok         bool
+		pixelCount    int
+		nonBlankCount int
+	)
+
+	newPal = append(newPal, fixedPal...)
+
+	var (
+		min, max   int = 5000, 0
+		none, rgba color.RGBA
+	)
+
+	// rgbaOr := func(condition bool, vals [2]color.RGBA) color.RGBA {
+	// 	return vals[check.As[int](!condition)]
+	// }
+
+	for _, img := range imgs {
+
+		width, height := img.Bounds().Size().X, img.Bounds().Size().Y
+		// t.Logf("width:%d,height:%d", width, height)
+		pixelCount += width * height
+
+		for y := range height {
+			for x := range width {
+
+				r, g, b, a := img.At(x, y).RGBA()
+				rgba = color.RGBA{
+					R: uint8(r),
+					G: uint8(g),
+					B: uint8(b),
+					A: uint8(a),
+				}
+
+				if rgba != none {
+					nonBlankCount++
+					count = colorCountMap[rgba] + 1
+					colorCountMap[rgba] = count
+					if count < min {
+						min = count
+					} else if count > max {
+						max = count
+					}
+				}
+			}
+		}
+	}
+
+	// pixel line
+	bigImg = image.NewRGBA(image.Rect(0, 0, 1, nonBlankCount))
+	column := 0
+	for rgba, count = range colorCountMap {
+		for range count {
+			bigImg.SetRGBA(0, column, rgba)
+		}
+		column += count
+	}
+
+	// first 256 colors newPal, add to colormap
+	newPal = quant.Quantize(newPal, bigImg)
+	for v, c := range newPal {
+		colorMap[c] = uint8(v)
+	}
+
+	// create image with 256 color pal
+	paletted := image.NewPaletted(bigImg.Bounds(), newPal)
+	model := paletted.ColorModel()
+	rect := bigImg.Bounds()
+
+	for y := range rect.Max.Y {
+		for x := range rect.Max.X {
+			c := bigImg.At(x, y)
+			cv := model.Convert(c)
+			ix := colorMap[cv]
+			colorMap[c] = ix
+		}
+	}
+
+	// t.Logf("palette length:%d colorMap length=%d",
+	// 	len(newPal), len(colorMap))
+
+	return newPal, colorMap
 }

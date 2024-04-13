@@ -17,7 +17,7 @@ import (
 
 var _ = rand.New(rand.NewSource(time.Now().UnixNano()))
 var _ model.Recorder = (*Game)(nil)
-var _ model.Linker = (*Game)(nil)
+var _ model.Parent = (*Game)(nil)
 
 type GameItem struct {
 	Start         float64
@@ -33,10 +33,11 @@ type GameItem struct {
 	CaptureInterval float64
 	Capturing       bool
 	Paused          bool
+	DarkMode        bool
 	FixedPalette    []color.RGBA
 
 	path       string
-	backGround color.RGBA
+	BackGround color.RGBA
 	palette    color.Palette
 	colorMap   map[color.Color]uint8
 
@@ -88,6 +89,7 @@ func (gs *Game) Setup(record *model.Record, path string) *Game {
 	gs.Capturing = false
 	gs.Paused = false
 
+	gs.BackGround = rl.Black
 	gs.stopChan = make(chan int)
 	gs.scrChan = make(chan image.Image)
 	gs.gamepad = gpads.NewGPads()
@@ -124,14 +126,15 @@ func (gs *Game) AddColors(clrs []color.RGBA) {
 
 func (gs *Game) setColors() {
 	palette := make(color.Palette, 0, len(gs.FixedPalette))
+	palette = append(palette, color.RGBA{R: 0, G: 0, B: 0, A: 0}) //transparent
 	for _, c := range gs.FixedPalette {
 		palette = append(palette, c)
 	}
 	gs.palette, gs.colorMap =
-		CreatePaletteFromTextures(color.RGBA{0, 0, 0, 255}, palette, gs)
+		gs.CreatePaletteFromTextures(gs.BackGround, palette)
 }
 
-func (gs *Game) Link(recs ...*model.Record) {
+func (gs *Game) LinkChildren(recs ...*model.Record) {
 	var err error
 	defer func() {
 		if err != nil {
