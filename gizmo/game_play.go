@@ -5,7 +5,16 @@ import (
 )
 
 func (gs *Game) Run() {
-	gs.setColors()
+	gs.FixedPalette = append(gs.FixedPalette, gs.BackGround)
+
+	gs.createPalette()
+
+	rl.SetTraceLogLevel(rl.LogWarning)
+	rl.InitWindow(gs.Width, gs.Height, gs.Record.Title)
+
+	for _, txt := range gs.listTextures() {
+		txt.Load()
+	}
 
 	defer func() {
 		for _, actor := range gs.Actors() {
@@ -22,13 +31,6 @@ func (gs *Game) Run() {
 		}
 		rl.CloseWindow()
 	}()
-
-	rl.SetTraceLogLevel(rl.LogWarning)
-	rl.InitWindow(gs.Width, gs.Height, gs.Record.Title)
-
-	for _, txt := range gs.listTextures() {
-		txt.Load()
-	}
 
 	if !gs.FixedSize {
 		rl.SetWindowState(rl.FlagWindowResizable)

@@ -111,7 +111,6 @@ func create_mem_game(t *testing.T) {
 	gander_mv.AddDrawer(gander)
 	game.AddActor(gander_mv, 4)
 
-	game.FixedPalette = fixedPalette
 	data.Save(game)
 	if data.HasErrors() {
 		t.Fatal(data.Err)

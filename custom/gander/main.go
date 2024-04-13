@@ -1,7 +1,6 @@
 package main
 
 import (
-	"image/color"
 	"path/filepath"
 
 	"github.com/centretown/xray/builder"
@@ -16,17 +15,6 @@ func main() {
 }
 
 func build_gander(game *gizmo.Game, resourcePath string) {
-	var fixedPalette = []color.RGBA{
-		gizmo.White,
-		gizmo.Black,
-		gizmo.Red,
-		gizmo.Yellow,
-		gizmo.Green,
-		gizmo.Cyan,
-		gizmo.Blue,
-		gizmo.Magenta,
-	}
-
 	viewPort := game.SetViewPort(1600, 800)
 
 	hole := gizmo.NewTexture(filepath.Join(resourcePath, "polar.png"))
@@ -59,6 +47,5 @@ func build_gander(game *gizmo.Game, resourcePath string) {
 	door_mv.AddDrawer(door)
 	game.AddActor(door_mv, 10)
 
-	game.FixedPalette = fixedPalette
 	game.FrameRate = 30
 }

@@ -34,7 +34,7 @@ type GameItem struct {
 	Capturing       bool
 	Paused          bool
 	DarkMode        bool
-	FixedPalette    []color.RGBA
+	FixedPalette    color.Palette
 
 	path       string
 	BackGround color.RGBA
@@ -118,20 +118,6 @@ func (gs *Game) Children() (children []model.Recorder) {
 		children = append(children, gs.drawers[i])
 	}
 	return
-}
-
-func (gs *Game) AddColors(clrs []color.RGBA) {
-	gs.FixedPalette = append(gs.FixedPalette, clrs...)
-}
-
-func (gs *Game) setColors() {
-	palette := make(color.Palette, 0, len(gs.FixedPalette))
-	palette = append(palette, color.RGBA{R: 0, G: 0, B: 0, A: 0}) //transparent
-	for _, c := range gs.FixedPalette {
-		palette = append(palette, c)
-	}
-	gs.palette, gs.colorMap =
-		gs.CreatePaletteFromTextures(gs.BackGround, palette)
 }
 
 func (gs *Game) LinkChildren(recs ...*model.Record) {
