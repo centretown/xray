@@ -23,16 +23,15 @@ func init() {
 	flagset.Setup("install", "test")
 }
 
-func Build(builder func(*gizmo.Game, string)) (*gizmo.Game, bool, error) {
+func Build(custom func(*gizmo.Game, string)) (*gizmo.Game, bool, error) {
 
 	flag.Parse()
 
 	var (
-		flags        = &flagset.Flags
-		databasePath string
-		resourcePath string
-		inMemory     = false
-		install      = false
+		flags               = &flagset.Flags
+		databasePath string = ""
+		inMemory            = false
+		install             = false
 	)
 	// test and install conflict. test has higher priority
 	// because it is the safest option
@@ -42,20 +41,20 @@ func Build(builder func(*gizmo.Game, string)) (*gizmo.Game, bool, error) {
 	} else if flags.Install != "" {
 		install = true
 		databasePath = filepath.Join(installBase, flags.Install)
-		resourcePath = filepath.Base(databasePath)
 	}
 
-	game, err := create(databasePath, resourcePath, flags, builder, inMemory, install)
+	game, err := create(databasePath, flags, custom, inMemory, install)
 
-	log.Printf("memory: %v, databasePath: %s, resourcePath: %s\n",
-		inMemory, databasePath, resourcePath)
+	log.Printf("memory: %v, databasePath: %s\n",
+		inMemory, databasePath)
 	flags.Dump()
 
 	return game, install, err
 }
 
-func create(databasePath, resourcePath string, cmd *flagset.FlagSet,
-	builder func(*gizmo.Game, string), memory bool, install bool) (game *gizmo.Game, err error) {
+func create(databasePath string, cmd *flagset.FlagSet,
+	custom func(*gizmo.Game, string),
+	memory bool, install bool) (game *gizmo.Game, err error) {
 
 	fname := databasePath
 	if !memory {
@@ -85,14 +84,14 @@ func create(databasePath, resourcePath string, cmd *flagset.FlagSet,
 		captureFps   = 25
 	)
 
-	game = gizmo.NewGameSetup(resourcePath, screenWidth, screenHeight, fps)
+	game = gizmo.NewGameSetup("", screenWidth, screenHeight, fps)
 
 	data.Create(game.Record, &model.Version{Major: 0, Minor: 1})
 	if data.HasErrors() {
 		return
 	}
 
-	builder(game, resourcePath)
+	custom(game, "")
 
 	data.Save(game)
 	if data.HasErrors() {

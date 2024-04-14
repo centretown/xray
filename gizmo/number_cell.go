@@ -14,10 +14,6 @@ func NewNumberCell[T check.NumberType](states int) *NumberCell[T] {
 	return nc
 }
 
-func Zero[T any]() (t T) {
-	return t
-}
-
 func (c *NumberCell[T]) Clear() {
 	var t T
 	for i := range c.States {

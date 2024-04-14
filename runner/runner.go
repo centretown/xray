@@ -28,7 +28,7 @@ func main() {
 	}
 	selection := flag.Arg(1)
 	path = filepath.Join(installBase, selection)
-	dir, err = filepath.Abs(installBase)
+	dir, err = filepath.Abs(path)
 	if err != nil {
 		log.Fatalln(err)
 	}

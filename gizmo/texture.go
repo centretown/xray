@@ -37,33 +37,7 @@ func (tex *Texture) Load() *Texture {
 	return tex
 }
 
-// func (tex *Texture) LoadImage() (img image.Image, err error) {
-// 	var (
-// 		title = "LoadImage"
-// 		rdr   io.ReadCloser
-// 		enc   string
-// 	)
-
-// 	rdr, err = os.Open(tex.Resource.Path)
-// 	if err != nil {
-// 		log.Println()
-// 	}
-// 	defer rdr.Close()
-
-// 	img, enc, err = image.Decode(rdr)
-// 	if err != nil {
-// 		log.Printf("%s %s file %s\n", title, tex.Resource.Path, err)
-// 	} else {
-// 		log.Printf("%s %s file %s success\n", title, enc, tex.Resource.Path)
-// 	}
-// 	return
-// }
-
 func (tex *Texture) Unload() { rl.UnloadTexture(tex.texture2D) }
-
-func (tex *Texture) DrawSimple(x, y int32) {
-	rl.DrawTexture(tex.texture2D, x, y, White)
-}
 
 func (tex *Texture) Draw(v rl.Vector3) {
 	x, y, rotation := v.X, v.Y, v.Z
