@@ -79,22 +79,23 @@ func NewGrid[T check.NumberType](bounds rl.RectangleInt32,
 
 func (cs *NumberGrid[T]) GetRecord() *model.Record { return cs.Record }
 func (cs *NumberGrid[T]) GetItem() any             { return &cs.NumberGridItem }
-func (cs *NumberGrid[T]) Refresh(rect rl.RectangleInt32, options ...bool) {
+func (cs *NumberGrid[T]) Refresh(rect rl.RectangleInt32, funcs ...func(any)) {
 	if cs.cells == nil {
 		cs.SetupCells()
 	}
 	cs.bounds = rect
 	cs.CellWidth = rect.Width / cs.Cols
 	cs.CellHeight = rect.Height / cs.Rows
-
-	if len(options) == 0 || !options[0] {
+	if len(funcs) < 1 {
 		return
 	}
 
 	cells := cs.GetCells()
 	for y := int32(0); y <= cs.Rows; y++ {
 		for x := int32(0); x <= cs.Cols; x++ {
-			cells[x][y].Clear()
+			for _, f := range funcs {
+				f(cells[x][y])
+			}
 		}
 	}
 }
@@ -120,6 +121,10 @@ func (cs *NumberGrid[T]) GetCells() [][]*NumberCell[T] {
 
 func (cs *NumberGrid[T]) Position(x, y int32) (int32, int32) {
 	return cs.bounds.X + x*cs.CellWidth, cs.bounds.Y + y*cs.CellHeight
+}
+
+func (cs *NumberGrid[T]) PositionToCell(posX, posY int32) (x, y int32) {
+	return posX / cs.CellWidth, posY / cs.CellHeight
 }
 
 func (cs *NumberGrid[T]) getCell(x, y int32) *NumberCell[T] {

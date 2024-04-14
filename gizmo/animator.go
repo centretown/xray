@@ -9,7 +9,7 @@ type Drawer interface {
 	model.Recorder
 	Bounds() rl.RectangleInt32
 	Draw(rl.Vector3)
-	Refresh(rect rl.RectangleInt32, options ...bool)
+	Refresh(rect rl.RectangleInt32, funcs ...func(any))
 }
 
 type Inputer interface {

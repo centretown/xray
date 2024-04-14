@@ -1,7 +1,9 @@
 package gizmo
 
 import (
+	"fmt"
 	"log"
+	"math/rand"
 
 	"github.com/centretown/xray/check"
 	"github.com/centretown/xray/gizmo/categories"
@@ -19,7 +21,7 @@ const (
 type GridMoverItem[T check.NumberType] struct {
 	Bounds     rl.RectangleInt32
 	PixelRateX float64
-	playing    bool
+	Playing    bool
 	drawer     *NumberGrid[T]
 }
 
@@ -32,7 +34,8 @@ func NewGridMover[T check.NumberType](bounds rl.RectangleInt32, pixelRateX float
 	mv := &GridMover[T]{}
 	var _ model.Parent = mv
 	var _ Actor = mv
-	// var _ Inputer = mv
+	var _ Inputer = mv
+
 	mv.Bounds = bounds
 	mv.PixelRateX = pixelRateX
 	mv.Record = model.NewRecord("cellsmover", int32(categories.NumberMoveri8), &mv.GridMoverItem, model.JSON)
@@ -93,13 +96,28 @@ func (cm *GridMover[T]) Refresh(now float64, rect rl.RectangleInt32) {
 	if dr == nil {
 		log.Fatalln("nil drawer")
 	}
-	cm.drawer.Refresh(rect, false)
+	cm.init(false)
+}
+
+func (cm *GridMover[T]) init(clear bool) {
+
+	f := func(t any) {
+		cell, ok := t.(*NumberCell[T])
+		if ok {
+			cell.Clear()
+			if rand.Float64() < .1 && !clear {
+				cell.Set(Alive, 1)
+			}
+		}
+	}
+
+	cm.drawer.Refresh(cm.Bounds, f)
 }
 
 func (cm *GridMover[T]) Act(can_move bool, now float64) {
-	// if can_move {
-	// 	cm.Update()
-	// }
+	if can_move {
+		cm.Update()
+	}
 	cm.drawer.Draw(rl.Vector3{X: float32(cm.Bounds.X),
 		Y: float32(cm.Bounds.Y),
 		Z: 0})
@@ -108,12 +126,14 @@ func (cm *GridMover[T]) Act(can_move bool, now float64) {
 func (cm *GridMover[T]) Update() {
 	dr := cm.drawer
 	cells := dr.GetCells()
-	for i := int32(0); i <= dr.Cols; i++ {
-		for j := int32(0); j <= dr.Rows; j++ {
+
+	for i := int32(0); i < dr.Cols; i++ {
+		for j := int32(0); j < dr.Rows; j++ {
 			neighbors := cm.CountNeighbors(i, j)
+
 			cell := cells[i][j]
-			curr := cell.Get(Alive)
-			if curr == T(0) {
+			// curr :=
+			if cell.Get(Alive) == T(1) {
 				if neighbors < 2 {
 					cell.Set(Next, 0)
 				} else if neighbors > 3 {
@@ -125,54 +145,65 @@ func (cm *GridMover[T]) Update() {
 				cell.Set(Next, 1)
 				cell.Set(Visited, 1)
 			}
+			// v := cell.Get(Next)
+			// cell.Set(Alive, v)
 		}
 	}
-
-	for i := int32(0); i < dr.Cols; i++ {
+	for i := int32(0); i <= dr.Cols; i++ {
 		for j := int32(0); j < dr.Rows; j++ {
 			cell := cells[i][j]
-			cell.Set(Alive, cell.Get(Next))
+			v := cell.Get(Next)
+			cell.Set(Alive, v)
+			// cs.cells[i][j].Alive = dr.cells[i][j].Next
 		}
 	}
 }
 
 // INPUT
 func (cm *GridMover[T]) Input() {
-	// control
+
 	if rl.IsKeyPressed(rl.KeyR) {
-		cm.drawer.Refresh(cm.Bounds, false)
+		fmt.Println("R pressed")
+		cm.init(false)
 	}
 	if rl.IsKeyPressed(rl.KeyC) {
-		cm.drawer.Refresh(cm.Bounds, true)
+		fmt.Println("R pressed")
+		cm.init(true)
 	}
-	if rl.IsKeyDown(rl.KeyRight) && !cm.playing {
+	if rl.IsKeyDown(rl.KeyRight) && !cm.Playing {
+		fmt.Println("KeyRight pressed", cm.Playing)
 		cm.Update()
 	}
 	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 		cm.Click(rl.GetMouseX(), rl.GetMouseY())
 	}
 	if rl.IsKeyPressed(rl.KeySpace) {
-		cm.playing = !cm.playing
+		cm.Playing = !cm.Playing
+		fmt.Println("cm.Playing", cm.Playing)
 	}
 
 }
 
 func (cm *GridMover[T]) Click(clickX, clickY int32) {
-	// dr := cm.drawer
-	// cells := dr.GetCells()
-	// cell := dr.PositionToCell(clickX, clickY)
-	for y := int32(-1); y < 2; y++ {
+	var (
+		value, x, y, cx, cy int32
+		dr                  = cm.drawer
+		cells               = dr.GetCells()
+		ix, iy              = dr.PositionToCell(clickX, clickY)
+	)
 
-		for x := int32(-1); x < 2; x++ {
+	for cy = iy - 1; cy < iy+2; cy++ {
 
-			// cell := cells[x][y]
+		for cx = ix - 1; cx < ix+2; cx++ {
 
-			// if int32(cell.X) < clickX && int32(cell.X)+dr.CellWidth > clickX &&
-			// 	int32(cell.Y) < clickY && int32(cell.Y)+dr.CellHeight > clickY {
+			x = (dr.Cols + cx) % dr.Cols
+			y = (dr.Rows + cy) % dr.Rows
 
-			// 	cells[x][y].Alive = !cells[x][y].Alive
-			// 	cells[x][y].Next = cells[x][y].Alive
-			// }
+			cell := cells[x][y]
+			value = int32(cell.Get(Alive))
+			value = check.As[int32](value == 0)
+			cell.Set(Alive, T(value))
+			cell.Set(Next, T(value))
 		}
 	}
 }

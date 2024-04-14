@@ -123,11 +123,6 @@ func PackImages(imgs []image.Image) (combined image.Image) {
 	return
 }
 
-func ExtendPalette(pal color.Palette, imgs []image.Image,
-	count int) (color.Palette, map[color.Color]uint8) {
-	return extendPalette(pal, imgs, count)
-}
-
 // https://unix.stackexchange.com/questions/40638/how-to-do-i-convert-an-animated-gif-to-an-mp4-or-mv4-on-the-command-line
 // ffmpeg -i animated.gif -movflags faststart -pix_fmt yuv420p \
 //		-vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" video.mp4
@@ -190,7 +185,13 @@ func WriteGIF(path string, pics []image.Image, pal color.Palette,
 	}
 }
 
-func extendPalette(fixedPal color.Palette, imgs []image.Image,
+func ExtendPalette(colors []color.RGBA, imgs []image.Image,
+	count int) (color.Palette, map[color.Color]uint8) {
+
+	return extendPalette(colors, imgs, count)
+}
+
+func extendPalette(fixedColors []color.RGBA, imgs []image.Image,
 	count int) (color.Palette, map[color.Color]uint8) {
 	var (
 		bigImg        *image.RGBA
@@ -203,7 +204,9 @@ func extendPalette(fixedPal color.Palette, imgs []image.Image,
 		nonBlankCount int
 	)
 
-	newPal = append(newPal, fixedPal...)
+	for _, c := range fixedColors {
+		newPal = append(newPal, c)
+	}
 
 	var (
 		min, max   int = 5000, 0

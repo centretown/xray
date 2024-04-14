@@ -1,8 +1,13 @@
 package gizmo
 
 import (
+	"math/rand"
+	"time"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
+
+var _ = rand.NewSource(time.Now().UnixMicro())
 
 func (gs *Game) Run() {
 	gs.FixedPalette = append(gs.FixedPalette, gs.BackGround)

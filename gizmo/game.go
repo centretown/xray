@@ -34,7 +34,7 @@ type GameItem struct {
 	Capturing       bool
 	Paused          bool
 	DarkMode        bool
-	FixedPalette    color.Palette
+	FixedPalette    []color.RGBA
 
 	path       string
 	BackGround color.RGBA
