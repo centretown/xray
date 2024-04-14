@@ -36,7 +36,6 @@ type GameItem struct {
 	DarkMode        bool
 	FixedPalette    []color.RGBA
 
-	path       string
 	BackGround color.RGBA
 	palette    color.Palette
 	colorMap   map[color.Color]uint8
@@ -60,12 +59,11 @@ type Game struct {
 	Record *model.Record
 }
 
-func NewGameSetup(path string, width, height, fps int32) *Game {
+func NewGameSetup(width, height, fps int32) *Game {
 	gs := NewGame()
 	gs.Width = width
 	gs.Height = height
 	gs.FrameRate = fps
-	gs.path = path
 	return gs
 }
 
@@ -78,7 +76,6 @@ func NewGame() *Game {
 
 func (gs *Game) Setup(record *model.Record, path string) *Game {
 	gs.Record = record
-	gs.path = path
 
 	gs.Start = 0
 	gs.Current = rl.GetTime()

@@ -35,7 +35,7 @@ func Build(custom func(*gizmo.Game, string)) (*gizmo.Game, bool, error) {
 	)
 	// test and install conflict. test has higher priority
 	// because it is the safest option
-	if flags.Test {
+	if flags.Quick {
 		inMemory = true
 		databasePath = memoryPath
 	} else if flags.Install != "" {
@@ -84,7 +84,7 @@ func create(databasePath string, cmd *flagset.FlagSet,
 		captureFps   = 25
 	)
 
-	game = gizmo.NewGameSetup("", screenWidth, screenHeight, fps)
+	game = gizmo.NewGameSetup(screenWidth, screenHeight, fps)
 
 	data.Create(game.Record, &model.Version{Major: 0, Minor: 1})
 	if data.HasErrors() {

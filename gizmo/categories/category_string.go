@@ -19,9 +19,9 @@ func _() {
 	_ = x[COUNT-8]
 }
 
-const _Category_name = "TextureCircleCellsOrgMoverGameCellsMoverCellsPlayerCOUNT"
+const _Category_name = "TextureCircleCellsOrgMoverGameNumberMoveri8NumberGridi8PlayerCOUNT"
 
-var _Category_index = [...]uint8{0, 7, 13, 21, 26, 30, 40, 45, 51, 56}
+var _Category_index = [...]uint8{0, 7, 13, 21, 26, 30, 43, 55, 61, 66}
 
 func (i Category) String() string {
 	if i < 0 || i >= Category(len(_Category_index)-1) {

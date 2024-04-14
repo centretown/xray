@@ -13,7 +13,7 @@ type FlagSet struct {
 	Path               string
 	Resource           string
 	Install            string
-	Test               bool
+	Quick              bool
 }
 
 func (cmdl *FlagSet) Dump() {
@@ -26,28 +26,22 @@ func (cmdl *FlagSet) Dump() {
 var Flags FlagSet
 
 var (
-	majorUsage    = "major version number"
-	minorUsage    = "minor version number"
-	keyUsage      = "uuid key"
-	pathUsage     = "build destination folder"
-	installUsage  = "install build to folder"
-	resourceUsage = "build resource location if different from path"
-	testUsage     = "run test version"
+	majorUsage   = "major version number"
+	minorUsage   = "minor version number"
+	keyUsage     = "uuid key"
+	installUsage = "install build to folder"
+	quickUsage   = "quick build and run in temporary memory database"
 
-	flagMajor    = "major"
-	flagM        = "m"
-	flagMinor    = "minor"
-	flagN        = "n"
-	flagKey      = "key"
-	flagK        = "k"
-	flagPath     = "path"
-	flagP        = "p"
-	flagInstall  = "install"
-	flagI        = "i"
-	flagTest     = "test"
-	flagT        = "t"
-	flagResource = "resource"
-	flagR        = "r"
+	flagMajor   = "major"
+	flagM       = "m"
+	flagMinor   = "minor"
+	flagN       = "n"
+	flagKey     = "key"
+	flagK       = "k"
+	flagInstall = "install"
+	flagI       = "i"
+	flagQuick   = "quick"
+	flagQ       = "q"
 )
 
 func Setup(options ...string) {
@@ -79,13 +73,6 @@ func Setup(options ...string) {
 			flag.StringVar(&Flags.Key, flagKey, Flags.Key, keyUsage)
 			flag.StringVar(&Flags.Key, flagK, Flags.Key, sameAs(flagKey))
 
-		case flagP:
-			flag.StringVar(&Flags.Path, flagPath, Flags.Path, pathUsage)
-			flag.StringVar(&Flags.Path, flagP, Flags.Path, sameAs(flagPath))
-		case flagPath:
-			flag.StringVar(&Flags.Path, flagPath, Flags.Path, pathUsage)
-			flag.StringVar(&Flags.Path, flagP, Flags.Path, sameAs(flagPath))
-
 		case flagInstall:
 			flag.StringVar(&Flags.Install, flagInstall, Flags.Install, installUsage)
 			flag.StringVar(&Flags.Install, flagI, Flags.Install, sameAs(flagInstall))
@@ -93,19 +80,12 @@ func Setup(options ...string) {
 			flag.StringVar(&Flags.Install, flagInstall, Flags.Install, installUsage)
 			flag.StringVar(&Flags.Install, flagI, Flags.Install, sameAs(flagInstall))
 
-		case flagTest:
-			flag.BoolVar(&Flags.Test, flagTest, Flags.Test, testUsage)
-			flag.BoolVar(&Flags.Test, flagT, Flags.Test, sameAs(flagTest))
-		case flagT:
-			flag.BoolVar(&Flags.Test, flagTest, Flags.Test, testUsage)
-			flag.BoolVar(&Flags.Test, flagT, Flags.Test, sameAs(flagTest))
-
-		case flagResource:
-			flag.StringVar(&Flags.Resource, flagResource, Flags.Resource, resourceUsage)
-			flag.StringVar(&Flags.Resource, flagR, Flags.Resource, sameAs(flagResource))
-		case flagR:
-			flag.StringVar(&Flags.Resource, flagResource, Flags.Resource, resourceUsage)
-			flag.StringVar(&Flags.Resource, flagR, Flags.Resource, sameAs(flagResource))
+		case flagQuick:
+			flag.BoolVar(&Flags.Quick, flagQuick, Flags.Quick, quickUsage)
+			flag.BoolVar(&Flags.Quick, flagQ, Flags.Quick, sameAs(flagQuick))
+		case flagQ:
+			flag.BoolVar(&Flags.Quick, flagQuick, Flags.Quick, quickUsage)
+			flag.BoolVar(&Flags.Quick, flagQ, Flags.Quick, sameAs(flagQuick))
 		}
 	}
 

@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -16,40 +15,38 @@ var (
 
 func main() {
 	flag.Parse()
-	// cmd := cmdl.Cmdl
-	var (
-		path, dir string
-		err       error
-	)
-
 	if len(flag.Args()) < 2 {
-		fmt.Println("Enter the name of the game.")
-		os.Exit(1)
+		log.Println("Enter a title. (eg: life02)")
+		return
 	}
-	selection := flag.Arg(1)
-	path = filepath.Join(installBase, selection)
-	dir, err = filepath.Abs(path)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	err = os.Chdir(dir)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Println(path, dir) //, cmd.MajorKey, cmd.MinorKey, cmd.Key)
 
 	var (
-		game *gizmo.Game
+		selection    = flag.Arg(1)
+		runDirectory string
+		err          error
+		game         *gizmo.Game
 	)
 
-	game, err = gizmo.LoadGameKey(path)
+	defer func() {
+		if err != nil {
+			log.Printf("Unable run %s. Cause: %v\n", selection, err)
+			os.Exit(1)
+		}
+	}()
+
+	runDirectory, err = filepath.Abs(filepath.Join(installBase, selection))
 	if err != nil {
-		log.Println("Loading game:", err)
-		j, n, k := game.Keys()
-		log.Println(path, j, n, k)
-		os.Exit(1)
+		return
+	}
+
+	err = os.Chdir(runDirectory)
+	if err != nil {
+		return
+	}
+
+	game, err = gizmo.LoadGameKey("")
+	if err != nil {
+		return
 	}
 
 	game.Run()

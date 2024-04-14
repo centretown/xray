@@ -32,7 +32,7 @@ func (gs *Game) BeginGIFCapture() {
 		gs.captureDelay = 4
 	}
 
-	go capture.CaptureGIF(gs.path, gs.stopChan, gs.scrChan, gs.palette,
+	go capture.CaptureGIF("", gs.stopChan, gs.scrChan, gs.palette,
 		gs.captureDelay, gs.colorMap)
 }
 
