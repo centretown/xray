@@ -13,4 +13,3 @@ const (
 )
 
 //go:generate stringer -type=TextItem
-//go:generate gostringer -type=TextItem
