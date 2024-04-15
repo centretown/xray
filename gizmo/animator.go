@@ -9,17 +9,17 @@ type Drawer interface {
 	model.Recorder
 	Bounds() rl.RectangleInt32
 	Draw(rl.Vector3)
-	Refresh(rect rl.RectangleInt32, funcs ...func(any))
+	Refresh(now float64, rect rl.RectangleInt32, funcs ...func(any))
 }
 
 type Inputer interface {
 	Input()
 }
 
-type Actor interface {
+type Mover interface {
 	model.Recorder
-	Act(can_move bool, current float64)
-	Refresh(now float64, rect rl.RectangleInt32)
+	Move(can_move bool, current float64)
+	Refresh(now float64, rect rl.RectangleInt32, funcs ...func(any))
 	GetDrawer() Drawer
 }
 

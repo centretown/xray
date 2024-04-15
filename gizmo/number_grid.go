@@ -79,7 +79,7 @@ func NewGrid[T check.NumberType](bounds rl.RectangleInt32,
 
 func (cs *NumberGrid[T]) GetRecord() *model.Record { return cs.Record }
 func (cs *NumberGrid[T]) GetItem() any             { return &cs.NumberGridItem }
-func (cs *NumberGrid[T]) Refresh(rect rl.RectangleInt32, funcs ...func(any)) {
+func (cs *NumberGrid[T]) Refresh(now float64, rect rl.RectangleInt32, funcs ...func(any)) {
 	if cs.cells == nil {
 		cs.SetupCells()
 	}

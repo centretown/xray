@@ -48,7 +48,7 @@ type GameItem struct {
 	stopChan chan int
 	scrChan  chan image.Image
 
-	actors    []Actor
+	actors    []Mover
 	drawers   []Drawer
 	inputters []Inputer
 	gamepad   pad.PadG
@@ -92,7 +92,7 @@ func (gs *Game) Setup(record *model.Record, path string) *Game {
 	gs.gamepad = gpads.NewGPads()
 	gs.captureStart = 250
 	gs.captureDelay = 4
-	gs.actors = make([]Actor, 0)
+	gs.actors = make([]Mover, 0)
 	gs.drawers = make([]Drawer, 0)
 	gs.inputters = make([]Inputer, 0)
 	return gs
@@ -101,8 +101,8 @@ func (gs *Game) Setup(record *model.Record, path string) *Game {
 func (gs *Game) GetRecord() *model.Record        { return gs.Record }
 func (gs *Game) GetItem() any                    { return &gs.GameItem }
 func (gs *Game) SetPad(pad pad.PadG)             { gs.gamepad = pad }
-func (gs *Game) AddActor(a Actor, after float64) { gs.actors = append(gs.actors, a) }
-func (gs *Game) Actors() []Actor                 { return gs.actors }
+func (gs *Game) AddActor(a Mover, after float64) { gs.actors = append(gs.actors, a) }
+func (gs *Game) Actors() []Mover                 { return gs.actors }
 func (gs *Game) AddDrawer(dr Drawer)             { gs.drawers = append(gs.drawers, dr) }
 func (gs *Game) Drawers() []Drawer               { return gs.drawers }
 
@@ -132,7 +132,7 @@ func (gs *Game) LinkChildren(recs ...*model.Record) {
 		if err == nil {
 
 			switch t := el.(type) {
-			case Actor:
+			case Mover:
 				gs.actors = append(gs.actors, t)
 			case Drawer:
 				gs.drawers = append(gs.drawers, Drawer(t))

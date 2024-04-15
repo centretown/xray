@@ -61,7 +61,7 @@ func (gs *Game) Run() {
 		}
 
 		for _, actor := range gs.Actors() {
-			actor.Act(!gs.Paused, gs.Current)
+			actor.Move(!gs.Paused, gs.Current)
 		}
 
 		gs.DrawStatus()

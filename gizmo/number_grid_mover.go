@@ -19,7 +19,7 @@ const (
 )
 
 type GridMoverItem[T check.NumberType] struct {
-	Bounds     rl.RectangleInt32
+	Rectangle  rl.RectangleInt32
 	PixelRateX float64
 	Playing    bool
 	drawer     *NumberGrid[T]
@@ -33,10 +33,10 @@ type GridMover[T check.NumberType] struct {
 func NewGridMover[T check.NumberType](bounds rl.RectangleInt32, pixelRateX float64) *GridMover[T] {
 	mv := &GridMover[T]{}
 	var _ model.Parent = mv
-	var _ Actor = mv
+	var _ Mover = mv
 	var _ Inputer = mv
 
-	mv.Bounds = bounds
+	mv.Rectangle = bounds
 	mv.PixelRateX = pixelRateX
 	mv.Record = model.NewRecord("cellsmover", int32(categories.NumberMoveri8), &mv.GridMoverItem, model.JSON)
 	return mv
@@ -90,8 +90,8 @@ func (cs *GridMover[T]) CountNeighbors(cellX, cellY int32) int {
 	return count
 }
 
-func (cm *GridMover[T]) Refresh(now float64, rect rl.RectangleInt32) {
-	cm.Bounds = rect
+func (cm *GridMover[T]) Refresh(now float64, rect rl.RectangleInt32, f ...func(any)) {
+	cm.Rectangle = rect
 	dr := cm.drawer
 	if dr == nil {
 		log.Fatalln("nil drawer")
@@ -111,15 +111,15 @@ func (cm *GridMover[T]) init(clear bool) {
 		}
 	}
 
-	cm.drawer.Refresh(cm.Bounds, f)
+	cm.drawer.Refresh(0, cm.Rectangle, f)
 }
 
-func (cm *GridMover[T]) Act(can_move bool, now float64) {
+func (cm *GridMover[T]) Move(can_move bool, now float64) {
 	if can_move {
 		cm.Update()
 	}
-	cm.drawer.Draw(rl.Vector3{X: float32(cm.Bounds.X),
-		Y: float32(cm.Bounds.Y),
+	cm.drawer.Draw(rl.Vector3{X: float32(cm.Rectangle.X),
+		Y: float32(cm.Rectangle.Y),
 		Z: 0})
 }
 

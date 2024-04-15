@@ -40,7 +40,7 @@ func (b *Circle) GetItem() any {
 	return &b.CircleItem
 }
 
-func (b *Circle) Refresh(rect rl.RectangleInt32, funcs ...func(any)) {
+func (b *Circle) Refresh(float64, rl.RectangleInt32, ...func(any)) {
 }
 
 func (b *Circle) Bounds() rl.RectangleInt32 {

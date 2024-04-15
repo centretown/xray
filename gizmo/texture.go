@@ -49,7 +49,8 @@ func (tex *Texture) Draw(v rl.Vector3) {
 	rl.DrawTexturePro(tex.texture2D, srcRec, destRec, origin,
 		rotation, White)
 }
-func (tex *Texture) Refresh(rect rl.RectangleInt32, funcs ...func(any)) {}
+
+func (tex *Texture) Refresh(now float64, rect rl.RectangleInt32, funcs ...func(any)) {}
 
 func (tex *Texture) Bounds() rl.RectangleInt32 {
 	return rl.RectangleInt32{X: 0, Y: 0,

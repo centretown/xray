@@ -99,7 +99,7 @@ func (cs *CellsOrg) Init(clear bool) {
 	}
 }
 
-func (cs *CellsOrg) Refresh(rect rl.RectangleInt32, funcs ...func(any)) {}
+func (cs *CellsOrg) Refresh(float64, rl.RectangleInt32, ...func(any)) {}
 func (cs *CellsOrg) Bounds() rl.RectangleInt32 {
 	return rl.RectangleInt32{X: 0, Y: 0, Width: cs.Width, Height: cs.Height}
 }

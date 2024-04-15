@@ -17,7 +17,7 @@ func MakeCategory(cat categories.Category, rec *model.Record) model.Recorder {
 	case categories.CellsOrg:
 		return &CellsOrg{Record: rec}
 	case categories.Mover:
-		return &Mover{Record: rec}
+		return &Tracker{Record: rec}
 	case categories.NumberMoveri8:
 		return &GridMover[int8]{Record: rec}
 	case categories.NumberGridi8:
