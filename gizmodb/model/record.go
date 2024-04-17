@@ -10,7 +10,6 @@ import (
 var (
 	origin                   uuid.UUID
 	originMajor, originMinor int64
-	inMajor, inMinor         int64
 )
 
 const IN_HOUSE = "018e9522-01c9-77c0-be6c-65526f21ec1a"
@@ -18,7 +17,6 @@ const IN_HOUSE = "018e9522-01c9-77c0-be6c-65526f21ec1a"
 func init() {
 	origin, _ = uuid.Parse(IN_HOUSE)
 	originMajor, originMinor = RecordID(origin)
-	inMajor, inMinor = originMajor, originMinor
 }
 
 func RecordID(id uuid.UUID) (major, minor int64) {
@@ -39,7 +37,7 @@ func RecordUUID(major, minor int64) (id uuid.UUID) {
 
 type Record struct {
 	Class    string
-	Category int32
+	Classn   int32
 	Content  string
 	Encoding Encoding
 	Major    int64
@@ -50,7 +48,7 @@ type Record struct {
 	Updated  time.Time
 }
 
-func InitRecord(rec *Record, class string, category int32,
+func InitRecord(rec *Record, class string, classn int32,
 	vContent any, encoding Encoding) {
 
 	id, _ := uuid.NewV7()
@@ -67,7 +65,7 @@ func InitRecord(rec *Record, class string, category int32,
 	rec.Origin = originMajor
 	rec.Originn = originMinor
 	rec.Class = class
-	rec.Category = category
+	rec.Classn = classn
 	rec.Created = time.Now()
 	rec.Updated = time.Now()
 	rec.Encoding = encoding
@@ -84,16 +82,17 @@ func (rec *Record) UpdateContent(v any) string {
 }
 
 func (rec *Record) Copy(record *Record) {
-	rec.Major = record.Major
-	rec.Minor = record.Minor
-	rec.Origin = record.Origin
-	rec.Originn = record.Originn
-	rec.Class = record.Class
-	rec.Category = record.Category
-	rec.Created = record.Created
-	rec.Updated = record.Updated
-	rec.Encoding = record.Encoding
-	rec.Content = record.Content
+	*rec = *record
+	// rec.Major = record.Major
+	// rec.Minor = record.Minor
+	// rec.Origin = record.Origin
+	// rec.Originn = record.Originn
+	// rec.Class = record.Class
+	// rec.Classn = record.classn
+	// rec.Created = record.Created
+	// rec.Updated = record.Updated
+	// rec.Encoding = record.Encoding
+	// rec.Content = record.Content
 }
 
 func (rec *Record) Dump() {
@@ -103,7 +102,7 @@ func (rec *Record) Dump() {
 		"Origin", rec.Origin,
 		"Originn", rec.Originn,
 		"Class", rec.Class,
-		"Category", rec.Category,
+		"Classn", rec.Classn,
 		"Created", rec.Created,
 		"Updated", rec.Updated,
 		"Encoding", rec.Encoding,

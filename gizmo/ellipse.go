@@ -4,7 +4,7 @@ import (
 	"image/color"
 
 	"github.com/centretown/xray/gizmo/class"
-	"github.com/centretown/xray/model"
+	"github.com/centretown/xray/gizmodb/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 

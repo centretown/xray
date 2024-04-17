@@ -18,6 +18,11 @@ func build_gander(game *gizmo.Game) {
 	viewPort := game.SetViewPort(1600, 800)
 	vp := viewPort.ToFloat32()
 
+	game.Content.Title = "Gander"
+	game.Content.Author = "Dave"
+	game.Content.Description = "Gander is a testing game. It implements Ellipse, Tracker, Texture"
+	game.Content.Instructions = "Nothing to do right now."
+
 	hole := gizmo.NewTexture("polar.png")
 	hole_mv := gizmo.NewTracker(vp, 5, 5, 5)
 	hole_mv.AddDrawer(hole)

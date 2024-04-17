@@ -17,4 +17,4 @@ const (
 	COUNT
 )
 
-//go:generate stringer -type=Category
+//go:generate stringer -type=Class

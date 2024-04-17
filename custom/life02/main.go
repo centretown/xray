@@ -17,6 +17,14 @@ func main() {
 func build_life02(game *gizmo.Game) {
 	viewPort := game.SetViewPort(900, 800)
 	vp := viewPort.ToFloat32()
+
+	game.Content.Title = "Life"
+	game.Content.Author = "Dave"
+	game.Content.Description = "Life is a testing game. It implements NumberGrid, NumberGridMover"
+	game.Content.Instructions = `Staying Alive
+	- Press R to reset.
+	- Press C to clear.`
+
 	grid := gizmo.NewGrid[int8](vp, 40, 40,
 		color.RGBA{R: 255, G: 56, B: 12, A: 255},  //horizontal
 		color.RGBA{R: 255, G: 255, B: 12, A: 255}, //vertical

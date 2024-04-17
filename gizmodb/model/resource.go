@@ -23,7 +23,7 @@ type Resource struct {
 	Err    error `json:"-"`
 }
 
-func InitResource(res *Resource, path string, category int32) {
+func InitResource(res *Resource, path string, classn int32) {
 	var (
 		info fs.FileInfo
 		err  error

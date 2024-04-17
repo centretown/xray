@@ -1,7 +1,7 @@
 package gizmo
 
 import (
-	"github.com/centretown/xray/model"
+	"github.com/centretown/xray/gizmodb/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 

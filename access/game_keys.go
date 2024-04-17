@@ -3,7 +3,7 @@ package access
 import (
 	"log"
 
-	"github.com/centretown/xray/model"
+	"github.com/centretown/xray/gizmodb/model"
 	"github.com/google/uuid"
 )
 

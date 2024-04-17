@@ -9,7 +9,7 @@ import (
 	"github.com/centretown/xray/flagset"
 	"github.com/centretown/xray/gizmo"
 	"github.com/centretown/xray/gizmodb"
-	"github.com/centretown/xray/model"
+	"github.com/centretown/xray/gizmodb/model"
 )
 
 var (

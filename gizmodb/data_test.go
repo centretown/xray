@@ -3,7 +3,7 @@ package gizmodb
 import (
 	"testing"
 
-	"github.com/centretown/xray/model"
+	"github.com/centretown/xray/gizmodb/model"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"

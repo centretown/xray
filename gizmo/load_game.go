@@ -1,12 +1,14 @@
 package gizmo
 
 import (
+	"fmt"
 	"log"
 	"path/filepath"
 
 	"github.com/centretown/xray/access"
+	"github.com/centretown/xray/gizmo/class"
 	"github.com/centretown/xray/gizmodb"
-	"github.com/centretown/xray/model"
+	"github.com/centretown/xray/gizmodb/model"
 )
 
 func LoadGame() (err error) {
@@ -44,7 +46,7 @@ func LoadGame() (err error) {
 		return
 	}
 
-	recorder = MakeLink(&record)
+	recorder = makeLink(&record)
 	game, ok = recorder.(*Game)
 	if !ok {
 		log.Fatal()
@@ -81,7 +83,7 @@ func link(data *gizmodb.Data, parent model.Parent, records []*model.Record) {
 			return
 		}
 
-		recorder = MakeLink(record)
+		recorder = makeLink(record)
 
 		parent.LinkChild(recorder)
 
@@ -94,4 +96,29 @@ func link(data *gizmodb.Data, parent model.Parent, records []*model.Record) {
 			link(data, p, rs)
 		}
 	}
+}
+
+func makeLink(record *model.Record) (recorder model.Recorder) {
+	fmt.Println("MakeLink", *record)
+	cat := class.Class(record.Classn)
+	switch cat {
+	case class.Game:
+		return NewGameFromRecord(record)
+	case class.Texture:
+		return NewTextureFromRecord(record)
+	case class.Ellipse:
+		return NewEllipseFromRecord(record)
+	case class.CellsOrg:
+		return NewCellsOrgFromRecord(record)
+	case class.Tracker:
+		return NewTrackerFromRecord(record)
+	case class.LifeMover:
+		return NewLifeMoverFromRecord(record)
+	case class.LifeGrid:
+		return NewLifeGridFromRecord(record)
+	}
+
+	err := fmt.Errorf("unknown Class %d(%s)", cat, cat)
+	log.Fatal(err)
+	return nil
 }

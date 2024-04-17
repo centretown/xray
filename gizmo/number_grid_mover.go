@@ -7,7 +7,7 @@ import (
 
 	"github.com/centretown/xray/check"
 	"github.com/centretown/xray/gizmo/class"
-	"github.com/centretown/xray/model"
+	"github.com/centretown/xray/gizmodb/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -39,6 +39,7 @@ func NewGridMover[T check.NumberType](bounds rl.Rectangle, pixelRateX float64) *
 	mv.Content.PixelRateX = pixelRateX
 	model.InitRecorder[GridMover[T]](mv, class.LifeMover.String(),
 		int32(class.LifeMover))
+	// mv.init(true)
 	return mv
 }
 
@@ -60,6 +61,7 @@ func (cm *GridMover[T]) Children() []model.Recorder {
 }
 
 func (cm *GridMover[T]) AddDrawer(dr *NumberGrid[T]) {
+	fmt.Println("GRIDMOVER ADDED DRAWER")
 	cm.Content.drawer = dr
 }
 

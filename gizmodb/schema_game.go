@@ -3,7 +3,7 @@ package gizmodb
 import (
 	"time"
 
-	"github.com/centretown/xray/model"
+	"github.com/centretown/xray/gizmodb/model"
 )
 
 var SchemaGame = &Schema{
@@ -28,7 +28,7 @@ PRIMARY KEY (item,itemn,major,minor));`,
 
 		`CREATE TABLE items (
 class VARCHAR(80) NOT NULL,
-category INTEGER,
+classn INTEGER,
 content TEXT,
 major BIGINT, minor BIGINT,			
 origin BIGINT, originn BIGINT,
@@ -36,10 +36,10 @@ created TIMESTAMP, updated TIMESTAMP,
 encoding SMALLINT,
 PRIMARY KEY (major,minor));`,
 
-		"CREATE INDEX items_class ON items (class,category,origin,originn);",
-		"CREATE INDEX items_category ON items (category,class,origin,originn);",
-		"CREATE INDEX items_origin_t ON items (origin,originn,class,category);",
-		"CREATE INDEX items_origin_c ON items (origin,originn,category,class);",
+		"CREATE INDEX items_class ON items (class,classn,origin,originn);",
+		"CREATE INDEX items_classn ON items (classn,class,origin,originn);",
+		"CREATE INDEX items_origin_t ON items (origin,originn,class,classn);",
+		"CREATE INDEX items_origin_c ON items (origin,originn,classn,class);",
 
 		`CREATE TABLE tags (
 name VARCHAR(32) NOT NULL,
@@ -64,8 +64,8 @@ PRIMARY KEY (major,minor,linked,linkedn));`,
 	InsertVersion: `INSERT INTO version (item, itemn, major, minor, patch, extension) 
 VALUES (:item,:itemn,:major,:minor,:patch,:extension);`,
 
-	InsertItem: `INSERT INTO items (class, category, content, encoding, major, minor, origin, originn, created, updated)
-VALUES (:class,:category,:content,:encoding,:major,:minor,:origin,:originn,:created,:updated);`,
+	InsertItem: `INSERT INTO items (class, classn, content, encoding, major, minor, origin, originn, created, updated)
+VALUES (:class,:classn,:content,:encoding,:major,:minor,:origin,:originn,:created,:updated);`,
 
 	InsertLink: `INSERT INTO links (major, minor, linked, linkedn, repeated, weight)
 VALUES (:major,:minor,:linked,:linkedn,:repeated,:weight);`,

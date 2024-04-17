@@ -57,7 +57,7 @@ var drawCircle3d = Draw3d{
 	},
 }
 
-func Run3d(runr *Runner, gpads *gpads.GPads) {
+func Run3d(runr *Run3D, gpads *gpads.GPads) {
 	rl.InitWindow(1280, 720, "3d")
 
 	gpads.BeginPad()

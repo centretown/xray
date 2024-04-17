@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/centretown/xray/gizmodb"
-	"github.com/centretown/xray/model"
+	"github.com/centretown/xray/gizmodb/model"
 
 	"github.com/centretown/gpads/gpads"
 	"github.com/centretown/gpads/pad"
@@ -21,6 +21,12 @@ var _ model.Recorder = (*Game)(nil)
 var _ model.Parent = (*Game)(nil)
 
 type GameItem struct {
+	Title        string
+	Description  string
+	Rules        string
+	Instructions string
+	Author       string
+
 	Start         float64
 	Current       float64
 	Width         int32

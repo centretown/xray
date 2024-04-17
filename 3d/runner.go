@@ -12,14 +12,14 @@ const (
 	bottomMargin = 20
 )
 
-type Runner struct {
+type Run3D struct {
 	Width  int32
 	Height int32
 	Actors []gizmo.Mover
 }
 
-func NewRunner(width int32, height int32) *Runner {
-	runr := &Runner{
+func NewRunner(width int32, height int32) *Run3D {
+	runr := &Run3D{
 		Height: height,
 		Width:  width,
 		Actors: make([]gizmo.Mover, 0),
@@ -28,11 +28,11 @@ func NewRunner(width int32, height int32) *Runner {
 	return runr
 }
 
-func (runr *Runner) Add(a gizmo.Mover, after float64) {
+func (runr *Run3D) Add(a gizmo.Mover, after float64) {
 	runr.Actors = append(runr.Actors, a)
 }
 
-func (runr *Runner) Refresh(current float64) {
+func (runr *Run3D) Refresh(current float64) {
 
 	viewPort := rl.RectangleInt32{X: 0, Y: 0, Width: int32(rl.GetRenderWidth()),
 		Height: int32(rl.GetRenderHeight())}
@@ -43,13 +43,13 @@ func (runr *Runner) Refresh(current float64) {
 	}
 }
 
-func (runr *Runner) SetupWindow(title string) {
+func (runr *Run3D) SetupWindow(title string) {
 	rl.SetTraceLogLevel(rl.LogWarning)
 	rl.InitWindow(runr.Width, runr.Height, title)
 	rl.SetWindowState(rl.FlagWindowResizable)
 }
 
-func (runr *Runner) GetMessageBox() (rect rl.RectangleInt32) {
+func (runr *Run3D) GetMessageBox() (rect rl.RectangleInt32) {
 	rw := int32(rl.GetRenderWidth())
 	rh := int32(rl.GetRenderHeight())
 	rect.X = 0
@@ -65,7 +65,7 @@ const (
 	min_height = 280
 )
 
-func (runr *Runner) GetViewPort() rl.RectangleInt32 {
+func (runr *Run3D) GetViewPort() rl.RectangleInt32 {
 	rw := rl.GetRenderWidth()
 	rh := rl.GetRenderHeight()
 

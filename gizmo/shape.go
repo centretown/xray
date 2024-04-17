@@ -3,7 +3,7 @@ package gizmo
 import (
 	"image/color"
 
-	"github.com/centretown/xray/model"
+	"github.com/centretown/xray/gizmodb/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -21,10 +21,10 @@ func ShapeFromRecord[T any](sh *Shape[T], record *model.Record) {
 	model.Decode(sh, record)
 }
 
-func InitShape[T any](sh *Shape[T], name string, category int32,
+func InitShape[T any](sh *Shape[T], name string, classn int32,
 	color color.RGBA, width float32, height float32, custom ...float32) {
 
-	model.InitRecorder[Shape[T]](sh, name, int32(category))
+	model.InitRecorder[Shape[T]](sh, name, int32(classn))
 	sh.Content.Color = color
 	sh.Content.Dimensions.X = width
 	sh.Content.Dimensions.Y = height

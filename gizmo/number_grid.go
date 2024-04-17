@@ -7,7 +7,7 @@ import (
 
 	"github.com/centretown/xray/check"
 	"github.com/centretown/xray/gizmo/class"
-	"github.com/centretown/xray/model"
+	"github.com/centretown/xray/gizmodb/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -98,6 +98,7 @@ func (cs *NumberGrid[T]) SetupCells() {
 			item.cells[x][y] = NewNumberCell[T](item.StateCount)
 		}
 	}
+	fmt.Println("SETUP CELLS", len(item.cells))
 }
 
 func (cs *NumberGrid[T]) GetCells() [][]*NumberCell[T] {
