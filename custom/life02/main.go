@@ -4,7 +4,7 @@ import (
 	"image/color"
 
 	"github.com/centretown/xray/builder"
-	"github.com/centretown/xray/gizmo"
+	"github.com/centretown/xray/gizzmo"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 	}
 }
 
-func build_life02(game *gizmo.Game) {
+func build_life02(game *gizzmo.Game) {
 	viewPort := game.SetViewPort(900, 800)
 	vp := viewPort.ToFloat32()
 
@@ -25,7 +25,7 @@ func build_life02(game *gizmo.Game) {
 	- Press R to reset.
 	- Press C to clear.`
 
-	grid := gizmo.NewGrid[int8](vp, 40, 40,
+	grid := gizzmo.NewGrid[int8](vp, 40, 40,
 		color.RGBA{R: 255, G: 56, B: 12, A: 255},  //horizontal
 		color.RGBA{R: 255, G: 255, B: 12, A: 255}, //vertical
 
@@ -36,7 +36,7 @@ func build_life02(game *gizmo.Game) {
 	game.AddColors(grid.Content.HorizontalColor, grid.Content.VerticalColor)
 	game.AddColors(grid.Content.StateColors...)
 
-	grid_mv := gizmo.NewGridMover[int8](vp, 5)
+	grid_mv := gizzmo.NewGridMover[int8](vp, 5)
 	grid_mv.AddDrawer(grid)
 
 	game.AddActor(grid_mv, 1)

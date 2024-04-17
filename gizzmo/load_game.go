@@ -1,4 +1,4 @@
-package gizmo
+package gizzmo
 
 import (
 	"fmt"
@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 
 	"github.com/centretown/xray/access"
-	"github.com/centretown/xray/gizmo/class"
-	"github.com/centretown/xray/gizmodb"
-	"github.com/centretown/xray/gizmodb/model"
+	"github.com/centretown/xray/gizzmo/class"
+	"github.com/centretown/xray/gizzmodb"
+	"github.com/centretown/xray/gizzmodb/model"
 )
 
 func LoadGame() (err error) {
@@ -21,7 +21,7 @@ func LoadGame() (err error) {
 
 	log.Println("LoadGameKey", gameKeys.Minor, gameKeys.Major)
 
-	data := gizmodb.NewGameData("sqlite3", filepath.Join(path, "xray_game.db"))
+	data := gizzmodb.NewGameData("sqlite3", filepath.Join(path, "xray_game.db"))
 	defer func() {
 		if data.HasErrors() {
 			err = data.Err
@@ -65,7 +65,7 @@ func LoadGame() (err error) {
 	return
 }
 
-func link(data *gizmodb.Data, parent model.Parent, records []*model.Record) {
+func link(data *gizzmodb.Data, parent model.Parent, records []*model.Record) {
 	var (
 		recorder model.Recorder
 	)

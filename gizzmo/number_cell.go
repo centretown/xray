@@ -1,4 +1,4 @@
-package gizmo
+package gizzmo
 
 import "github.com/centretown/xray/check"
 

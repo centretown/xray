@@ -1,4 +1,4 @@
-package gizmodb
+package gizzmodb
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/centretown/xray/access"
-	"github.com/centretown/xray/gizmodb/model"
+	"github.com/centretown/xray/gizzmodb/model"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"

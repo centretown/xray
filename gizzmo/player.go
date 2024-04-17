@@ -1,4 +1,4 @@
-package gizmo
+package gizzmo
 
 type Player struct {
 }

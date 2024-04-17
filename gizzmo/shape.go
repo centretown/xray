@@ -1,9 +1,9 @@
-package gizmo
+package gizzmo
 
 import (
 	"image/color"
 
-	"github.com/centretown/xray/gizmodb/model"
+	"github.com/centretown/xray/gizzmodb/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 

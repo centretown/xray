@@ -1,12 +1,12 @@
-package gizmo
+package gizzmo
 
 import (
 	"fmt"
 	"log"
 
 	"github.com/centretown/xray/check"
-	"github.com/centretown/xray/gizmo/class"
-	"github.com/centretown/xray/gizmodb/model"
+	"github.com/centretown/xray/gizzmo/class"
+	"github.com/centretown/xray/gizzmodb/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 

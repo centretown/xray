@@ -1,7 +1,7 @@
-package gizmodb
+package gizzmodb
 
 import (
-	"github.com/centretown/xray/gizmodb/model"
+	"github.com/centretown/xray/gizzmodb/model"
 )
 
 type Schema struct {

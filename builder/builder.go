@@ -7,9 +7,9 @@ import (
 
 	"github.com/centretown/xray/access"
 	"github.com/centretown/xray/flagset"
-	"github.com/centretown/xray/gizmo"
-	"github.com/centretown/xray/gizmodb"
-	"github.com/centretown/xray/gizmodb/model"
+	"github.com/centretown/xray/gizzmo"
+	"github.com/centretown/xray/gizzmodb"
+	"github.com/centretown/xray/gizzmodb/model"
 )
 
 var (
@@ -23,7 +23,7 @@ func init() {
 	flagset.Setup("install", "quick")
 }
 
-func Build(custom func(*gizmo.Game)) (*gizmo.Game, bool, error) {
+func Build(custom func(*gizzmo.Game)) (*gizzmo.Game, bool, error) {
 
 	flag.Parse()
 
@@ -53,15 +53,15 @@ func Build(custom func(*gizmo.Game)) (*gizmo.Game, bool, error) {
 }
 
 func create(databasePath string, cmd *flagset.FlagSet,
-	custom func(*gizmo.Game),
-	memory bool, install bool) (game *gizmo.Game, err error) {
+	custom func(*gizzmo.Game),
+	memory bool, install bool) (game *gizzmo.Game, err error) {
 
 	fname := databasePath
 	if !memory {
 		fname = filepath.Join(databasePath, gameName)
 	}
 
-	data := gizmodb.NewGameData("sqlite3", fname)
+	data := gizzmodb.NewGameData("sqlite3", fname)
 	defer func() {
 		if data != nil {
 			data.Close()
@@ -83,7 +83,7 @@ func create(databasePath string, cmd *flagset.FlagSet,
 		captureFps   = 25
 	)
 
-	game = &gizmo.Game{}
+	game = &gizzmo.Game{}
 	game.NewGameSetup(screenWidth, screenHeight, fps)
 	data.Create(game.GetRecord(), &model.Version{Major: 0, Minor: 1})
 	if data.HasErrors() {

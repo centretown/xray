@@ -1,9 +1,9 @@
-package gizmodb
+package gizzmodb
 
 import (
 	"time"
 
-	"github.com/centretown/xray/gizmodb/model"
+	"github.com/centretown/xray/gizzmodb/model"
 )
 
 var SchemaGame = &Schema{

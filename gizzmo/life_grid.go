@@ -1,7 +1,7 @@
-package gizmo
+package gizzmo
 
 import (
-	"github.com/centretown/xray/gizmodb/model"
+	"github.com/centretown/xray/gizzmodb/model"
 )
 
 func NewLifeGridFromRecord(record *model.Record) model.Recorder {

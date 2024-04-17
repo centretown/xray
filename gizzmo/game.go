@@ -1,4 +1,4 @@
-package gizmo
+package gizzmo
 
 import (
 	"fmt"
@@ -7,12 +7,12 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/centretown/xray/gizmodb"
-	"github.com/centretown/xray/gizmodb/model"
+	"github.com/centretown/xray/gizzmodb"
+	"github.com/centretown/xray/gizzmodb/model"
 
 	"github.com/centretown/gpads/gpads"
 	"github.com/centretown/gpads/pad"
-	"github.com/centretown/xray/gizmo/class"
+	"github.com/centretown/xray/gizzmo/class"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -63,7 +63,7 @@ type GameItem struct {
 
 type Game struct {
 	model.RecorderG[GameItem]
-	data *gizmodb.Data
+	data *gizzmodb.Data
 }
 
 func NewGameFromRecord(record *model.Record) *Game {

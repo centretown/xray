@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/centretown/xray/gizmo"
+	"github.com/centretown/xray/gizzmo"
 )
 
 var (
@@ -43,7 +43,7 @@ func main() {
 		return
 	}
 
-	err = gizmo.LoadGame()
+	err = gizzmo.LoadGame()
 	if err != nil {
 		return
 	}
