@@ -20,10 +20,11 @@ const (
 )
 
 func (gs *Game) ProcessInput() {
-	gs.gamepad.BeginPad()
-	if gs.Current > gs.nextInput {
-		gs.nextInput = gs.Current + gs.InputInterval
-		for i := range gs.gamepad.GetPadCount() {
+	item := &gs.Content
+	item.gamepad.BeginPad()
+	if item.Current > item.nextInput {
+		item.nextInput = item.Current + item.InputInterval
+		for i := range item.gamepad.GetPadCount() {
 			gs.CheckPad(i)
 		}
 	}
@@ -35,62 +36,63 @@ func (gs *Game) ProcessInput() {
 		}
 	}
 
-	gs.FramesCounter++
+	item.FramesCounter++
 }
 
 func (gs *Game) CheckPad(i int32) {
+	item := &gs.Content
 	var multiply_by_ten, down bool
 	// gs.gamepad.GetPadButtonPressed()
 
 	for b := range PAD_STATES {
 		switch b {
 		case TIMES_TEN:
-			multiply_by_ten = gs.gamepad.IsGamepadButtonDown(i, gpads.RL_LeftTrigger1)
+			multiply_by_ten = item.gamepad.IsGamepadButtonDown(i, gpads.RL_LeftTrigger1)
 			// rl.GamepadButtonLeftTrigger1)
 
 		case FPS_INC:
-			if gs.gamepad.IsGamepadButtonDown(i, gpads.RL_LeftFaceUp) {
-				gs.FrameRate += check.AsOr[int32](multiply_by_ten, 10, 1)
-				rl.SetTargetFPS(gs.FrameRate)
+			if item.gamepad.IsGamepadButtonDown(i, gpads.RL_LeftFaceUp) {
+				item.FrameRate += check.AsOr[int32](multiply_by_ten, 10, 1)
+				rl.SetTargetFPS(item.FrameRate)
 			}
 		case FPS_DEC:
-			if gs.gamepad.IsGamepadButtonDown(i, gpads.RL_LeftFaceDown) {
-				gs.FrameRate -= check.AsOr[int32](multiply_by_ten, 10, 1)
-				if gs.FrameRate < 5 {
-					gs.FrameRate = 5
+			if item.gamepad.IsGamepadButtonDown(i, gpads.RL_LeftFaceDown) {
+				item.FrameRate -= check.AsOr[int32](multiply_by_ten, 10, 1)
+				if item.FrameRate < 5 {
+					item.FrameRate = 5
 				}
-				rl.SetTargetFPS(gs.FrameRate)
+				rl.SetTargetFPS(item.FrameRate)
 			}
 
 		case CAPTURE_COUNT_INC:
-			if gs.gamepad.IsGamepadButtonDown(i, gpads.RL_RightFaceUp) {
-				gs.captureStart += check.AsOr(multiply_by_ten, 10, 1)
+			if item.gamepad.IsGamepadButtonDown(i, gpads.RL_RightFaceUp) {
+				item.CaptureStart += check.AsOr(multiply_by_ten, 10, 1)
 			}
 		case CAPTURE_COUNT_DEC:
-			if gs.gamepad.IsGamepadButtonDown(i, gpads.RL_RightFaceDown) {
-				gs.captureStart -= check.AsOr(multiply_by_ten, 10, 1)
-				if gs.captureStart < 1 {
-					gs.captureStart = 1
+			if item.gamepad.IsGamepadButtonDown(i, gpads.RL_RightFaceDown) {
+				item.CaptureStart -= check.AsOr(multiply_by_ten, 10, 1)
+				if item.CaptureStart < 1 {
+					item.CaptureStart = 1
 				}
 			}
 
 		case CAPTURE_GIF:
-			down = gs.gamepad.IsGamepadButtonDown(i, gpads.RL_MiddleLeft)
-			if down && gs.Capturing {
+			down = item.gamepad.IsGamepadButtonDown(i, gpads.RL_MiddleLeft)
+			if down && item.Capturing {
 				gs.EndGIFCapture()
 			} else if down {
 				gs.BeginGIFCapture()
 			}
 
 		case CAPTURE_PNG:
-			if gs.gamepad.IsGamepadButtonDown(i, gpads.RL_MiddleRight) {
+			if item.gamepad.IsGamepadButtonDown(i, gpads.RL_MiddleRight) {
 				capture.CapturePNG("", rl.LoadImageFromScreen().ToImage())
 			}
 		case PAUSED:
-			if gs.gamepad.IsGamepadButtonDown(i, gpads.RL_RightFaceLeft) {
-				gs.Paused = !gs.Paused
-				if !gs.Paused {
-					gs.Refresh(gs.Current)
+			if item.gamepad.IsGamepadButtonDown(i, gpads.RL_RightFaceLeft) {
+				item.Paused = !item.Paused
+				if !item.Paused {
+					gs.Refresh(item.Current)
 				}
 			}
 

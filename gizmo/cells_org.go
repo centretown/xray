@@ -40,29 +40,29 @@ var _ Drawer = (*CellsOrg)(nil)
 var _ Inputer = (*CellsOrg)(nil)
 
 type CellsOrg struct {
-	CellItemsOrg
-	Record *model.Record
+	model.RecorderG[CellItemsOrg]
 }
 
-func NewCellsOrg(width, height, squareSize int32) *CellsOrg {
-
+func NewCellsOrgFromRecord(record *model.Record) *CellsOrg {
 	cs := &CellsOrg{}
-	cs.Height = height
-	cs.Width = width
-	cs.SquareSize = squareSize
-	cs.Cols = width / squareSize
-	cs.Rows = height / squareSize
-	cs.Colors = append(cs.Colors, gridColor, aliveColor, visitedColor)
-
-	cs.Record = model.NewRecord("cells",
-		int32(categories.CellsOrg), &cs.CellItemsOrg, model.JSON)
-	cs.setup = false
-	cs.start()
+	model.Decode(cs, record)
 	return cs
 }
 
-func (cs *CellsOrg) GetRecord() *model.Record { return cs.Record }
-func (cs *CellsOrg) GetItem() any             { return &cs.CellItemsOrg }
+func NewCellsOrg(width, height, squareSize int32) *CellsOrg {
+	cs := &CellsOrg{}
+	item := &cs.Content
+	item.Height = height
+	item.Width = width
+	item.SquareSize = squareSize
+	item.Cols = width / squareSize
+	item.Rows = height / squareSize
+	item.Colors = append(item.Colors, gridColor, aliveColor, visitedColor)
+	model.InitRecorder[CellItemsOrg](&cs.RecorderG, categories.CellsOrg.String(),
+		int32(categories.CellsOrg))
+	cs.start()
+	return cs
+}
 
 func (cs *CellsOrg) SetColors(aliveColor,
 	visitedColor,
@@ -70,94 +70,100 @@ func (cs *CellsOrg) SetColors(aliveColor,
 }
 
 func (cs *CellsOrg) start() {
-	cs.cells = make([][]*CellOrg, int(cs.Cols+1))
-	for x := int32(0); x <= cs.Cols; x++ {
-		cs.cells[x] = make([]*CellOrg, int(cs.Rows+1))
-		for y := int32(0); y <= cs.Rows; y++ {
-			cs.cells[x][y] = &CellOrg{}
+	item := &cs.Content
+	item.cells = make([][]*CellOrg, int(item.Cols+1))
+
+	for x := int32(0); x <= item.Cols; x++ {
+		item.cells[x] = make([]*CellOrg, int(item.Rows+1))
+		for y := int32(0); y <= item.Rows; y++ {
+			item.cells[x][y] = &CellOrg{}
 		}
 	}
 
 	cs.Init(true)
-	cs.setup = true
+	item.setup = true
 }
 
 func (cs *CellsOrg) Init(clear bool) {
-	for x := int32(0); x <= cs.Cols; x++ {
-		for y := int32(0); y <= cs.Rows; y++ {
-			*cs.cells[x][y] = CellOrg{}
+	item := &cs.Content
 
-			cs.cells[x][y].Position = rl.NewVector2(float32(x*cs.SquareSize),
-				float32(y*cs.SquareSize+1))
-			cs.cells[x][y].Size = rl.NewVector2(float32(cs.SquareSize-1),
-				float32(cs.SquareSize-1))
+	for x := int32(0); x <= item.Cols; x++ {
+		for y := int32(0); y <= item.Rows; y++ {
+			*item.cells[x][y] = CellOrg{}
+
+			item.cells[x][y].Position = rl.NewVector2(float32(x*item.SquareSize),
+				float32(y*item.SquareSize+1))
+			item.cells[x][y].Size = rl.NewVector2(float32(item.SquareSize-1),
+				float32(item.SquareSize-1))
 
 			if rand.Float64() < 0.1 && !clear {
-				cs.cells[x][y].Alive = true
+				item.cells[x][y].Alive = true
 			}
 		}
 	}
 }
 
-func (cs *CellsOrg) Refresh(float64, rl.RectangleInt32, ...func(any)) {}
-func (cs *CellsOrg) Bounds() rl.RectangleInt32 {
-	return rl.RectangleInt32{X: 0, Y: 0, Width: cs.Width, Height: cs.Height}
+func (cs *CellsOrg) Refresh(float64, rl.Vector4, ...func(any)) {}
+func (cs *CellsOrg) Bounds() rl.Rectangle {
+	return rl.Rectangle{X: 0, Y: 0, Width: float32(cs.Content.Width), Height: float32(cs.Content.Height)}
 }
 
 func (cs *CellsOrg) GetCells() [][]*CellOrg {
-	return cs.cells
+	return cs.Content.cells
 }
 
-func (cs *CellsOrg) Draw(v rl.Vector3) {
+func (cs *CellsOrg) Draw(v rl.Vector4) {
+	item := &cs.Content
 
-	if !cs.setup {
+	if !cs.Content.setup {
 		cs.start()
 	}
 
 	cs.Update()
 	// Draw cells
-	for x := int32(0); x <= cs.Cols; x++ {
-		for y := int32(0); y <= cs.Rows; y++ {
-			if cs.cells[x][y].Alive {
-				rl.DrawRectangleV(cs.cells[x][y].Position, cs.cells[x][y].Size,
+	for x := int32(0); x <= item.Cols; x++ {
+		for y := int32(0); y <= item.Rows; y++ {
+			if item.cells[x][y].Alive {
+				rl.DrawRectangleV(item.cells[x][y].Position, item.cells[x][y].Size,
 					aliveColor)
-			} else if cs.cells[x][y].Visited {
-				rl.DrawRectangleV(cs.cells[x][y].Position, cs.cells[x][y].Size,
+			} else if item.cells[x][y].Visited {
+				rl.DrawRectangleV(item.cells[x][y].Position, item.cells[x][y].Size,
 					visitedColor)
 			}
 		}
 	}
 
 	// Draw grid lines
-	for i := int32(0); i < cs.Cols+1; i++ {
+	for i := int32(0); i < item.Cols+1; i++ {
 		rl.DrawLineV(
-			rl.NewVector2(float32(cs.SquareSize*i), 0),
-			rl.NewVector2(float32(cs.SquareSize*i), float32(cs.Height)),
+			rl.NewVector2(float32(item.SquareSize*i), 0),
+			rl.NewVector2(float32(item.SquareSize*i), float32(item.Height)),
 			gridColor)
 	}
 
-	for i := int32(0); i < cs.Rows+1; i++ {
+	for i := int32(0); i < item.Rows+1; i++ {
 		rl.DrawLineV(
-			rl.NewVector2(0, float32(cs.SquareSize*i)),
-			rl.NewVector2(float32(cs.Width), float32(cs.SquareSize*i)),
+			rl.NewVector2(0, float32(item.SquareSize*i)),
+			rl.NewVector2(float32(item.Width), float32(item.SquareSize*i)),
 			gridColor)
 	}
 }
 
 func (cs *CellsOrg) CountNeighbors(x, y int32) int {
+	item := &cs.Content
 	count := 0
 
 	for i := int32(-1); i < 2; i++ {
 		for j := int32(-1); j < 2; j++ {
-			col := (x + i + (cs.Cols)) % (cs.Cols)
-			row := (y + j + (cs.Rows)) % (cs.Rows)
-			if cs.cells[col][row].Alive {
+			col := (x + i + (item.Cols)) % (item.Cols)
+			row := (y + j + (item.Rows)) % (item.Rows)
+			if item.cells[col][row].Alive {
 				count++
 			}
 		}
 	}
 
-	if cs.cells[x][y].Alive {
+	if item.cells[x][y].Alive {
 		count--
 	}
 
@@ -165,28 +171,29 @@ func (cs *CellsOrg) CountNeighbors(x, y int32) int {
 }
 
 func (cs *CellsOrg) Update() {
-	for i := int32(0); i <= cs.Cols; i++ {
-		for j := int32(0); j <= cs.Rows; j++ {
+	item := &cs.Content
+	for i := int32(0); i <= item.Cols; i++ {
+		for j := int32(0); j <= item.Rows; j++ {
 			NeighborCount := cs.CountNeighbors(i, j)
-			if cs.cells[i][j].Alive {
+			if item.cells[i][j].Alive {
 				if NeighborCount < 2 {
-					cs.cells[i][j].Next = false
+					item.cells[i][j].Next = false
 				} else if NeighborCount > 3 {
-					cs.cells[i][j].Next = false
+					item.cells[i][j].Next = false
 				} else {
-					cs.cells[i][j].Next = true
+					item.cells[i][j].Next = true
 				}
 			} else {
 				if NeighborCount == 3 {
-					cs.cells[i][j].Next = true
-					cs.cells[i][j].Visited = true
+					item.cells[i][j].Next = true
+					item.cells[i][j].Visited = true
 				}
 			}
 		}
 	}
-	for i := int32(0); i <= cs.Cols; i++ {
-		for j := int32(0); j < cs.Rows; j++ {
-			cs.cells[i][j].Alive = cs.cells[i][j].Next
+	for i := int32(0); i <= item.Cols; i++ {
+		for j := int32(0); j < item.Rows; j++ {
+			item.cells[i][j].Alive = item.cells[i][j].Next
 		}
 	}
 }
@@ -199,27 +206,28 @@ func (cs *CellsOrg) Input() {
 	if rl.IsKeyPressed(rl.KeyC) {
 		cs.Init(true)
 	}
-	if rl.IsKeyDown(rl.KeyRight) && !cs.Playing {
+	if rl.IsKeyDown(rl.KeyRight) && !cs.Content.Playing {
 		cs.Update()
 	}
 	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 		cs.Click(rl.GetMouseX(), rl.GetMouseY())
 	}
 	if rl.IsKeyPressed(rl.KeySpace) {
-		cs.Playing = !cs.Playing
+		cs.Content.Playing = !cs.Content.Playing
 	}
 
 }
 
 func (cs *CellsOrg) Click(x, y int32) {
-	for i := int32(0); i <= cs.Cols; i++ {
-		for j := int32(0); j <= cs.Rows; j++ {
-			cell := cs.cells[i][j].Position
-			if int32(cell.X) < x && int32(cell.X)+cs.SquareSize > x &&
-				int32(cell.Y) < y && int32(cell.Y)+cs.SquareSize > y {
+	item := &cs.Content
+	for i := int32(0); i <= item.Cols; i++ {
+		for j := int32(0); j <= item.Rows; j++ {
+			cell := item.cells[i][j].Position
+			if int32(cell.X) < x && int32(cell.X)+item.SquareSize > x &&
+				int32(cell.Y) < y && int32(cell.Y)+item.SquareSize > y {
 
-				cs.cells[i][j].Alive = !cs.cells[i][j].Alive
-				cs.cells[i][j].Next = cs.cells[i][j].Alive
+				item.cells[i][j].Alive = !item.cells[i][j].Alive
+				item.cells[i][j].Next = item.cells[i][j].Alive
 			}
 		}
 	}

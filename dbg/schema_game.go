@@ -28,7 +28,7 @@ PRIMARY KEY (item,itemn,major,minor));`,
 
 		`CREATE TABLE items (
 title VARCHAR(80) NOT NULL,
-category VARCHAR(16) NOT NULL,
+category INTEGER,
 content TEXT,
 major BIGINT, minor BIGINT,			
 origin BIGINT, originn BIGINT,

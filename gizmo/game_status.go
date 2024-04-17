@@ -16,6 +16,7 @@ const (
 )
 
 func (gs *Game) DrawStatus() {
+	item := &gs.Content
 	mb := gs.GetMessageBox()
 	rl.DrawLine(mb.X, mb.Y, mb.Width, mb.Y, color.RGBA{255, 0, 0, 255})
 
@@ -26,21 +27,21 @@ func (gs *Game) DrawStatus() {
 		monitor, rl.GetMonitorWidth(monitor),
 		rl.GetMonitorHeight(monitor), rl.GetMonitorRefreshRate(monitor),
 		rl.GetScreenWidth(), rl.GetScreenHeight(),
-		gs.captureStart)
+		item.CaptureStart)
 
 	yellow := color.RGBA{255, 255, 0, 255}
 	rl.DrawText(text, mb.X, mb.Y+mb.Height-38, 21, yellow)
 
-	if gs.Capturing {
-		rl.DrawText(fmt.Sprintf("Capturing... %4d", gs.CaptureCount),
+	if item.Capturing {
+		rl.DrawText(fmt.Sprintf("Capturing... %4d", item.CaptureCount),
 			mb.X, mb.Y+mb.Height-70, 21, yellow)
 	}
 }
 
 func (gs *Game) Refresh(current float64) {
 	viewPort := gs.SetViewPortFromWindow()
-	for _, run := range gs.actors {
-		run.Refresh(current, viewPort)
+	for _, run := range gs.Content.movers {
+		run.Refresh(current, rl.Vector4{X: float32(viewPort.Width), Y: float32(viewPort.Height)})
 	}
 }
 
@@ -50,8 +51,8 @@ func (gs *Game) SetViewPortFromWindow() rl.RectangleInt32 {
 }
 
 func (gs *Game) SetViewPort(rw, rh int32) rl.RectangleInt32 {
-	gs.Width = rw
-	gs.Height = rh
+	gs.Content.Width = rw
+	gs.Content.Height = rh
 	return gs.GetViewPort()
 }
 
@@ -59,8 +60,8 @@ func (gs *Game) GetViewPort() rl.RectangleInt32 {
 	return rl.RectangleInt32{
 		X:      0,
 		Y:      0,
-		Width:  gs.Width,
-		Height: gs.Height - msg_height,
+		Width:  gs.Content.Width,
+		Height: gs.Content.Height - msg_height,
 	}
 }
 

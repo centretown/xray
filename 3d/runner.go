@@ -36,9 +36,10 @@ func (runr *Runner) Refresh(current float64) {
 
 	viewPort := rl.RectangleInt32{X: 0, Y: 0, Width: int32(rl.GetRenderWidth()),
 		Height: int32(rl.GetRenderHeight())}
+	vp := viewPort.ToFloat32()
 
 	for _, mover := range runr.Actors {
-		mover.Refresh(current, viewPort)
+		mover.Refresh(current, rl.Vector4{X: vp.X, Y: vp.Y})
 	}
 }
 

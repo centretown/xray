@@ -10,16 +10,14 @@ import (
 var _ = rand.NewSource(time.Now().UnixMicro())
 
 func (gs *Game) Run() {
-	gs.FixedPalette = append(gs.FixedPalette, gs.BackGround)
-
+	content := &gs.Content
+	content.FixedPalette = append(content.FixedPalette, content.BackGround)
 	gs.createPalette()
-
-	rl.SetTraceLogLevel(rl.LogWarning)
-	rl.InitWindow(gs.Width, gs.Height, gs.Record.Title)
-
+	rl.InitWindow(content.Width, content.Height, gs.Record.Title)
 	for _, txt := range gs.listTextures() {
 		txt.Load()
 	}
+	rl.SetTraceLogLevel(rl.LogWarning)
 
 	defer func() {
 		for _, actor := range gs.Actors() {
@@ -37,31 +35,31 @@ func (gs *Game) Run() {
 		rl.CloseWindow()
 	}()
 
-	if !gs.FixedSize {
+	if !content.FixedSize {
 		rl.SetWindowState(rl.FlagWindowResizable)
 	}
-	rl.SetTargetFPS(gs.FrameRate)
-	gs.Current = rl.GetTime()
-	gs.Refresh(gs.Current)
+	rl.SetTargetFPS(content.FrameRate)
+	content.Current = rl.GetTime()
+	gs.Refresh(content.Current)
 
 	for !rl.WindowShouldClose() {
 
-		gs.Current = rl.GetTime()
+		content.Current = rl.GetTime()
 
 		if rl.IsWindowResized() {
-			gs.Refresh(gs.Current)
+			gs.Refresh(content.Current)
 		}
 
 		rl.BeginDrawing()
 
-		rl.ClearBackground(gs.BackGround)
+		rl.ClearBackground(content.BackGround)
 
 		for _, dr := range gs.Drawers() {
-			dr.Draw(rl.Vector3{X: 0, Y: 0, Z: 0})
+			dr.Draw(rl.Vector4{X: 0, Y: 0, Z: 0})
 		}
 
 		for _, actor := range gs.Actors() {
-			actor.Move(!gs.Paused, gs.Current)
+			actor.Move(!content.Paused, content.Current)
 		}
 
 		gs.DrawStatus()
@@ -70,7 +68,7 @@ func (gs *Game) Run() {
 
 		gs.ProcessInput()
 
-		if gs.Capturing {
+		if content.Capturing {
 			gs.gifCapture()
 		}
 	}

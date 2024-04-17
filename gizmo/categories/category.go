@@ -5,14 +5,15 @@ type Category int32
 type NotFound struct{}
 
 const (
-	Texture Category = iota
-	Circle
-	CellsOrg
-	Mover
+	Unknown Category = iota
 	Game
-	NumberMoveri8
-	NumberGridi8
+	Ellipse
+	Texture
+	Tracker
+	LifeMover
+	LifeGrid
 	Player
+	CellsOrg
 	COUNT
 )
 

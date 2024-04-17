@@ -19,47 +19,48 @@ const (
 )
 
 type GridMoverItem[T check.NumberType] struct {
-	Rectangle  rl.RectangleInt32
+	Rectangle  rl.Rectangle
 	PixelRateX float64
 	Playing    bool
 	drawer     *NumberGrid[T]
 }
 
 type GridMover[T check.NumberType] struct {
-	GridMoverItem[T]
-	Record *model.Record
+	model.RecorderG[GridMoverItem[T]]
 }
 
-func NewGridMover[T check.NumberType](bounds rl.RectangleInt32, pixelRateX float64) *GridMover[T] {
+func NewGridMover[T check.NumberType](bounds rl.Rectangle, pixelRateX float64) *GridMover[T] {
 	mv := &GridMover[T]{}
 	var _ model.Parent = mv
 	var _ Mover = mv
 	var _ Inputer = mv
 
-	mv.Rectangle = bounds
-	mv.PixelRateX = pixelRateX
-	mv.Record = model.NewRecord("cellsmover", int32(categories.NumberMoveri8), &mv.GridMoverItem, model.JSON)
+	mv.Content.Rectangle = bounds
+	mv.Content.PixelRateX = pixelRateX
+	model.InitRecorder[GridMover[T]](mv, categories.LifeMover.String(),
+		int32(categories.LifeMover))
 	return mv
 }
 
-func (cm *GridMover[T]) GetDrawer() Drawer        { return cm.drawer }
-func (cm *GridMover[T]) GetRecord() *model.Record { return cm.Record }
-func (cm *GridMover[T]) GetItem() any             { return &cm.GridMoverItem }
+func (cm *GridMover[T]) GetDrawer() Drawer    { return cm.Content.drawer }
+func (cm *GridMover[T]) Bounds() rl.Rectangle { return cm.Content.Rectangle }
+func (cm *GridMover[T]) Draw(v rl.Vector4)    { cm.Content.drawer.Draw(v) }
 
-func (cm *GridMover[T]) LinkChildren(recs ...*model.Record) {
-	// log.Println("MAKELINK", len(recs))
-	err := MakeLink(cm.AddDrawer, 1, 1, recs...)
-	if err != nil {
-		log.Fatal(err)
+func (cm *GridMover[T]) LinkChild(recorder model.Recorder) {
+	dr, ok := recorder.(*NumberGrid[T])
+	if ok {
+		cm.AddDrawer(dr)
+	} else {
+		log.Fatal(fmt.Errorf("GridMoverLinkChildren: not a NumberGrid"))
 	}
 }
 
 func (cm *GridMover[T]) Children() []model.Recorder {
-	return []model.Recorder{cm.drawer}
+	return []model.Recorder{cm.Content.drawer}
 }
 
 func (cm *GridMover[T]) AddDrawer(dr *NumberGrid[T]) {
-	cm.drawer = dr
+	cm.Content.drawer = dr
 }
 
 func doMod(a, b int32) int32 {
@@ -68,14 +69,14 @@ func doMod(a, b int32) int32 {
 
 func (cs *GridMover[T]) CountNeighbors(cellX, cellY int32) int {
 	count := 0
-	dr := cs.drawer
+	dr := cs.Content.drawer
 	cells := dr.GetCells()
 
 	//-1..1
 	for y := int32(-1); y < 2; y++ {
 		//-1..1
 		for x := int32(-1); x < 2; x++ {
-			nx, ny := doMod(cellX+x, dr.Cols), doMod(cellY+y, dr.Rows)
+			nx, ny := doMod(cellX+x, dr.Content.Cols), doMod(cellY+y, dr.Content.Rows)
 			neigh := cells[nx][ny]
 			if neigh.Get(Alive) != T(0) {
 				count++
@@ -90,9 +91,9 @@ func (cs *GridMover[T]) CountNeighbors(cellX, cellY int32) int {
 	return count
 }
 
-func (cm *GridMover[T]) Refresh(now float64, rect rl.RectangleInt32, f ...func(any)) {
-	cm.Rectangle = rect
-	dr := cm.drawer
+func (cm *GridMover[T]) Refresh(now float64, v rl.Vector4, f ...func(any)) {
+	cm.Content.Rectangle = rl.Rectangle{Width: v.X, Height: v.Y}
+	dr := cm.Content.drawer
 	if dr == nil {
 		log.Fatalln("nil drawer")
 	}
@@ -111,24 +112,26 @@ func (cm *GridMover[T]) init(clear bool) {
 		}
 	}
 
-	cm.drawer.Refresh(0, cm.Rectangle, f)
+	cm.Content.drawer.Refresh(0, rl.Vector4{
+		X: cm.Content.Rectangle.X,
+		Y: cm.Content.Rectangle.Y}, f)
 }
 
 func (cm *GridMover[T]) Move(can_move bool, now float64) {
 	if can_move {
 		cm.Update()
 	}
-	cm.drawer.Draw(rl.Vector3{X: float32(cm.Rectangle.X),
-		Y: float32(cm.Rectangle.Y),
+	cm.Content.drawer.Draw(rl.Vector4{X: float32(cm.Content.Rectangle.X),
+		Y: float32(cm.Content.Rectangle.Y),
 		Z: 0})
 }
 
 func (cm *GridMover[T]) Update() {
-	dr := cm.drawer
+	dr := cm.Content.drawer
 	cells := dr.GetCells()
 
-	for i := int32(0); i < dr.Cols; i++ {
-		for j := int32(0); j < dr.Rows; j++ {
+	for i := int32(0); i < dr.Content.Cols; i++ {
+		for j := int32(0); j < dr.Content.Rows; j++ {
 			neighbors := cm.CountNeighbors(i, j)
 
 			cell := cells[i][j]
@@ -149,8 +152,8 @@ func (cm *GridMover[T]) Update() {
 			// cell.Set(Alive, v)
 		}
 	}
-	for i := int32(0); i <= dr.Cols; i++ {
-		for j := int32(0); j < dr.Rows; j++ {
+	for i := int32(0); i <= dr.Content.Cols; i++ {
+		for j := int32(0); j < dr.Content.Rows; j++ {
 			cell := cells[i][j]
 			v := cell.Get(Next)
 			cell.Set(Alive, v)
@@ -170,16 +173,16 @@ func (cm *GridMover[T]) Input() {
 		fmt.Println("R pressed")
 		cm.init(true)
 	}
-	if rl.IsKeyDown(rl.KeyRight) && !cm.Playing {
-		fmt.Println("KeyRight pressed", cm.Playing)
+	if rl.IsKeyDown(rl.KeyRight) && !cm.Content.Playing {
+		fmt.Println("KeyRight pressed", cm.Content.Playing)
 		cm.Update()
 	}
 	if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 		cm.Click(rl.GetMouseX(), rl.GetMouseY())
 	}
 	if rl.IsKeyPressed(rl.KeySpace) {
-		cm.Playing = !cm.Playing
-		fmt.Println("cm.Playing", cm.Playing)
+		cm.Content.Playing = !cm.Content.Playing
+		fmt.Println("cm.Playing", cm.Content.Playing)
 	}
 
 }
@@ -187,7 +190,7 @@ func (cm *GridMover[T]) Input() {
 func (cm *GridMover[T]) Click(clickX, clickY int32) {
 	var (
 		value, x, y, cx, cy int32
-		dr                  = cm.drawer
+		dr                  = cm.Content.drawer
 		cells               = dr.GetCells()
 		ix, iy              = dr.PositionToCell(clickX, clickY)
 	)
@@ -196,8 +199,8 @@ func (cm *GridMover[T]) Click(clickX, clickY int32) {
 
 		for cx = ix - 1; cx < ix+2; cx++ {
 
-			x = (dr.Cols + cx) % dr.Cols
-			y = (dr.Rows + cy) % dr.Rows
+			x = (dr.Content.Cols + cx) % dr.Content.Cols
+			y = (dr.Content.Rows + cy) % dr.Content.Rows
 
 			cell := cells[x][y]
 			value = int32(cell.Get(Alive))

@@ -1,6 +1,7 @@
 package gizmo
 
 import (
+	"fmt"
 	"image/color"
 	"time"
 
@@ -11,27 +12,20 @@ import (
 )
 
 type NumberGridItem[T check.NumberType] struct {
-	Cols       int32
-	Rows       int32
-	CellWidth  int32
-	CellHeight int32
-	Start      time.Time
-	Duration   time.Duration
-	Colors     []color.RGBA
+	Cols            int32
+	Rows            int32
+	CellWidth       int32
+	CellHeight      int32
+	Start           time.Time
+	Duration        time.Duration
+	HorizontalColor color.RGBA
+	VerticalColor   color.RGBA
+	StateColors     []color.RGBA
 
 	StateCount int
 	cells      [][]*NumberCell[T]
-	bounds     rl.RectangleInt32
+	bounds     rl.Rectangle
 }
-
-const (
-	CellColorLineHorizontal = iota
-	CellColorLineVertical
-	CellColorOff
-	CellColorOn
-	CellColorMinimum
-	CellColorState = CellColorOn
-)
 
 var (
 	gridColors = []color.RGBA{
@@ -44,55 +38,49 @@ var (
 )
 
 type NumberGrid[T check.NumberType] struct {
-	NumberGridItem[T]
-	Record *model.Record
+	model.RecorderG[NumberGridItem[T]]
 }
 
-func NewGrid[T check.NumberType](bounds rl.RectangleInt32,
-	columns, rows int32,
+func NewGrid[T check.NumberType](bounds rl.Rectangle,
+	columns, rows int32, horizontalColor color.RGBA, verticalColor color.RGBA,
 	colors ...color.RGBA) *NumberGrid[T] {
 
 	cs := &NumberGrid[T]{}
 	var _ Drawer = cs
 
-	cs.bounds = bounds
-	cs.Cols = columns
-	cs.Rows = rows
-	cs.CellWidth = cs.bounds.Width / columns
-	cs.CellHeight = cs.bounds.Height / rows
+	item := &cs.Content
+	item.bounds = bounds
+	item.Cols = int32(columns)
+	item.Rows = int32(rows)
+	item.CellWidth = int32(item.bounds.Width / float32(columns))
+	item.CellHeight = int32(item.bounds.Height / float32(rows))
+	item.HorizontalColor = horizontalColor
+	item.VerticalColor = verticalColor
+	item.StateColors = colors
+	item.StateCount = len(item.StateColors)
 
-	l := len(colors)
-	if l < colorMin {
-		cs.Colors = gridColors[l:]
-		cs.Colors = append(cs.Colors, colors...)
-	} else {
-		cs.Colors = colors
-	}
-
-	cs.StateCount = len(cs.Colors) - int(CellColorState)
 	cs.SetupCells()
-	cs.Record = model.NewRecord("generic_grid",
-		int32(categories.NumberGridi8), &cs.NumberGridItem, model.JSON)
-
+	model.InitRecorder[NumberGrid[T]](cs, categories.LifeGrid.String(),
+		int32(categories.LifeGrid))
 	return cs
 }
 
-func (cs *NumberGrid[T]) GetRecord() *model.Record { return cs.Record }
-func (cs *NumberGrid[T]) GetItem() any             { return &cs.NumberGridItem }
-func (cs *NumberGrid[T]) Refresh(now float64, rect rl.RectangleInt32, funcs ...func(any)) {
-	if cs.cells == nil {
+func (cs *NumberGrid[T]) Refresh(now float64, v rl.Vector4, funcs ...func(any)) {
+	item := &cs.Content
+	if item.cells == nil {
 		cs.SetupCells()
 	}
-	cs.bounds = rect
-	cs.CellWidth = rect.Width / cs.Cols
-	cs.CellHeight = rect.Height / cs.Rows
+	item.bounds = rl.NewRectangle(0, 0, v.X, v.Y)
+	item.CellWidth = int32(v.X / float32(item.Cols))
+	item.CellHeight = int32(v.Y / float32(item.Rows))
+
 	if len(funcs) < 1 {
 		return
 	}
 
 	cells := cs.GetCells()
-	for y := int32(0); y <= cs.Rows; y++ {
-		for x := int32(0); x <= cs.Cols; x++ {
+	for y := int32(0); y <= item.Rows; y++ {
+		for x := int32(0); x <= item.Cols; x++ {
 			for _, f := range funcs {
 				f(cells[x][y])
 			}
@@ -100,66 +88,64 @@ func (cs *NumberGrid[T]) Refresh(now float64, rect rl.RectangleInt32, funcs ...f
 	}
 }
 
-func (cs *NumberGrid[T]) SetColors(aliveColor,
-	visitedColor,
-	gridColor color.RGBA) {
-}
-
 func (cs *NumberGrid[T]) SetupCells() {
-	cs.cells = make([][]*NumberCell[T], int(cs.Cols+1))
-	for x := int32(0); x <= cs.Cols; x++ {
-		cs.cells[x] = make([]*NumberCell[T], int(cs.Rows+1))
-		for y := int32(0); y <= cs.Rows; y++ {
-			cs.cells[x][y] = NewNumberCell[T](cs.StateCount)
+	fmt.Println("SETUP CELLS")
+	item := &cs.Content
+	item.cells = make([][]*NumberCell[T], int(item.Cols+1))
+	for x := int32(0); x <= item.Cols; x++ {
+		item.cells[x] = make([]*NumberCell[T], int(item.Rows+1))
+		for y := int32(0); y <= item.Rows; y++ {
+			item.cells[x][y] = NewNumberCell[T](item.StateCount)
 		}
 	}
 }
 
 func (cs *NumberGrid[T]) GetCells() [][]*NumberCell[T] {
-	return cs.cells
+	return cs.Content.cells
 }
 
 func (cs *NumberGrid[T]) Position(x, y int32) (int32, int32) {
-	return cs.bounds.X + x*cs.CellWidth, cs.bounds.Y + y*cs.CellHeight
+	item := &cs.Content
+	return int32(item.bounds.X) + x*item.CellWidth, int32(item.bounds.Y) + y*item.CellHeight
 }
 
 func (cs *NumberGrid[T]) PositionToCell(posX, posY int32) (x, y int32) {
-	return posX / cs.CellWidth, posY / cs.CellHeight
+	return posX / cs.Content.CellWidth, posY / cs.Content.CellHeight
 }
 
 func (cs *NumberGrid[T]) getCell(x, y int32) *NumberCell[T] {
-	return cs.cells[x][y]
+	return cs.Content.cells[x][y]
 }
 
-func (cs *NumberGrid[T]) Draw(rl.Vector3) {
+func (cs *NumberGrid[T]) Draw(rl.Vector4) {
 	var clr color.RGBA
-
-	for y := range cs.Rows {
-		for x := range cs.Cols {
+	item := &cs.Content
+	for y := range item.Rows {
+		for x := range item.Cols {
 			cell := cs.getCell(x, y)
 			clr = Black
 			for s := range cell.States {
-				clr = cs.Colors[CellColorOff+int(cell.Get(int32(s)))]
+				clr = item.StateColors[int(cell.Get(int32(s)))]
 			}
 			// clr = cs.Colors[CellColorOff+int(cell.Get(x))]
 			posX, posY := cs.Position(x, y)
-			rl.DrawRectangle(posX, posY, cs.CellWidth, cs.CellHeight, clr)
+			rl.DrawRectangle(posX, posY, item.CellWidth, item.CellHeight, clr)
 		}
 	}
 
-	for x := range cs.Cols {
+	for x := range item.Cols {
 		fromX, fromY := cs.Position(x, 0)
-		toX, toY := cs.Position(x, cs.Rows)
-		rl.DrawLine(fromX, fromY, toX, toY, cs.Colors[CellColorLineVertical])
+		toX, toY := cs.Position(x, item.Rows)
+		rl.DrawLine(fromX, fromY, toX, toY, item.VerticalColor)
 	}
 
-	for y := range cs.Rows {
+	for y := range item.Rows {
 		fromX, fromY := cs.Position(0, y)
-		toX, toY := cs.Position(cs.Cols, y)
-		rl.DrawLine(fromX, fromY, toX, toY, cs.Colors[CellColorLineHorizontal])
+		toX, toY := cs.Position(item.Cols, y)
+		rl.DrawLine(fromX, fromY, toX, toY, item.HorizontalColor)
 	}
 }
 
-func (cs *NumberGrid[T]) Bounds() rl.RectangleInt32 {
-	return cs.bounds
+func (cs *NumberGrid[T]) Bounds() rl.Rectangle {
+	return cs.Content.bounds
 }

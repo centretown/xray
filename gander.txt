@@ -1,0 +1,19 @@
+LoadGameKey -2648257431265398654 -1910710782829949439
+MakeLink {Game 1 {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250} JSON -1910710782829949439 -2648257431265398654 -4577969489486443007 1939962301497306302 2024-04-16 21:08:00.33092897 -0400 -0400 2024-04-16 21:08:00.330929104 -0400 -0400}
+Decode RECORD.CONTENT
+ {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250} {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250}
+6
+GameLinkChildren Game
+ {{{Game 1 {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250} JSON -1910710782829949439 -2648257431265398654 -4577969489486443007 1939962301497306302 2024-04-16 21:08:00.33092897 -0400 -0400 2024-04-16 21:08:00.330929104 -0400 -0400} {0 0 1600 800 30 0.2 0 false 0 0 false false false [] {0 0 0 255} [] map[] 0 4 250 0 <nil> <nil> [] [] [] <nil>}} 0xc0003784b0}
+GameLinkChildren Game Record
+ {Game 1 {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250} JSON -1910710782829949439 -2648257431265398654 -4577969489486443007 1939962301497306302 2024-04-16 21:08:00.33092897 -0400 -0400 2024-04-16 21:08:00.330929104 -0400 -0400}
+GameLinkChildren Game Records
+ 6
+
+
+GameLinkChildren Child Record
+MakeLink {Game 1 {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250} JSON -1910710782829949439 -2648257431265398654 -4577969489486443007 1939962301497306302 2024-04-16 21:08:00.33092897 -0400 -0400 2024-04-16 21:08:00.330929104 -0400 -0400}
+Decode RECORD.CONTENT
+ {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250} {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250}
+
+

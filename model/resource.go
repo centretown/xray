@@ -23,18 +23,17 @@ type Resource struct {
 	Err    error `json:"-"`
 }
 
-func NewFileResource(path string, category int32, content any) (res *Resource) {
+func InitResource(res *Resource, path string, category int32) {
 	var (
 		info fs.FileInfo
 		err  error
-		errp = &err
 	)
 
-	res = &Resource{}
+	res.Path = path
 	res.Scheme = File
 
 	defer func() {
-		res.Err = *errp
+		res.Err = err
 	}()
 
 	// path = filepath.Clean(path)
@@ -45,7 +44,6 @@ func NewFileResource(path string, category int32, content any) (res *Resource) {
 		res.Width, res.Height = GetDimensions(path, ext)
 	}
 
-	res.Path = path
 	info, err = os.Stat(path)
 
 	if err == nil {
@@ -53,8 +51,6 @@ func NewFileResource(path string, category int32, content any) (res *Resource) {
 		res.Size = info.Size()
 		res.IsDir = info.IsDir()
 	}
-
-	return
 }
 
 func GetDimensions(path, ext string) (width int32, height int32) {

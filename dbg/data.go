@@ -7,7 +7,6 @@ import (
 
 	"github.com/centretown/xray/access"
 	"github.com/centretown/xray/model"
-	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
@@ -21,12 +20,13 @@ type Data struct {
 }
 
 func NewGameData(driver, path string) *Data {
-	return &Data{Schema: SchemaGame,
+	data := &Data{Schema: SchemaGame,
 		Keys: access.NewDataKeys(driver, path)}
-}
 
-func (data *Data) Open() *Data {
 	data.dbx, data.Err = sqlx.Connect(data.Keys.Driver, data.Keys.Path)
+	if data.HasErrors() {
+		log.Fatal(data.Err)
+	}
 	return data
 }
 
@@ -110,29 +110,9 @@ func (data *Data) InsertLinks(links ...*model.Link) {
 	}
 }
 
-func (data *Data) GetItemID(id string) *model.Record {
-	var uid uuid.UUID
-	uid, data.Err = uuid.Parse((id))
-	if data.HasErrors() {
-		return &model.Record{}
-	}
-	return data.GetItemUUID(uid)
-}
-
-func (data *Data) GetItemUUID(uid uuid.UUID) *model.Record {
-	major, minor := model.RecordID(uid)
-	return data.GetItem(major, minor)
-}
-
-func (data *Data) GetItemRecord(item model.Recorder) *model.Record {
-	rec := item.GetRecord()
-	return data.GetItem(rec.Major, rec.Minor)
-}
-
-func (data *Data) GetItem(major, minor int64) *model.Record {
-	item := &model.Record{}
-	data.Err = data.dbx.Get(item, data.Schema.GetItem, major, minor)
-	return item
+func (data *Data) GetRecord(record *model.Record) {
+	data.Err = data.dbx.Get(record, data.Schema.GetItem,
+		record.Major, record.Minor)
 }
 
 func (data *Data) GetVersion(version *model.Version) *model.Version {
@@ -147,74 +127,16 @@ func (data *Data) GetVersions() error {
 	return data.Err
 }
 
-func (data *Data) GetLinks(rec *model.Record) (recs []*model.Record) {
-	recs = make([]*model.Record, 0)
-	var (
-		rows  *sqlx.Rows
-		links = make([]*model.Link, 0)
-	)
-
-	rows, data.Err = data.dbx.Queryx(data.Schema.GetLinks, rec.Major, rec.Minor)
-	if data.HasErrors() {
-		return
-	}
-
-	for rows.Next() {
-		link := &model.Link{}
-		data.Err = rows.StructScan(link)
-		if data.HasErrors() {
-			return
-		}
-		links = append(links, link)
-	}
-
-	for _, l := range links {
-		rec = data.GetItem(l.Linked, l.Linkedn)
-		if data.HasErrors() {
-			return
-		}
-		recs = append(recs, rec)
-	}
-	return
-}
-
-func (data *Data) Load(item model.Recorder) {
-	data.Err = model.Decode(item)
-	if data.HasErrors() {
-		return
-	}
-
-	linker, isLinker := item.(model.Parent)
-	if isLinker {
-		data.addLinks(linker)
-	}
-}
-
-func (data *Data) addLinks(item model.Parent) {
-	linkRecs := data.GetLinks(item.GetRecord())
-	if data.HasErrors() {
-		return
-	}
-
-	item.LinkChildren(linkRecs...)
-
-	for _, child := range item.Children() {
-		linker, isLinker := child.(model.Parent)
-		if isLinker {
-			data.addLinks(linker)
-		}
-	}
-}
-
 func (data *Data) Save(rec model.Recorder) {
 	data.InsertItems(rec)
+
 	if !data.HasErrors() {
-		linker, isLinker := rec.(model.Parent)
-		if isLinker {
-			list, links := data.addLists(linker)
-			log.Println(list)
+		parent, isParent := rec.(model.Parent)
+		if isParent {
+			children, links := data.getChildLinks(parent)
+			log.Println(children)
 			log.Println(links)
-			data.InsertItems(list...)
+			data.InsertItems(children...)
 			if data.HasErrors() {
 				return
 			}
@@ -226,21 +148,49 @@ func (data *Data) Save(rec model.Recorder) {
 	}
 }
 
-func (data *Data) addLists(parent model.Parent) (list []model.Recorder, links []*model.Link) {
-	children := len(parent.Children())
-	list = make([]model.Recorder, 0, children)
-	list = append(list, parent.Children()...)
-	links = make([]*model.Link, 0, children)
+func (data *Data) getChildLinks(parent model.Parent) (children []model.Recorder, links []*model.Link) {
+	count := len(parent.Children())
+	children = make([]model.Recorder, 0, count)
+	children = append(children, parent.Children()...)
+	links = make([]*model.Link, 0, count)
 
 	for _, item := range parent.Children() {
 		link := model.NewLink(parent, item, 1, 1)
 		links = append(links, link)
 		linker, isLinker := item.(model.Parent)
 		if isLinker {
-			r, l := data.addLists(linker)
-			list = append(list, r...)
+			r, l := data.getChildLinks(linker)
+			children = append(children, r...)
 			links = append(links, l...)
 		}
 	}
+	return
+}
+
+func (data *Data) LoadLinks(record *model.Record) (records []*model.Record) {
+
+	records = make([]*model.Record, 0)
+
+	var rows *sqlx.Rows
+
+	rows, data.Err = data.dbx.Queryx(data.Schema.GetLinks, record.Major, record.Minor)
+	if data.HasErrors() {
+		return
+	}
+
+	for rows.Next() {
+		link := &model.Link{}
+		data.Err = rows.StructScan(link)
+		if data.HasErrors() {
+			return
+		}
+		rec := &model.Record{Major: link.Linked, Minor: link.Linkedn}
+		data.GetRecord(record)
+		if data.HasErrors() {
+			return
+		}
+		records = append(records, rec)
+	}
+
 	return
 }

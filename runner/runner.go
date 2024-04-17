@@ -24,7 +24,6 @@ func main() {
 		selection    = flag.Arg(1)
 		runDirectory string
 		err          error
-		game         *gizmo.Game
 	)
 
 	defer func() {
@@ -44,10 +43,8 @@ func main() {
 		return
 	}
 
-	game, err = gizmo.LoadGameKey("")
+	err = gizmo.LoadGame()
 	if err != nil {
 		return
 	}
-
-	game.Run()
 }

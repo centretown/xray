@@ -9,53 +9,57 @@ import (
 )
 
 func (gs *Game) CanCapture() bool {
-	canCapture := gs.Current >= gs.previousCapture+gs.CaptureInterval
+	item := &gs.Content
+	canCapture := item.Current >= item.previousCapture+item.CaptureInterval
 	moveFloat := check.As[float64](canCapture)
-	gs.previousCapture = moveFloat*gs.CaptureInterval + moveFloat*gs.Current
+	item.previousCapture = moveFloat*item.CaptureInterval + moveFloat*item.Current
 	return canCapture
 }
 
 func (gs *Game) BeginGIFCapture() {
-	if gs.Capturing {
+	item := &gs.Content
+	if item.Capturing {
 		log.Println("already capturing...")
 		return
 	}
-	gs.CaptureCount = gs.captureStart
-	gs.Capturing = true
+	item.CaptureCount = item.CaptureStart
+	item.Capturing = true
 
 	fps := rl.GetFPS()
 	if fps >= 50 {
 		rl.SetTargetFPS(50)
-		gs.captureDelay = 2
+		item.CaptureDelay = 2
 	} else {
 		rl.SetTargetFPS(25)
-		gs.captureDelay = 4
+		item.CaptureDelay = 4
 	}
 
-	go capture.CaptureGIF("", gs.stopChan, gs.scrChan, gs.palette,
-		gs.captureDelay, gs.colorMap)
+	go capture.CaptureGIF("", item.stopChan, item.scrChan, item.palette,
+		item.CaptureDelay, item.colorMap)
 }
 
 func (gs *Game) gifCapture() {
-	if !gs.Capturing {
+	item := &gs.Content
+	if !item.Capturing {
 		log.Println("not supposed to capture")
 		return
 	}
 
-	gs.scrChan <- rl.LoadImageFromScreen().ToImage()
-	gs.CaptureCount--
-	if gs.CaptureCount < 0 {
+	item.scrChan <- rl.LoadImageFromScreen().ToImage()
+	item.CaptureCount--
+	if item.CaptureCount < 0 {
 		gs.EndGIFCapture()
 	}
 }
 
 func (gs *Game) EndGIFCapture() {
-	if !gs.Capturing {
+	item := &gs.Content
+	if !item.Capturing {
 		log.Println("nothing to end. not capturing!")
 		return
 	}
 	log.Println("end capturing!")
-	gs.CaptureCount = -1
-	gs.Capturing = false
-	gs.stopChan <- 1
+	item.CaptureCount = -1
+	item.Capturing = false
+	item.stopChan <- 1
 }

@@ -1,6 +1,9 @@
 package gizmo
 
 import (
+	"fmt"
+	"image/color"
+
 	"github.com/centretown/xray/gizmo/categories"
 	"github.com/centretown/xray/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -10,49 +13,59 @@ var _ Drawer = (*Texture)(nil)
 var _ model.Recorder = (*Texture)(nil)
 
 type TextureItem struct {
-	Resource  *model.Resource
+	Resource  model.Resource
 	texture2D rl.Texture2D
 }
 
 type Texture struct {
-	TextureItem
-	Record *model.Record
+	Shape[TextureItem]
 }
 
-func NewTexture(path string) (tex *Texture) {
+func NewTextureFromRecord(record *model.Record) (tex *Texture) {
 	tex = &Texture{}
-	tex.Resource = model.NewFileResource(path, int32(categories.Texture), &tex.TextureItem)
-	tex.Record = model.NewRecord("texture",
-		int32(categories.Texture), &tex.TextureItem, model.JSON)
+	ShapeFromRecord(&tex.Shape, record)
+	model.InitResource(&tex.Content.Custom.Resource,
+		tex.Content.Custom.Resource.Path, int32(categories.Texture))
 	return tex
 }
 
-func (tex *Texture) GetRecord() *model.Record { return tex.Record }
-func (tex *Texture) GetItem() any             { return &tex.TextureItem }
+func NewTexture(path string) *Texture {
+	tex := &Texture{}
+	InitShape[TextureItem](&tex.Shape, categories.Texture.String(), int32(categories.Texture),
+		color.RGBA{}, 0, 0)
+	model.InitResource(&tex.Content.Custom.Resource, path, int32(categories.Texture))
+	var _ Drawer = tex
+
+	return tex
+}
 
 func (tex *Texture) Load() *Texture {
-	if tex.Resource != nil && tex.Resource.Err == nil {
-		tex.texture2D = rl.LoadTexture(tex.Resource.Path)
+	fmt.Println("LOAD TEXTURE")
+	res := &tex.Content.Custom.Resource
+
+	// if !tex.initialized {
+	// 	model.InitResource(res,
+	// 		res.Path, int32(categories.Texture))
+	// 	tex.initialized = true
+	// }
+
+	if res.Err == nil {
+		tex.Content.Custom.texture2D = rl.LoadTexture(tex.Content.Custom.Resource.Path)
+		fmt.Println("TEXTURE LOADed")
 	}
 	return tex
 }
 
-func (tex *Texture) Unload() { rl.UnloadTexture(tex.texture2D) }
+func (tex *Texture) Unload() { rl.UnloadTexture(tex.Content.Custom.texture2D) }
 
-func (tex *Texture) Draw(v rl.Vector3) {
-	x, y, rotation := v.X, v.Y, v.Z
-	width, height := float32(tex.texture2D.Width), float32(tex.texture2D.Height)
+func (tex *Texture) Draw(v rl.Vector4) {
+	x, y, rotation := v.X, v.Y, v.W
+	width, height := float32(tex.Content.Custom.texture2D.Width),
+		float32(tex.Content.Custom.texture2D.Height)
 	srcRec := rl.Rectangle{X: 0, Y: 0, Width: width, Height: height}
 	destRec := rl.Rectangle{X: x, Y: y, Width: width, Height: height}
 	origin := rl.Vector2{X: width / 2, Y: height / 2}
 
-	rl.DrawTexturePro(tex.texture2D, srcRec, destRec, origin,
+	rl.DrawTexturePro(tex.Content.Custom.texture2D, srcRec, destRec, origin,
 		rotation, White)
-}
-
-func (tex *Texture) Refresh(now float64, rect rl.RectangleInt32, funcs ...func(any)) {}
-
-func (tex *Texture) Bounds() rl.RectangleInt32 {
-	return rl.RectangleInt32{X: 0, Y: 0,
-		Width: tex.Resource.Width, Height: tex.Resource.Height}
 }

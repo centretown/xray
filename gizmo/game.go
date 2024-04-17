@@ -1,12 +1,13 @@
 package gizmo
 
 import (
+	"fmt"
 	"image"
 	"image/color"
-	"log"
 	"math/rand"
 	"time"
 
+	"github.com/centretown/xray/dbg"
 	"github.com/centretown/xray/model"
 
 	"github.com/centretown/gpads/gpads"
@@ -35,115 +36,97 @@ type GameItem struct {
 	Paused          bool
 	DarkMode        bool
 	FixedPalette    []color.RGBA
+	BackGround      color.RGBA
 
-	BackGround color.RGBA
-	palette    color.Palette
-	colorMap   map[color.Color]uint8
+	palette  color.Palette
+	colorMap map[color.Color]uint8
 
 	nextInput       float64
-	captureDelay    int
-	captureStart    int
+	CaptureDelay    int
+	CaptureStart    int
 	previousCapture float64
 
 	stopChan chan int
 	scrChan  chan image.Image
 
-	actors    []Mover
+	movers    []Mover
 	drawers   []Drawer
 	inputters []Inputer
 	gamepad   pad.PadG
 }
 
 type Game struct {
-	GameItem
-	Record *model.Record
+	model.RecorderG[GameItem]
+	data *dbg.Data
 }
 
-func NewGameSetup(width, height, fps int32) *Game {
-	gs := NewGame()
-	gs.Width = width
-	gs.Height = height
-	gs.FrameRate = fps
-	return gs
-}
-
-func NewGame() *Game {
+func NewGameFromRecord(record *model.Record) *Game {
 	gs := &Game{}
-	record := model.NewRecord("game", int32(categories.Game), &gs.GameItem, model.JSON)
-	gs.Setup(record, "")
+	model.Decode(gs, record)
+	gs.Setup()
 	return gs
 }
 
-func (gs *Game) Setup(record *model.Record, path string) *Game {
-	gs.Record = record
-
-	gs.Start = 0
-	gs.Current = rl.GetTime()
-	gs.InputInterval = .2
-
-	gs.CaptureCount = 0
-	gs.CaptureInterval = float64(rl.GetFrameTime()) * 2
-	gs.Capturing = false
-	gs.Paused = false
-
-	gs.BackGround = rl.Black
-	gs.stopChan = make(chan int)
-	gs.scrChan = make(chan image.Image)
-	gs.gamepad = gpads.NewGPads()
-	gs.captureStart = 250
-	gs.captureDelay = 4
-	gs.actors = make([]Mover, 0)
-	gs.drawers = make([]Drawer, 0)
-	gs.inputters = make([]Inputer, 0)
-	return gs
+func (gs *Game) NewGameSetup(width, height, fps int32) {
+	model.InitRecorder[GameItem](gs, categories.Game.String(), int32(categories.Game))
+	item := &gs.Content
+	item.Width = width
+	item.Height = height
+	item.FrameRate = fps
+	item.Start = 0
+	item.Current = rl.GetTime()
+	item.InputInterval = .2
+	item.CaptureCount = 0
+	item.CaptureInterval = float64(rl.GetFrameTime()) * 2
+	item.Capturing = false
+	item.Paused = false
+	item.BackGround = rl.Black
+	item.CaptureStart = 250
+	item.CaptureDelay = 4
+	gs.Setup()
 }
 
-func (gs *Game) GetRecord() *model.Record        { return gs.Record }
-func (gs *Game) GetItem() any                    { return &gs.GameItem }
-func (gs *Game) SetPad(pad pad.PadG)             { gs.gamepad = pad }
-func (gs *Game) AddActor(a Mover, after float64) { gs.actors = append(gs.actors, a) }
-func (gs *Game) Actors() []Mover                 { return gs.actors }
-func (gs *Game) AddDrawer(dr Drawer)             { gs.drawers = append(gs.drawers, dr) }
-func (gs *Game) Drawers() []Drawer               { return gs.drawers }
+func (gs *Game) Setup() {
+	item := &gs.Content
+	item.stopChan = make(chan int)
+	item.scrChan = make(chan image.Image)
+	item.gamepad = gpads.NewGPads()
+	item.movers = make([]Mover, 0)
+	item.drawers = make([]Drawer, 0)
+	item.inputters = make([]Inputer, 0)
+}
+
+func (gs *Game) SetPad(pad pad.PadG)             { gs.Content.gamepad = pad }
+func (gs *Game) AddActor(a Mover, after float64) { gs.Content.movers = append(gs.Content.movers, a) }
+func (gs *Game) Actors() []Mover                 { return gs.Content.movers }
+func (gs *Game) AddDrawer(dr Drawer)             { gs.Content.drawers = append(gs.Content.drawers, dr) }
+func (gs *Game) Drawers() []Drawer               { return gs.Content.drawers }
 
 func (gs *Game) Children() (children []model.Recorder) {
-	children = make([]model.Recorder, 0, len(gs.actors)+len(gs.drawers))
-	for i := range gs.actors {
-		children = append(children, gs.actors[i])
+	children = make([]model.Recorder, 0,
+		len(gs.Content.movers)+len(gs.Content.drawers))
+
+	for i := range gs.Content.movers {
+		children = append(children, gs.Content.movers[i])
 	}
-	for i := range gs.drawers {
-		children = append(children, gs.drawers[i])
+	for i := range gs.Content.drawers {
+		children = append(children, gs.Content.drawers[i])
 	}
 	return
 }
 
-func (gs *Game) LinkChildren(recs ...*model.Record) {
-	var err error
-	defer func() {
-		if err != nil {
-			log.Println(err)
-		}
-	}()
-
-	for _, rec := range recs {
-		cat := categories.Category(rec.Category)
-		el := MakeCategory(cat, rec)
-		err = model.Decode(el)
-		if err == nil {
-
-			switch t := el.(type) {
-			case Mover:
-				gs.actors = append(gs.actors, t)
-			case Drawer:
-				gs.drawers = append(gs.drawers, Drawer(t))
-			}
+func (gs *Game) LinkChild(recorder model.Recorder) {
+	mover, ok := recorder.(Mover)
+	if ok {
+		fmt.Println("Added Mover")
+		gs.Content.movers = append(gs.Content.movers, mover)
+	} else {
+		drawer, ok := recorder.(Drawer)
+		if ok {
+			fmt.Println("Added Drawer")
+			gs.Content.drawers = append(gs.Content.drawers, Drawer(drawer))
+		} else {
+			panic("Game LinkChildren bad child")
 		}
 	}
-}
-
-func (gs Game) Keys() (key string, major, minor int64) {
-	major, minor = gs.Record.Major, gs.Record.Minor
-	uuid := model.RecordUUID(major, minor)
-	key = uuid.String()
-	return
 }

@@ -7,9 +7,9 @@ import (
 
 type Drawer interface {
 	model.Recorder
-	Bounds() rl.RectangleInt32
-	Draw(rl.Vector3)
-	Refresh(now float64, rect rl.RectangleInt32, funcs ...func(any))
+	Bounds() rl.Rectangle
+	Refresh(now float64, rect rl.Vector4, funcs ...func(any))
+	Draw(rl.Vector4)
 }
 
 type Inputer interface {
@@ -18,8 +18,8 @@ type Inputer interface {
 
 type Mover interface {
 	model.Recorder
+	Drawer
 	Move(can_move bool, current float64)
-	Refresh(now float64, rect rl.RectangleInt32, funcs ...func(any))
 	GetDrawer() Drawer
 }
 

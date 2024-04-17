@@ -21,16 +21,13 @@ var (
 	Magenta = color.RGBA{R: 255, G: 0, B: 255, A: 255}
 )
 
-func (gs *Game) AddColors(clrs []color.RGBA) {
-
-	for _, c := range clrs {
-		gs.FixedPalette = append(gs.FixedPalette, c)
-	}
+func (gs *Game) AddColors(clrs ...color.RGBA) {
+	gs.Content.FixedPalette = append(gs.Content.FixedPalette, clrs...)
 }
 
 func (gs *Game) createPalette() {
 
-	gs.FixedPalette = append(gs.FixedPalette,
+	gs.Content.FixedPalette = append(gs.Content.FixedPalette,
 		color.RGBA{R: 255, G: 255, B: 255, A: 0},
 		Black,
 		White,
@@ -53,7 +50,7 @@ func (gs *Game) createPalette() {
 	txts = gs.listTextures()
 
 	for _, txt = range txts {
-		img, err = loadImage(txt.Resource.Path)
+		img, err = loadImage(txt.Content.Custom.Resource.Path)
 		if err == nil {
 			imgs = append(imgs, img)
 		} else {
@@ -61,7 +58,8 @@ func (gs *Game) createPalette() {
 		}
 	}
 
-	gs.palette, gs.colorMap = capture.ExtendPalette(gs.FixedPalette, imgs, 256)
+	gs.Content.palette, gs.Content.colorMap =
+		capture.ExtendPalette(gs.Content.FixedPalette, imgs, 256)
 }
 
 func loadImage(path string) (img image.Image, err error) {
@@ -81,13 +79,14 @@ func loadImage(path string) (img image.Image, err error) {
 
 func (game *Game) listTextures() (txts []*Texture) {
 	txts = make([]*Texture, 0)
-	for _, obj := range game.actors {
+
+	for _, obj := range game.Content.movers {
 		if t, ok := obj.GetDrawer().(*Texture); ok {
 			txts = append(txts, t)
 		}
 	}
 
-	for _, obj := range game.drawers {
+	for _, obj := range game.Content.drawers {
 		if t, ok := obj.(*Texture); ok {
 			txts = append(txts, t)
 		}

@@ -8,60 +8,31 @@ import (
 	"github.com/centretown/xray/model"
 )
 
-func MakeCategory(cat categories.Category, rec *model.Record) model.Recorder {
+func MakeLink(record *model.Record) (recorder model.Recorder) {
+	fmt.Println("MakeLink", *record)
+	recorder = makeCategory(categories.Category(record.Category), record)
+	return
+}
+
+func makeCategory(cat categories.Category, rec *model.Record) model.Recorder {
 	switch cat {
+	case categories.Game:
+		return NewGameFromRecord(rec)
 	case categories.Texture:
-		return &Texture{Record: rec}
-	case categories.Circle:
-		return &Circle{Record: rec}
+		return NewTextureFromRecord(rec)
+	case categories.Ellipse:
+		return NewEllipseFromRecord(rec)
 	case categories.CellsOrg:
-		return &CellsOrg{Record: rec}
-	case categories.Mover:
-		return &Tracker{Record: rec}
-	case categories.NumberMoveri8:
-		return &GridMover[int8]{Record: rec}
-	case categories.NumberGridi8:
-		return &NumberGrid[int8]{Record: rec}
+		return NewCellsOrgFromRecord(rec)
+	case categories.Tracker:
+		return NewTrackerFromRecord(rec)
+	case categories.LifeMover:
+		return NewLifeMoverFromRecord(rec)
+	case categories.LifeGrid:
+		return NewLifeGridFromRecord(rec)
 	}
 
 	err := fmt.Errorf("unknown category %d(%s)", cat, cat)
 	log.Fatal(err)
 	return nil
-}
-
-func MakeLink[T any](add func(T), min, max int,
-	recs ...*model.Record) (err error) {
-
-	var (
-		cat    categories.Category
-		dr     model.Recorder
-		ok     bool
-		typ    T
-		length int
-	)
-
-	defer func() {
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
-
-	if length = len(recs); length < min || length > max {
-		err = fmt.Errorf("too many links want range [%d-%d] have %d",
-			min, max, len(recs))
-		return
-	}
-
-	for _, rec := range recs {
-		cat = categories.Category(rec.Category)
-		dr = MakeCategory(cat, rec)
-		if err = model.Decode(dr); err != nil {
-			return
-		}
-		if typ, ok = dr.(T); ok {
-			add(typ)
-		}
-	}
-
-	return
 }

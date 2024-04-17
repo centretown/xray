@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"log"
 	"time"
 
@@ -51,30 +50,28 @@ type Record struct {
 	Updated  time.Time
 }
 
-func NewRecord(title string, category int32,
-	v any, encoding Encoding) *Record {
+func InitRecord(rec *Record, title string, category int32,
+	vContent any, encoding Encoding) {
 
 	id, _ := uuid.NewV7()
 	major, minor := RecordID(id)
 
-	buf, err := encoding.Encode(v)
+	buf, err := encoding.Encode(vContent)
 	if err != nil {
 		buf, _ = encoding.Encode(err.Error())
 	}
 	content := string(buf)
 
-	return &Record{
-		Major:    major,
-		Minor:    minor,
-		Origin:   originMajor,
-		Originn:  originMinor,
-		Title:    title,
-		Category: category,
-		Created:  time.Now(),
-		Updated:  time.Now(),
-		Encoding: encoding,
-		Content:  content,
-	}
+	rec.Major = major
+	rec.Minor = minor
+	rec.Origin = originMajor
+	rec.Originn = originMinor
+	rec.Title = title
+	rec.Category = category
+	rec.Created = time.Now()
+	rec.Updated = time.Now()
+	rec.Encoding = encoding
+	rec.Content = content
 }
 
 func (rec *Record) UpdateContent(v any) string {
@@ -86,23 +83,35 @@ func (rec *Record) UpdateContent(v any) string {
 	return rec.Content
 }
 
-type Recorder interface {
-	GetRecord() *Record
-	GetItem() any
+func (rec *Record) Copy(record *Record) {
+	rec.Major = record.Major
+	rec.Minor = record.Minor
+	rec.Origin = record.Origin
+	rec.Originn = record.Originn
+	rec.Title = record.Title
+	rec.Category = record.Category
+	rec.Created = record.Created
+	rec.Updated = record.Updated
+	rec.Encoding = record.Encoding
+	rec.Content = record.Content
 }
 
-func Decode(recorder Recorder) (err error) {
-	rec := recorder.GetRecord()
-	err = json.Unmarshal([]byte(rec.Content), recorder.GetItem())
-	if err != nil {
-		log.Println(rec.Content)
-		panic(err)
+func (rec *Record) Dump() {
+	log.Println(
+		"Major", rec.Major,
+		"Minor", rec.Minor,
+		"Origin", rec.Origin,
+		"Originn", rec.Originn,
+		"Title", rec.Title,
+		"Category", rec.Category,
+		"Created", rec.Created,
+		"Updated", rec.Updated,
+		"Encoding", rec.Encoding,
+		"Content", rec.Content)
+}
+
+func DumpList(records []*Record) {
+	for _, record := range records {
+		record.Dump()
 	}
-	return
-}
-
-type Parent interface {
-	Recorder
-	LinkChildren(...*Record)
-	Children() []Recorder
 }

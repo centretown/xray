@@ -64,7 +64,6 @@ func ping(t *testing.T) {
 
 func ping_mem_gamedata(t *testing.T) {
 	data := NewGameData("sqlite3", ":memory:")
-	data.Open()
 	if data.HasErrors() {
 		t.Fatal(data.Err)
 	}
@@ -79,7 +78,6 @@ func ping_mem_gamedata(t *testing.T) {
 
 func create_mem_gamedata(t *testing.T) {
 	data := NewGameData("sqlite3", ":memory:")
-	data.Open()
 	if data.HasErrors() {
 		t.Fatal(data.Err)
 	}
@@ -97,8 +95,7 @@ func create_mem_gamedata(t *testing.T) {
 
 func create_mem_game(t *testing.T) {
 	// gd := NewGameData("sqlite3", "/home/dave/xray/test/db/gd2.db")
-	gd := NewGameData("sqlite3", "/home/dave/xray/test/db/gd2.db")
-	gd.Open()
+	gd := NewGameData("sqlite3", ":memory:")
 	if gd.Err != nil {
 		t.Fatal(gd.Err)
 	}
@@ -113,20 +110,21 @@ func create_mem_game(t *testing.T) {
 	gd.Create(&model.Record{}, &model.Version{})
 
 	var paths = []string{
-		"../2d/head.png",
-		"../2d/head_90.png",
-		"../2d/head_300.png",
-		"../2d/hole.png",
-		"../2d/gander.png",
-		"../2d/runt.png",
-		"../2d/polar.png",
-		"../2d/swirl.png",
-		"../2d/GJwBkohXoAAiWN9.jpeg",
+		// "../2d/head.png",
+		// "../2d/head_90.png",
+		// "../2d/head_300.png",
+		// "../2d/hole.png",
+		// "../2d/gander.png",
+		// "../2d/runt.png",
+		// "../2d/polar.png",
+		// "../2d/swirl.png",
+		// "../2d/GJwBkohXoAAiWN9.jpeg",
 	}
 
 	for _, path := range paths {
-		item := model.NewFileResource(path, 0, "just a test")
-		if item.Err != nil {
+		var resource = model.Resource{}
+		model.InitResource(&resource, path, 0)
+		if resource.Err != nil {
 			t.Fatal(gd.Err)
 		}
 		// gd.InsertItem(item)

@@ -14,12 +14,12 @@ func main() {
 	}
 }
 
-func build_life01(game *gizmo.Game, resourcePath string) {
+func build_life01(game *gizmo.Game) {
 	viewPort := game.GetViewPort()
 	cells := gizmo.NewCellsOrg(viewPort.Width, viewPort.Height, 12)
 	game.AddDrawer(cells)
-	game.FrameRate = 20
-	game.FixedSize = true
-	cells.Colors = []color.RGBA{gizmo.White, gizmo.Blue, gizmo.Green}
-	game.AddColors(cells.Colors)
+	game.Content.FrameRate = 20
+	game.Content.FixedSize = true
+	cells.Content.Colors = []color.RGBA{gizmo.White, gizmo.Blue, gizmo.Green}
+	game.AddColors(cells.Content.Colors...)
 }

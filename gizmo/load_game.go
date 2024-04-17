@@ -9,41 +9,89 @@ import (
 	"github.com/centretown/xray/model"
 )
 
-func LoadGameKey(path string) (game *Game, err error) {
-	gameKeys, _ := access.LoadGameKey(filepath.Join(path, "game_keys.yaml"))
-	var record = &model.Record{
-		Major: gameKeys.Major,
-		Minor: gameKeys.Minor,
+func LoadGame() (err error) {
+	path := "."
+	gameKeys, err := access.LoadGameKey(filepath.Join(path, "game_keys.yaml"))
+	if err != nil {
+		log.Fatalln(err)
+		return
 	}
-	return LoadGame(path, record)
-}
 
-func LoadGame(folder string, record *model.Record) (game *Game, err error) {
-	game = &Game{}
-	path := filepath.Clean(folder)
+	log.Println("LoadGameKey", gameKeys.Minor, gameKeys.Major)
+
 	data := dbg.NewGameData("sqlite3", filepath.Join(path, "xray_game.db"))
-	data.Open()
-
 	defer func() {
-		if data.Err != nil {
+		if data.HasErrors() {
 			err = data.Err
-			log.Println(data.Err)
+			log.Fatalln(data.Err)
 			return
 		}
 		data.Close()
 	}()
 
-	record = data.GetItem(record.Major, record.Minor)
+	var (
+		record   model.Record
+		recorder model.Recorder
+		ok       bool
+		game     *Game
+	)
+
+	record.Major = gameKeys.Major
+	record.Minor = gameKeys.Minor
+
+	data.GetRecord(&record)
 	if data.HasErrors() {
 		return
 	}
 
-	game.Setup(record, path)
+	recorder = MakeLink(&record)
+	game, ok = recorder.(*Game)
+	if !ok {
+		log.Fatal()
+	}
 
-	data.Load(game)
+	gameRecord := game.GetRecord()
+	records := data.LoadLinks(gameRecord)
 	if data.HasErrors() {
 		return
 	}
 
+	game.data = data
+	link(game.data, game, records)
+
+	game.Run()
 	return
+}
+
+func link(data *dbg.Data, parent model.Parent, records []*model.Record) {
+	var (
+		recorder model.Recorder
+	)
+
+	defer func() {
+		if data.HasErrors() {
+			log.Fatal(data.Err)
+		}
+	}()
+
+	for _, record := range records {
+
+		data.GetRecord(record)
+		if data.HasErrors() {
+			return
+		}
+
+		recorder = MakeLink(record)
+
+		parent.LinkChild(recorder)
+
+		p, ok := recorder.(model.Parent)
+		if ok {
+			rs := data.LoadLinks(p.GetRecord())
+			if data.HasErrors() {
+				return
+			}
+			link(data, p, rs)
+		}
+	}
 }

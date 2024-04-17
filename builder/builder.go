@@ -20,10 +20,10 @@ var (
 )
 
 func init() {
-	flagset.Setup("install", "test")
+	flagset.Setup("install", "quick")
 }
 
-func Build(custom func(*gizmo.Game, string)) (*gizmo.Game, bool, error) {
+func Build(custom func(*gizmo.Game)) (*gizmo.Game, bool, error) {
 
 	flag.Parse()
 
@@ -33,8 +33,8 @@ func Build(custom func(*gizmo.Game, string)) (*gizmo.Game, bool, error) {
 		inMemory            = false
 		install             = false
 	)
-	// test and install conflict. test has higher priority
-	// because it is the safest option
+	// test and install conflict
+	// test has higher priority because it's the safest option
 	if flags.Quick {
 		inMemory = true
 		databasePath = memoryPath
@@ -53,7 +53,7 @@ func Build(custom func(*gizmo.Game, string)) (*gizmo.Game, bool, error) {
 }
 
 func create(databasePath string, cmd *flagset.FlagSet,
-	custom func(*gizmo.Game, string),
+	custom func(*gizmo.Game),
 	memory bool, install bool) (game *gizmo.Game, err error) {
 
 	fname := databasePath
@@ -71,11 +71,10 @@ func create(databasePath string, cmd *flagset.FlagSet,
 			}
 		}
 	}()
-
-	data.Open()
 	if data.HasErrors() {
 		return
 	}
+
 	const (
 		baseInterval = .02
 		screenWidth  = 800
@@ -84,14 +83,14 @@ func create(databasePath string, cmd *flagset.FlagSet,
 		captureFps   = 25
 	)
 
-	game = gizmo.NewGameSetup(screenWidth, screenHeight, fps)
-
-	data.Create(game.Record, &model.Version{Major: 0, Minor: 1})
+	game = &gizmo.Game{}
+	game.NewGameSetup(screenWidth, screenHeight, fps)
+	data.Create(game.GetRecord(), &model.Version{Major: 0, Minor: 1})
 	if data.HasErrors() {
 		return
 	}
 
-	custom(game, "")
+	custom(game)
 
 	data.Save(game)
 	if data.HasErrors() {
