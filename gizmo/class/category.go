@@ -1,11 +1,11 @@
-package categories
+package class
 
-type Category int32
+type Class int32
 
 type NotFound struct{}
 
 const (
-	Unknown Category = iota
+	Unknown Class = iota
 	Game
 	Ellipse
 	Texture

@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 
 	"github.com/centretown/xray/access"
-	"github.com/centretown/xray/dbg"
 	"github.com/centretown/xray/flagset"
 	"github.com/centretown/xray/gizmo"
+	"github.com/centretown/xray/gizmodb"
 	"github.com/centretown/xray/model"
 )
 
@@ -61,7 +61,7 @@ func create(databasePath string, cmd *flagset.FlagSet,
 		fname = filepath.Join(databasePath, gameName)
 	}
 
-	data := dbg.NewGameData("sqlite3", fname)
+	data := gizmodb.NewGameData("sqlite3", fname)
 	defer func() {
 		if data != nil {
 			data.Close()

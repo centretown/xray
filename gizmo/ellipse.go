@@ -3,7 +3,7 @@ package gizmo
 import (
 	"image/color"
 
-	"github.com/centretown/xray/gizmo/categories"
+	"github.com/centretown/xray/gizmo/class"
 	"github.com/centretown/xray/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -23,8 +23,8 @@ func NewEllipseFromRecord(record *model.Record) *Ellipse {
 
 func NewEllipse(rgba color.RGBA, width float32, height float32) *Ellipse {
 	ell := &Ellipse{}
-	InitShape[EllipseItem](&ell.Shape, categories.Ellipse.String(),
-		int32(categories.Ellipse), rgba, width, height)
+	InitShape[EllipseItem](&ell.Shape, class.Ellipse.String(),
+		int32(class.Ellipse), rgba, width, height)
 	var _ model.Recorder = ell
 	var _ Drawer = ell
 	return ell

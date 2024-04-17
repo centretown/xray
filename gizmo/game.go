@@ -7,12 +7,12 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/centretown/xray/dbg"
+	"github.com/centretown/xray/gizmodb"
 	"github.com/centretown/xray/model"
 
 	"github.com/centretown/gpads/gpads"
 	"github.com/centretown/gpads/pad"
-	"github.com/centretown/xray/gizmo/categories"
+	"github.com/centretown/xray/gizmo/class"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -57,7 +57,7 @@ type GameItem struct {
 
 type Game struct {
 	model.RecorderG[GameItem]
-	data *dbg.Data
+	data *gizmodb.Data
 }
 
 func NewGameFromRecord(record *model.Record) *Game {
@@ -68,7 +68,7 @@ func NewGameFromRecord(record *model.Record) *Game {
 }
 
 func (gs *Game) NewGameSetup(width, height, fps int32) {
-	model.InitRecorder[GameItem](gs, categories.Game.String(), int32(categories.Game))
+	model.InitRecorder[GameItem](gs, class.Game.String(), int32(class.Game))
 	item := &gs.Content
 	item.Width = width
 	item.Height = height

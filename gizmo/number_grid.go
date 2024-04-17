@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/centretown/xray/check"
-	"github.com/centretown/xray/gizmo/categories"
+	"github.com/centretown/xray/gizmo/class"
 	"github.com/centretown/xray/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -60,8 +60,8 @@ func NewGrid[T check.NumberType](bounds rl.Rectangle,
 	item.StateCount = len(item.StateColors)
 
 	cs.SetupCells()
-	model.InitRecorder[NumberGrid[T]](cs, categories.LifeGrid.String(),
-		int32(categories.LifeGrid))
+	model.InitRecorder[NumberGrid[T]](cs, class.LifeGrid.String(),
+		int32(class.LifeGrid))
 	return cs
 }
 

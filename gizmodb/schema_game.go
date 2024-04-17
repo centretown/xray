@@ -1,4 +1,4 @@
-package dbg
+package gizmodb
 
 import (
 	"time"
@@ -27,7 +27,7 @@ extension SMALLINT,
 PRIMARY KEY (item,itemn,major,minor));`,
 
 		`CREATE TABLE items (
-title VARCHAR(80) NOT NULL,
+class VARCHAR(80) NOT NULL,
 category INTEGER,
 content TEXT,
 major BIGINT, minor BIGINT,			
@@ -36,10 +36,10 @@ created TIMESTAMP, updated TIMESTAMP,
 encoding SMALLINT,
 PRIMARY KEY (major,minor));`,
 
-		"CREATE INDEX items_title ON items (title,category,origin,originn);",
-		"CREATE INDEX items_category ON items (category,title,origin,originn);",
-		"CREATE INDEX items_origin_t ON items (origin,originn,title,category);",
-		"CREATE INDEX items_origin_c ON items (origin,originn,category,title);",
+		"CREATE INDEX items_class ON items (class,category,origin,originn);",
+		"CREATE INDEX items_category ON items (category,class,origin,originn);",
+		"CREATE INDEX items_origin_t ON items (origin,originn,class,category);",
+		"CREATE INDEX items_origin_c ON items (origin,originn,category,class);",
 
 		`CREATE TABLE tags (
 name VARCHAR(32) NOT NULL,
@@ -64,8 +64,8 @@ PRIMARY KEY (major,minor,linked,linkedn));`,
 	InsertVersion: `INSERT INTO version (item, itemn, major, minor, patch, extension) 
 VALUES (:item,:itemn,:major,:minor,:patch,:extension);`,
 
-	InsertItem: `INSERT INTO items (title, category, content, encoding, major, minor, origin, originn, created, updated)
-VALUES (:title,:category,:content,:encoding,:major,:minor,:origin,:originn,:created,:updated);`,
+	InsertItem: `INSERT INTO items (class, category, content, encoding, major, minor, origin, originn, created, updated)
+VALUES (:class,:category,:content,:encoding,:major,:minor,:origin,:originn,:created,:updated);`,
 
 	InsertLink: `INSERT INTO links (major, minor, linked, linkedn, repeated, weight)
 VALUES (:major,:minor,:linked,:linkedn,:repeated,:weight);`,

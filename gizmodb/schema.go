@@ -1,4 +1,4 @@
-package dbg
+package gizmodb
 
 import (
 	"github.com/centretown/xray/model"

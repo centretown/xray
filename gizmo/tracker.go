@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/centretown/xray/check"
-	"github.com/centretown/xray/gizmo/categories"
+	"github.com/centretown/xray/gizmo/class"
 	"github.com/centretown/xray/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -60,7 +60,7 @@ func NewTracker(bounds rl.Rectangle,
 	item.Axes[1] = NewAxis(int32(item.Rectangle.Height))
 	tr.Refresh(now, rl.Vector4{X: bounds.Width, Y: bounds.Height})
 	model.InitRecorder[TrackerItem](tr,
-		categories.Tracker.String(), int32(categories.Tracker))
+		class.Tracker.String(), int32(class.Tracker))
 	return tr
 }
 

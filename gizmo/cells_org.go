@@ -4,7 +4,7 @@ import (
 	"image/color"
 	"math/rand"
 
-	"github.com/centretown/xray/gizmo/categories"
+	"github.com/centretown/xray/gizmo/class"
 	"github.com/centretown/xray/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -58,8 +58,8 @@ func NewCellsOrg(width, height, squareSize int32) *CellsOrg {
 	item.Cols = width / squareSize
 	item.Rows = height / squareSize
 	item.Colors = append(item.Colors, gridColor, aliveColor, visitedColor)
-	model.InitRecorder[CellItemsOrg](&cs.RecorderG, categories.CellsOrg.String(),
-		int32(categories.CellsOrg))
+	model.InitRecorder[CellItemsOrg](&cs.RecorderG, class.CellsOrg.String(),
+		int32(class.CellsOrg))
 	cs.start()
 	return cs
 }

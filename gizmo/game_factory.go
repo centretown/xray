@@ -4,31 +4,31 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/centretown/xray/gizmo/categories"
+	"github.com/centretown/xray/gizmo/class"
 	"github.com/centretown/xray/model"
 )
 
 func MakeLink(record *model.Record) (recorder model.Recorder) {
 	fmt.Println("MakeLink", *record)
-	recorder = makeCategory(categories.Category(record.Category), record)
+	recorder = makeCategory(class.Class(record.Category), record)
 	return
 }
 
-func makeCategory(cat categories.Category, rec *model.Record) model.Recorder {
+func makeCategory(cat class.Class, rec *model.Record) model.Recorder {
 	switch cat {
-	case categories.Game:
+	case class.Game:
 		return NewGameFromRecord(rec)
-	case categories.Texture:
+	case class.Texture:
 		return NewTextureFromRecord(rec)
-	case categories.Ellipse:
+	case class.Ellipse:
 		return NewEllipseFromRecord(rec)
-	case categories.CellsOrg:
+	case class.CellsOrg:
 		return NewCellsOrgFromRecord(rec)
-	case categories.Tracker:
+	case class.Tracker:
 		return NewTrackerFromRecord(rec)
-	case categories.LifeMover:
+	case class.LifeMover:
 		return NewLifeMoverFromRecord(rec)
-	case categories.LifeGrid:
+	case class.LifeGrid:
 		return NewLifeGridFromRecord(rec)
 	}
 

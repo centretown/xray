@@ -6,7 +6,7 @@ import (
 	"math/rand"
 
 	"github.com/centretown/xray/check"
-	"github.com/centretown/xray/gizmo/categories"
+	"github.com/centretown/xray/gizmo/class"
 	"github.com/centretown/xray/model"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -37,8 +37,8 @@ func NewGridMover[T check.NumberType](bounds rl.Rectangle, pixelRateX float64) *
 
 	mv.Content.Rectangle = bounds
 	mv.Content.PixelRateX = pixelRateX
-	model.InitRecorder[GridMover[T]](mv, categories.LifeMover.String(),
-		int32(categories.LifeMover))
+	model.InitRecorder[GridMover[T]](mv, class.LifeMover.String(),
+		int32(class.LifeMover))
 	return mv
 }
 

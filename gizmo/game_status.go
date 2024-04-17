@@ -40,8 +40,15 @@ func (gs *Game) DrawStatus() {
 
 func (gs *Game) Refresh(current float64) {
 	viewPort := gs.SetViewPortFromWindow()
-	for _, run := range gs.Content.movers {
-		run.Refresh(current, rl.Vector4{X: float32(viewPort.Width), Y: float32(viewPort.Height)})
+	for _, mover := range gs.Content.movers {
+		mover.Refresh(current, rl.Vector4{
+			X: float32(viewPort.Width),
+			Y: float32(viewPort.Height)})
+	}
+	for _, drawer := range gs.Content.drawers {
+		drawer.Refresh(current, rl.Vector4{
+			X: float32(viewPort.Width),
+			Y: float32(viewPort.Height)})
 	}
 }
 

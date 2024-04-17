@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/centretown/xray/access"
-	"github.com/centretown/xray/dbg"
+	"github.com/centretown/xray/gizmodb"
 	"github.com/centretown/xray/model"
 )
 
@@ -19,7 +19,7 @@ func LoadGame() (err error) {
 
 	log.Println("LoadGameKey", gameKeys.Minor, gameKeys.Major)
 
-	data := dbg.NewGameData("sqlite3", filepath.Join(path, "xray_game.db"))
+	data := gizmodb.NewGameData("sqlite3", filepath.Join(path, "xray_game.db"))
 	defer func() {
 		if data.HasErrors() {
 			err = data.Err
@@ -63,7 +63,7 @@ func LoadGame() (err error) {
 	return
 }
 
-func link(data *dbg.Data, parent model.Parent, records []*model.Record) {
+func link(data *gizmodb.Data, parent model.Parent, records []*model.Record) {
 	var (
 		recorder model.Recorder
 	)

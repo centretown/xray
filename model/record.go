@@ -38,7 +38,7 @@ func RecordUUID(major, minor int64) (id uuid.UUID) {
 }
 
 type Record struct {
-	Title    string
+	Class    string
 	Category int32
 	Content  string
 	Encoding Encoding
@@ -50,7 +50,7 @@ type Record struct {
 	Updated  time.Time
 }
 
-func InitRecord(rec *Record, title string, category int32,
+func InitRecord(rec *Record, class string, category int32,
 	vContent any, encoding Encoding) {
 
 	id, _ := uuid.NewV7()
@@ -66,7 +66,7 @@ func InitRecord(rec *Record, title string, category int32,
 	rec.Minor = minor
 	rec.Origin = originMajor
 	rec.Originn = originMinor
-	rec.Title = title
+	rec.Class = class
 	rec.Category = category
 	rec.Created = time.Now()
 	rec.Updated = time.Now()
@@ -88,7 +88,7 @@ func (rec *Record) Copy(record *Record) {
 	rec.Minor = record.Minor
 	rec.Origin = record.Origin
 	rec.Originn = record.Originn
-	rec.Title = record.Title
+	rec.Class = record.Class
 	rec.Category = record.Category
 	rec.Created = record.Created
 	rec.Updated = record.Updated
@@ -102,7 +102,7 @@ func (rec *Record) Dump() {
 		"Minor", rec.Minor,
 		"Origin", rec.Origin,
 		"Originn", rec.Originn,
-		"Title", rec.Title,
+		"Class", rec.Class,
 		"Category", rec.Category,
 		"Created", rec.Created,
 		"Updated", rec.Updated,

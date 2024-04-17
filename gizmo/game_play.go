@@ -13,7 +13,7 @@ func (gs *Game) Run() {
 	content := &gs.Content
 	content.FixedPalette = append(content.FixedPalette, content.BackGround)
 	gs.createPalette()
-	rl.InitWindow(content.Width, content.Height, gs.Record.Title)
+	rl.InitWindow(content.Width, content.Height, gs.Record.Class)
 	for _, txt := range gs.listTextures() {
 		txt.Load()
 	}
