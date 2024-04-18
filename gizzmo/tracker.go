@@ -21,12 +21,15 @@ const (
 
 type TrackerItem struct {
 	Rectangle    rl.Rectangle
+	Position     rl.Vector2
 	Source       rl.Rectangle
-	PixelRateY   float64 // pixels per second
 	PixelRateX   float64
+	PixelRateY   float64 // pixels per second
+	PixelRateZ   float64 // pixels per second
+	Depth        float32
 	Rotation     float32
 	RotationRate float32
-	Axes         []*Axis
+	Axes         [3]Axis
 	drawer       Drawer
 }
 
@@ -51,13 +54,13 @@ func NewTracker(bounds rl.Rectangle,
 	item.Rectangle = bounds
 	item.PixelRateX = pixelRateX
 	item.PixelRateY = pixelRateY
-	item.Rotation = 0
 	item.RotationRate = rotationRate
-	item.Axes = make([]*Axis, 2)
+	item.Rotation = 0
 
 	now := rl.GetTime()
-	item.Axes[0] = NewAxis(int32(item.Rectangle.Width))
-	item.Axes[1] = NewAxis(int32(item.Rectangle.Height))
+	item.Axes[0] = Axis{Extent: item.Rectangle.Width, Direction: 1}
+	item.Axes[1] = Axis{Extent: item.Rectangle.Height, Direction: 1}
+	item.Axes[2] = Axis{Extent: item.Depth, Direction: 1}
 	tr.Refresh(now, rl.Vector4{X: bounds.Width, Y: bounds.Height})
 	model.InitRecorder[TrackerItem](tr,
 		class.Tracker.String(), int32(class.Tracker))
@@ -77,7 +80,7 @@ func (tr *Tracker) Draw(v rl.Vector4)    { tr.Content.drawer.Draw(v) }
 
 func (tr *Tracker) Move(can_move bool, now float64) {
 	mv := &tr.Content
-	x, y := mv.Axes[0], mv.Axes[1]
+	x, y := &mv.Axes[0], &mv.Axes[1]
 
 	mv.drawer.Draw(rl.Vector4{
 		X: mv.Rectangle.X + float32(x.Position),
@@ -98,8 +101,8 @@ func (tr *Tracker) Refresh(now float64, bounds rl.Vector4, fs ...func(any)) {
 	mv.Rectangle.Y += mv.Source.Height / 2
 	mv.Rectangle.Width -= mv.Source.Width
 	mv.Rectangle.Height -= mv.Source.Height
-	mv.Axes[0].Refresh(now, int32(mv.Rectangle.Width))
-	mv.Axes[1].Refresh(now, int32(mv.Rectangle.Height))
+	mv.Axes[0].Refresh(now, mv.Rectangle.Width)
+	mv.Axes[1].Refresh(now, mv.Rectangle.Height)
 }
 
 func (tr *Tracker) LinkChild(recorder model.Recorder) {

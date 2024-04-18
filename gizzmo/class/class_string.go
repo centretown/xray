@@ -8,7 +8,7 @@ func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
-	_ = x[Unknown-0]
+	_ = x[ClassBegin-0]
 	_ = x[Game-1]
 	_ = x[Ellipse-2]
 	_ = x[Texture-3]
@@ -17,7 +17,7 @@ func _() {
 	_ = x[LifeGrid-6]
 	_ = x[Player-7]
 	_ = x[CellsOrg-8]
-	_ = x[COUNT-9]
+	_ = x[ClassEnd-9]
 }
 
 const _Class_name = "UnknownGameEllipseTextureTrackerLifeMoverLifeGridPlayerCellsOrgCOUNT"

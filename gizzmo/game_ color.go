@@ -21,10 +21,13 @@ var (
 	Magenta = color.RGBA{R: 255, G: 0, B: 255, A: 255}
 )
 
+// AddColors to the FixedPalette
 func (gs *Game) AddColors(clrs ...color.RGBA) {
 	gs.Content.FixedPalette = append(gs.Content.FixedPalette, clrs...)
 }
 
+// createPalette generates a 256 color palette from RGBA colors
+// found in the game textures
 func (gs *Game) createPalette() {
 
 	gs.Content.FixedPalette = append(gs.Content.FixedPalette,
@@ -43,13 +46,10 @@ func (gs *Game) createPalette() {
 		err  error
 		img  image.Image
 		imgs []image.Image = make([]image.Image, 0)
-		txts []*Texture
 		txt  *Texture
 	)
 
-	txts = gs.listTextures()
-
-	for _, txt = range txts {
+	for _, txt = range gs.Content.textureList {
 		img, err = loadImage(txt.Content.Custom.Resource.Path)
 		if err == nil {
 			imgs = append(imgs, img)
@@ -74,22 +74,5 @@ func loadImage(path string) (img image.Image, err error) {
 	defer rdr.Close()
 
 	img, _, err = image.Decode(rdr)
-	return
-}
-
-func (game *Game) listTextures() (txts []*Texture) {
-	txts = make([]*Texture, 0)
-
-	for _, obj := range game.Content.movers {
-		if t, ok := obj.GetDrawer().(*Texture); ok {
-			txts = append(txts, t)
-		}
-	}
-
-	for _, obj := range game.Content.drawers {
-		if t, ok := obj.(*Texture); ok {
-			txts = append(txts, t)
-		}
-	}
 	return
 }

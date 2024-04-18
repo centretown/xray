@@ -29,10 +29,10 @@ func NewTextureFromRecord(record *model.Record) (tex *Texture) {
 	return tex
 }
 
-func NewTexture(path string) *Texture {
+func NewTexture(path string, depth float32) *Texture {
 	tex := &Texture{}
 	InitShape[TextureItem](&tex.Shape, class.Texture.String(), int32(class.Texture),
-		color.RGBA{}, 0, 0)
+		color.RGBA{}, 0, 0, depth)
 	model.InitResource(&tex.Content.Custom.Resource, path, int32(class.Texture))
 	var _ Drawer = tex
 

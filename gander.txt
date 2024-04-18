@@ -1,19 +1,38 @@
-LoadGameKey -2648257431265398654 -1910710782829949439
-MakeLink {Game 1 {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250} JSON -1910710782829949439 -2648257431265398654 -4577969489486443007 1939962301497306302 2024-04-16 21:08:00.33092897 -0400 -0400 2024-04-16 21:08:00.330929104 -0400 -0400}
-Decode RECORD.CONTENT
- {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250} {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250}
-6
-GameLinkChildren Game
- {{{Game 1 {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250} JSON -1910710782829949439 -2648257431265398654 -4577969489486443007 1939962301497306302 2024-04-16 21:08:00.33092897 -0400 -0400 2024-04-16 21:08:00.330929104 -0400 -0400} {0 0 1600 800 30 0.2 0 false 0 0 false false false [] {0 0 0 255} [] map[] 0 4 250 0 <nil> <nil> [] [] [] <nil>}} 0xc0003784b0}
-GameLinkChildren Game Record
- {Game 1 {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250} JSON -1910710782829949439 -2648257431265398654 -4577969489486443007 1939962301497306302 2024-04-16 21:08:00.33092897 -0400 -0400 2024-04-16 21:08:00.330929104 -0400 -0400}
-GameLinkChildren Game Records
- 6
-
-
-GameLinkChildren Child Record
-MakeLink {Game 1 {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250} JSON -1910710782829949439 -2648257431265398654 -4577969489486443007 1939962301497306302 2024-04-16 21:08:00.33092897 -0400 -0400 2024-04-16 21:08:00.330929104 -0400 -0400}
-Decode RECORD.CONTENT
- {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250} {"Start":0,"Current":0,"Width":1600,"Height":800,"FrameRate":30,"InputInterval":0.2,"FramesCounter":0,"FixedSize":false,"CaptureCount":0,"CaptureInterval":0,"Capturing":false,"Paused":false,"DarkMode":false,"FixedPalette":null,"BackGround":{"R":0,"G":0,"B":0,"A":255},"CaptureDelay":4,"CaptureStart":250}
-
-
+INFO: Initializing raylib 5.0
+INFO: Platform backend: DESKTOP (GLFW)
+INFO: Supported raylib modules:
+INFO:     > rcore:..... loaded (mandatory)
+INFO:     > rlgl:...... loaded (mandatory)
+INFO:     > rshapes:... loaded (optional)
+INFO:     > rtextures:. loaded (optional)
+INFO:     > rtext:..... loaded (optional)
+INFO:     > rmodels:... loaded (optional)
+INFO:     > raudio:.... loaded (optional)
+INFO: DISPLAY: Device initialized successfully
+INFO:     > Display size: 2560 x 1440
+INFO:     > Screen size:  1600 x 800
+INFO:     > Render size:  1600 x 800
+INFO:     > Viewport offsets: 0, 0
+INFO: GLAD: OpenGL extensions loaded successfully
+INFO: GL: Supported extensions count: 213
+INFO: GL: OpenGL device information:
+INFO:     > Vendor:   Intel
+INFO:     > Renderer: Mesa Intel(R) HD Graphics 4600 (HSW GT2)
+INFO:     > Version:  4.6 (Core Profile) Mesa 23.2.1-1ubuntu3.1~22.04.2
+INFO:     > GLSL:     4.60
+INFO: GL: VAO extension detected, VAO functions loaded successfully
+INFO: GL: NPOT textures extension detected, full NPOT textures supported
+INFO: GL: DXT compressed textures supported
+INFO: GL: ETC2/EAC compressed textures supported
+INFO: PLATFORM: DESKTOP (GLFW): Initialized successfully
+INFO: TEXTURE: [ID 1] Texture loaded successfully (1x1 | R8G8B8A8 | 1 mipmaps)
+INFO: TEXTURE: [ID 1] Default texture loaded successfully
+INFO: SHADER: [ID 1] Vertex shader compiled successfully
+INFO: SHADER: [ID 2] Fragment shader compiled successfully
+INFO: SHADER: [ID 3] Program shader loaded successfully
+INFO: SHADER: [ID 3] Default shader loaded successfully
+INFO: RLGL: Render batch vertex buffers loaded successfully in RAM (CPU)
+INFO: RLGL: Render batch vertex buffers loaded successfully in VRAM (GPU)
+INFO: RLGL: Default OpenGL state initialized successfully
+INFO: TEXTURE: [ID 2] Texture loaded successfully (128x128 | GRAY_ALPHA | 1 mipmaps)
+INFO: FONT: Default font loaded successfully (224 glyphs)

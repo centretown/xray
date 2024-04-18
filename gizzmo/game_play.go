@@ -10,28 +10,31 @@ import (
 var _ = rand.NewSource(time.Now().UnixMicro())
 
 func (gs *Game) Run() {
-	content := &gs.Content
+	gs.BuildLists()
+
+	var (
+		content   = &gs.Content
+		depthList = gs.Content.depthList
+		drawer    Drawer
+		mover     Mover
+		isMover   bool
+	)
 	content.FixedPalette = append(content.FixedPalette, content.BackGround)
+
 	gs.createPalette()
+
 	rl.InitWindow(content.Width, content.Height, gs.Content.Title)
-	for _, txt := range gs.listTextures() {
-		txt.Load()
-	}
 	rl.SetTraceLogLevel(rl.LogWarning)
 
+	for _, txt := range gs.Content.textureList {
+		txt.Load()
+	}
+
 	defer func() {
-		for _, actor := range gs.Actors() {
-			t, ok := actor.GetDrawer().(*Texture)
-			if ok {
-				t.Unload()
-			}
+		for _, txt := range gs.Content.textureList {
+			txt.Unload()
 		}
-		for _, dr := range gs.Drawers() {
-			t, ok := dr.(*Texture)
-			if ok {
-				t.Unload()
-			}
-		}
+		gs.data.Close()
 		rl.CloseWindow()
 	}()
 
@@ -51,15 +54,18 @@ func (gs *Game) Run() {
 		}
 
 		rl.BeginDrawing()
-
 		rl.ClearBackground(content.BackGround)
 
-		for _, dr := range gs.Drawers() {
-			dr.Draw(rl.Vector4{X: 0, Y: 0, Z: 0})
-		}
-
-		for _, actor := range gs.Actors() {
-			actor.Move(!content.Paused, content.Current)
+		// iterate from deepest to least shallowest
+		depthList = gs.SortDepthList()
+		for i := len(depthList) - 1; i >= 0; i-- {
+			drawer = depthList[i].Drawer
+			mover, isMover = drawer.(Mover)
+			if isMover {
+				mover.Move(!content.Paused, content.Current)
+			} else {
+				drawer.Draw(rl.Vector4{X: 0, Y: 0, Z: 0})
+			}
 		}
 
 		gs.DrawStatus()

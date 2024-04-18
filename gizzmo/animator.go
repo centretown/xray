@@ -5,6 +5,10 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+type HasDepth interface {
+	GetDepth() int32
+}
+
 type Drawer interface {
 	model.Recorder
 	Bounds() rl.Rectangle

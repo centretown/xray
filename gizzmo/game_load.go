@@ -11,6 +11,10 @@ import (
 	"github.com/centretown/xray/gizzmodb/model"
 )
 
+// LoadGame reconstructs a game from the database.
+// A game is selected from the top entry of the key stack file.
+// The stack and database are created or updated at the end
+// of the build process.
 func LoadGame() (err error) {
 	path := "."
 	gameKeys, err := access.LoadGameKey(filepath.Join(path, "game_keys.yaml"))
@@ -98,6 +102,7 @@ func link(data *gizzmodb.Data, parent model.Parent, records []*model.Record) {
 	}
 }
 
+// makeLink constructs concrete classes from a database record
 func makeLink(record *model.Record) (recorder model.Recorder) {
 	fmt.Println("MakeLink", *record)
 	cat := class.Class(record.Classn)

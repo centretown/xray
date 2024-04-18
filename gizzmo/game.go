@@ -29,36 +29,42 @@ type GameItem struct {
 
 	Start         float64
 	Current       float64
-	Width         int32
-	Height        int32
-	FrameRate     int32
 	InputInterval float64
+	FrameRate     int32
 	FramesCounter int32
-	FixedSize     bool
+
+	Width     int32
+	Height    int32
+	FixedSize bool
 
 	CaptureCount    int
 	CaptureInterval float64
 	Capturing       bool
 	Paused          bool
-	DarkMode        bool
-	FixedPalette    []color.RGBA
-	BackGround      color.RGBA
+	DarkMode        bool         // defaults to true
+	FixedPalette    []color.RGBA // gizzmo colors plus colors added
+	BackGround      color.RGBA   // defaults to black
+	CaptureDelay    int
+	CaptureStart    int
 
 	palette  color.Palette
 	colorMap map[color.Color]uint8
 
 	nextInput       float64
-	CaptureDelay    int
-	CaptureStart    int
 	previousCapture float64
 
+	// capture go routine channels
 	stopChan chan int
 	scrChan  chan image.Image
 
-	movers    []Mover
-	drawers   []Drawer
-	inputters []Inputer
-	gamepad   pad.PadG
+	// note: movers are also drawers
+	movers      []Mover      // movers as loaded
+	drawers     []Drawer     // drawers as loaded
+	drawerList  []Drawer     // all drawers
+	depthList   []DeepDrawer // all drawers plus depth
+	textureList []*Texture   // all textures from all drawers
+	inputters   []Inputer    // all drawers that are inputters
+	gamepad     pad.PadG
 }
 
 type Game struct {
@@ -69,12 +75,13 @@ type Game struct {
 func NewGameFromRecord(record *model.Record) *Game {
 	gs := &Game{}
 	model.Decode(gs, record)
-	gs.Setup()
+	gs.setup()
 	return gs
 }
 
 func (gs *Game) NewGameSetup(width, height, fps int32) {
-	model.InitRecorder[GameItem](gs, class.Game.String(), int32(class.Game))
+	model.InitRecorder[GameItem](gs, class.Game.String(),
+		int32(class.Game))
 	item := &gs.Content
 	item.Width = width
 	item.Height = height
@@ -89,10 +96,10 @@ func (gs *Game) NewGameSetup(width, height, fps int32) {
 	item.BackGround = rl.Black
 	item.CaptureStart = 250
 	item.CaptureDelay = 4
-	gs.Setup()
+	gs.setup()
 }
 
-func (gs *Game) Setup() {
+func (gs *Game) setup() {
 	item := &gs.Content
 	item.stopChan = make(chan int)
 	item.scrChan = make(chan image.Image)
@@ -100,10 +107,12 @@ func (gs *Game) Setup() {
 	item.movers = make([]Mover, 0)
 	item.drawers = make([]Drawer, 0)
 	item.inputters = make([]Inputer, 0)
+	item.depthList = make([]DeepDrawer, 0)
+	item.textureList = make([]*Texture, 0)
 }
 
 func (gs *Game) SetPad(pad pad.PadG)             { gs.Content.gamepad = pad }
-func (gs *Game) AddActor(a Mover, after float64) { gs.Content.movers = append(gs.Content.movers, a) }
+func (gs *Game) AddActor(a Mover, depth float32) { gs.Content.movers = append(gs.Content.movers, a) }
 func (gs *Game) Actors() []Mover                 { return gs.Content.movers }
 func (gs *Game) AddDrawer(dr Drawer)             { gs.Content.drawers = append(gs.Content.drawers, dr) }
 func (gs *Game) Drawers() []Drawer               { return gs.Content.drawers }
@@ -135,4 +144,10 @@ func (gs *Game) LinkChild(recorder model.Recorder) {
 			panic("Game LinkChildren bad child")
 		}
 	}
+}
+
+func (gs *Game) Save(data *gizzmodb.Data) (err error) {
+	gs.data = data
+	data.Save(gs)
+	return data.Err
 }
