@@ -16,3 +16,7 @@ func CompareDepths(zo, other DeepDrawer) int {
 	}
 	return 1
 }
+
+func (dp *DeepDrawer) GetDepth() float32 {
+	return dp.Depth
+}

@@ -8,9 +8,11 @@ import (
 )
 
 type ShapeItem[T any] struct {
-	Color      color.RGBA
-	Dimensions rl.Vector4
-	Custom     T
+	Color         color.RGBA
+	Dimensions    rl.Vector4
+	ScaleToScreen bool
+
+	Custom T
 }
 
 type Shape[T any] struct {
@@ -33,7 +35,12 @@ func InitShape[T any](sh *Shape[T], name string, classn int32,
 	var _ HasDepth = sh
 }
 
-func (sh *Shape[T]) Refresh(float64, rl.Vector4, ...func(any)) {}
+func (sh *Shape[T]) Refresh(now float64, v rl.Vector4, f ...func(any)) {
+	if sh.Content.ScaleToScreen {
+		sh.Content.Dimensions.X = float32(rl.GetScreenWidth())
+		sh.Content.Dimensions.Y = float32(rl.GetScreenHeight())
+	}
+}
 
 func (sh *Shape[T]) Bounds() rl.Vector4 {
 	return rl.Vector4{X: 0, Y: 0, Z: sh.Content.Dimensions.Z}

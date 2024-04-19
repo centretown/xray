@@ -25,6 +25,7 @@ type Mover interface {
 	Drawer
 	Move(can_move bool, current float64)
 	GetDrawer() Drawer
+	GetDepth() float32
 }
 
 type Motor interface {

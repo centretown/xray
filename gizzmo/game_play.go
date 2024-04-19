@@ -64,7 +64,8 @@ func (gs *Game) Run() {
 			if isMover {
 				mover.Move(!content.Paused, content.Current)
 			} else {
-				drawer.Draw(rl.Vector4{X: 0, Y: 0, Z: 0})
+				drawer.Draw(rl.Vector4{X: 0, Y: 0,
+					Z: depthList[i].GetDepth()})
 			}
 		}
 

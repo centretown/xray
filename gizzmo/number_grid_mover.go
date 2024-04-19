@@ -42,6 +42,9 @@ func NewGridMover[T check.NumberType](bounds rl.Vector4, pixelRateX float64) *Gr
 	// mv.init(true)
 	return mv
 }
+func (cm *GridMover[T]) GetDepth() float32 {
+	return 1
+}
 
 func (cm *GridMover[T]) GetDrawer() Drawer  { return cm.Content.drawer }
 func (cm *GridMover[T]) Bounds() rl.Vector4 { return cm.Content.Bounds }
