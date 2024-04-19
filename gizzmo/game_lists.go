@@ -14,13 +14,14 @@ func (gs *Game) BuildLists() {
 	var (
 		drawerList = gs.Content.drawerList
 		depthList  = gs.Content.depthList
-		depth      int32
+		depth      float32
 	)
 
 	// initialize depths
 	for i := range drawerList {
 		deepDr, hasDepth := drawerList[i].(HasDepth)
 		if hasDepth {
+			fmt.Println("hasDepth")
 			depth = deepDr.GetDepth()
 		} else {
 			depth = Deepest
@@ -31,18 +32,27 @@ func (gs *Game) BuildLists() {
 	}
 
 	fmt.Println("BUILDLISTS depthlist", len(gs.Content.depthList))
-
+	dumpDepthList(gs.Content.depthList)
 	gs.SortDepthList()
+	dumpDepthList(gs.Content.depthList)
+}
+
+func dumpDepthList(depthList []DeepDrawer) {
+	for _, i := range depthList {
+		fmt.Print(i.Depth, ", ")
+	}
+	fmt.Println("\ndumpDepthList")
 }
 
 // SortDepthList all drawers plus depth sorted by depth (ascending)
 func (gs *Game) SortDepthList() []DeepDrawer {
-	for _, dl := range gs.Content.depthList {
-		deepDr, hasDepth := dl.Drawer.(HasDepth)
+	list := gs.Content.depthList
+	for i := range gs.Content.depthList {
+		deepDr, hasDepth := list[i].Drawer.(HasDepth)
 		if hasDepth {
-			dl.Depth = deepDr.GetDepth()
+			list[i].Depth = deepDr.GetDepth()
 		} else {
-			dl.Depth = Deepest
+			list[i].Depth = Deepest
 		}
 	}
 	slices.SortStableFunc(gs.Content.depthList, CompareDepths)

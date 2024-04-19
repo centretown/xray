@@ -9,9 +9,6 @@ func NewLifeMoverFromRecord(record *model.Record) model.Recorder {
 	lg := &GridMover[int8]{}
 	model.Decode(lg, record)
 	lg.init(true)
-	lg.Refresh(rl.GetTime(), rl.Vector4{
-		X: lg.Content.Rectangle.Width,
-		Y: lg.Content.Rectangle.Height,
-	})
+	lg.Refresh(rl.GetTime(), lg.Content.Bounds)
 	return lg
 }

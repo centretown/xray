@@ -42,13 +42,6 @@ func NewTexture(path string, depth float32) *Texture {
 func (tex *Texture) Load() *Texture {
 	fmt.Println("LOAD TEXTURE")
 	res := &tex.Content.Custom.Resource
-
-	// if !tex.initialized {
-	// 	model.InitResource(res,
-	// 		res.Path, int32(categories.Texture))
-	// 	tex.initialized = true
-	// }
-
 	if res.Err == nil {
 		tex.Content.Custom.texture2D = rl.LoadTexture(tex.Content.Custom.Resource.Path)
 		fmt.Println("TEXTURE LOADed")
@@ -62,10 +55,10 @@ func (tex *Texture) Draw(v rl.Vector4) {
 	x, y, rotation := v.X, v.Y, v.W
 	width, height := float32(tex.Content.Custom.texture2D.Width),
 		float32(tex.Content.Custom.texture2D.Height)
-	srcRec := rl.Rectangle{X: 0, Y: 0, Width: width, Height: height}
-	destRec := rl.Rectangle{X: x, Y: y, Width: width, Height: height}
+	source := rl.Rectangle{X: 0, Y: 0, Width: width, Height: height}
+	destination := rl.Rectangle{X: x, Y: y, Width: width, Height: height}
 	origin := rl.Vector2{X: width / 2, Y: height / 2}
 
-	rl.DrawTexturePro(tex.Content.Custom.texture2D, srcRec, destRec, origin,
+	rl.DrawTexturePro(tex.Content.Custom.texture2D, source, destination, origin,
 		rotation, White)
 }

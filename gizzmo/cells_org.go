@@ -91,8 +91,9 @@ func (cs *CellsOrg) Init(clear bool) {
 		for y := int32(0); y <= item.Rows; y++ {
 			*item.cells[x][y] = CellOrg{}
 
-			item.cells[x][y].Position = rl.NewVector2(float32(x*item.SquareSize),
-				float32(y*item.SquareSize+1))
+			item.cells[x][y].Position = rl.Vector2{X: float32(x * item.SquareSize),
+				Y: float32(y*item.SquareSize + 1)}
+
 			item.cells[x][y].Size = rl.NewVector2(float32(item.SquareSize-1),
 				float32(item.SquareSize-1))
 
@@ -104,8 +105,8 @@ func (cs *CellsOrg) Init(clear bool) {
 }
 
 func (cs *CellsOrg) Refresh(float64, rl.Vector4, ...func(any)) {}
-func (cs *CellsOrg) Bounds() rl.Rectangle {
-	return rl.Rectangle{X: 0, Y: 0, Width: float32(cs.Content.Width), Height: float32(cs.Content.Height)}
+func (cs *CellsOrg) Bounds() rl.Vector4 {
+	return rl.Vector4{X: float32(cs.Content.Width), Y: float32(cs.Content.Height)}
 }
 
 func (cs *CellsOrg) GetCells() [][]*CellOrg {

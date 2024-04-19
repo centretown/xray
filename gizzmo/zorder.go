@@ -1,9 +1,9 @@
 package gizzmo
 
-const Deepest int32 = 10000
+const Deepest float32 = 10000
 
 type DeepDrawer struct {
-	Depth  int32
+	Depth  float32
 	Drawer Drawer
 }
 

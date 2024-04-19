@@ -24,24 +24,14 @@ type NumberGridItem[T check.NumberType] struct {
 
 	StateCount int
 	cells      [][]*NumberCell[T]
-	bounds     rl.Rectangle
+	bounds     rl.Vector4
 }
-
-var (
-	gridColors = []color.RGBA{
-		rl.LightGray,
-		rl.LightGray,
-		rl.Black,
-		rl.Green,
-	}
-	colorMin = len(gridColors)
-)
 
 type NumberGrid[T check.NumberType] struct {
 	model.RecorderG[NumberGridItem[T]]
 }
 
-func NewGrid[T check.NumberType](bounds rl.Rectangle,
+func NewGrid[T check.NumberType](bounds rl.Vector4,
 	columns, rows int32, horizontalColor color.RGBA, verticalColor color.RGBA,
 	colors ...color.RGBA) *NumberGrid[T] {
 
@@ -52,8 +42,8 @@ func NewGrid[T check.NumberType](bounds rl.Rectangle,
 	item.bounds = bounds
 	item.Cols = int32(columns)
 	item.Rows = int32(rows)
-	item.CellWidth = int32(item.bounds.Width / float32(columns))
-	item.CellHeight = int32(item.bounds.Height / float32(rows))
+	item.CellWidth = int32(item.bounds.X / float32(columns))
+	item.CellHeight = int32(item.bounds.Y / float32(rows))
 	item.HorizontalColor = horizontalColor
 	item.VerticalColor = verticalColor
 	item.StateColors = colors
@@ -70,7 +60,7 @@ func (cs *NumberGrid[T]) Refresh(now float64, v rl.Vector4, funcs ...func(any)) 
 	if item.cells == nil {
 		cs.SetupCells()
 	}
-	item.bounds = rl.NewRectangle(0, 0, v.X, v.Y)
+	item.bounds = v
 	item.CellWidth = int32(v.X / float32(item.Cols))
 	item.CellHeight = int32(v.Y / float32(item.Rows))
 
@@ -147,6 +137,6 @@ func (cs *NumberGrid[T]) Draw(rl.Vector4) {
 	}
 }
 
-func (cs *NumberGrid[T]) Bounds() rl.Rectangle {
+func (cs *NumberGrid[T]) Bounds() rl.Vector4 {
 	return cs.Content.bounds
 }

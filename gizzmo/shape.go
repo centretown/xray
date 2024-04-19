@@ -31,13 +31,13 @@ func InitShape[T any](sh *Shape[T], name string, classn int32,
 	sh.Content.Dimensions.Y = height
 	sh.Content.Depth = depth
 	var _ model.Recorder = sh
-	// var _ Drawer = sh
+	var _ HasDepth = sh
 }
 
 func (sh *Shape[T]) Refresh(float64, rl.Vector4, ...func(any)) {}
 
-func (sh *Shape[T]) Bounds() rl.Rectangle {
-	return rl.Rectangle{X: 0, Y: 0, Width: sh.Content.Dimensions.X, Height: sh.Content.Dimensions.Y}
+func (sh *Shape[T]) Bounds() rl.Vector4 {
+	return rl.Vector4{X: 0, Y: 0, Z: sh.Content.Depth}
 }
 
 func (sh *Shape[T]) GetDepth() float32 { return sh.Content.Depth }

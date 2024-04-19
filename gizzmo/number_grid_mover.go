@@ -19,7 +19,7 @@ const (
 )
 
 type GridMoverItem[T check.NumberType] struct {
-	Rectangle  rl.Rectangle
+	Bounds     rl.Vector4
 	PixelRateX float64
 	Playing    bool
 	drawer     *NumberGrid[T]
@@ -29,13 +29,13 @@ type GridMover[T check.NumberType] struct {
 	model.RecorderG[GridMoverItem[T]]
 }
 
-func NewGridMover[T check.NumberType](bounds rl.Rectangle, pixelRateX float64) *GridMover[T] {
+func NewGridMover[T check.NumberType](bounds rl.Vector4, pixelRateX float64) *GridMover[T] {
 	mv := &GridMover[T]{}
 	var _ model.Parent = mv
 	var _ Mover = mv
 	var _ Inputer = mv
 
-	mv.Content.Rectangle = bounds
+	mv.Content.Bounds = bounds
 	mv.Content.PixelRateX = pixelRateX
 	model.InitRecorder[GridMover[T]](mv, class.LifeMover.String(),
 		int32(class.LifeMover))
@@ -43,9 +43,9 @@ func NewGridMover[T check.NumberType](bounds rl.Rectangle, pixelRateX float64) *
 	return mv
 }
 
-func (cm *GridMover[T]) GetDrawer() Drawer    { return cm.Content.drawer }
-func (cm *GridMover[T]) Bounds() rl.Rectangle { return cm.Content.Rectangle }
-func (cm *GridMover[T]) Draw(v rl.Vector4)    { cm.Content.drawer.Draw(v) }
+func (cm *GridMover[T]) GetDrawer() Drawer  { return cm.Content.drawer }
+func (cm *GridMover[T]) Bounds() rl.Vector4 { return cm.Content.Bounds }
+func (cm *GridMover[T]) Draw(v rl.Vector4)  { cm.Content.drawer.Draw(v) }
 
 func (cm *GridMover[T]) LinkChild(recorder model.Recorder) {
 	dr, ok := recorder.(*NumberGrid[T])
@@ -94,7 +94,7 @@ func (cs *GridMover[T]) CountNeighbors(cellX, cellY int32) int {
 }
 
 func (cm *GridMover[T]) Refresh(now float64, v rl.Vector4, f ...func(any)) {
-	cm.Content.Rectangle = rl.Rectangle{Width: v.X, Height: v.Y}
+	cm.Content.Bounds = v
 	dr := cm.Content.drawer
 	if dr == nil {
 		log.Fatalln("nil drawer")
@@ -115,16 +115,16 @@ func (cm *GridMover[T]) init(clear bool) {
 	}
 
 	cm.Content.drawer.Refresh(0, rl.Vector4{
-		X: cm.Content.Rectangle.X,
-		Y: cm.Content.Rectangle.Y}, f)
+		X: cm.Content.Bounds.X,
+		Y: cm.Content.Bounds.Y}, f)
 }
 
 func (cm *GridMover[T]) Move(can_move bool, now float64) {
 	if can_move {
 		cm.Update()
 	}
-	cm.Content.drawer.Draw(rl.Vector4{X: float32(cm.Content.Rectangle.X),
-		Y: float32(cm.Content.Rectangle.Y),
+	cm.Content.drawer.Draw(rl.Vector4{X: float32(cm.Content.Bounds.X),
+		Y: float32(cm.Content.Bounds.Y),
 		Z: 0})
 }
 

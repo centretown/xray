@@ -5,6 +5,7 @@ import (
 
 	"github.com/centretown/xray/builder"
 	"github.com/centretown/xray/gizzmo"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func main() {
@@ -16,7 +17,8 @@ func main() {
 
 func build_life02(game *gizzmo.Game) {
 	viewPort := game.SetViewPort(900, 800)
-	vp := viewPort.ToFloat32()
+	vf := viewPort.ToFloat32()
+	vp := rl.Vector4{X: vf.Width, Y: vf.Height}
 
 	game.Content.Title = "Life"
 	game.Content.Author = "Dave"

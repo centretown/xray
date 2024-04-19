@@ -6,12 +6,12 @@ import (
 )
 
 type HasDepth interface {
-	GetDepth() int32
+	GetDepth() float32
 }
 
 type Drawer interface {
 	model.Recorder
-	Bounds() rl.Rectangle
+	Bounds() rl.Vector4
 	Refresh(now float64, rect rl.Vector4, funcs ...func(any))
 	Draw(rl.Vector4)
 }
