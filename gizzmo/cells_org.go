@@ -40,7 +40,7 @@ var _ Drawer = (*CellsOrg)(nil)
 var _ Inputer = (*CellsOrg)(nil)
 
 type CellsOrg struct {
-	model.RecorderG[CellItemsOrg]
+	model.RecorderClass[CellItemsOrg]
 }
 
 func NewCellsOrgFromRecord(record *model.Record) *CellsOrg {
@@ -58,7 +58,7 @@ func NewCellsOrg(width, height, squareSize int32) *CellsOrg {
 	item.Cols = width / squareSize
 	item.Rows = height / squareSize
 	item.Colors = append(item.Colors, gridColor, aliveColor, visitedColor)
-	model.InitRecorder[CellItemsOrg](&cs.RecorderG, class.CellsOrg.String(),
+	model.InitRecorder[CellItemsOrg](&cs.RecorderClass, class.CellsOrg.String(),
 		int32(class.CellsOrg))
 	cs.start()
 	return cs

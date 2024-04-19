@@ -16,8 +16,7 @@ func main() {
 }
 
 func build_life02(game *gizzmo.Game) {
-	viewPort := game.SetViewPort(900, 800)
-	vf := viewPort.ToFloat32()
+	vf := game.SetViewPort(900, 800)
 	vp := rl.Vector4{X: vf.Width, Y: vf.Height}
 
 	game.Content.Title = "Life"

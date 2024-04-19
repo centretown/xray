@@ -33,8 +33,8 @@ type GameItem struct {
 	FrameRate     int32
 	FramesCounter int32
 
-	Width     int32
-	Height    int32
+	Width     float32
+	Height    float32
 	FixedSize bool
 
 	CaptureCount    int
@@ -68,7 +68,7 @@ type GameItem struct {
 }
 
 type Game struct {
-	model.RecorderG[GameItem]
+	model.RecorderClass[GameItem]
 	data *gizzmodb.Data
 }
 
@@ -83,8 +83,8 @@ func (gs *Game) NewGameSetup(width, height, fps int32) {
 	model.InitRecorder[GameItem](gs, class.Game.String(),
 		int32(class.Game))
 	item := &gs.Content
-	item.Width = width
-	item.Height = height
+	item.Width = float32(width)
+	item.Height = float32(height)
 	item.FrameRate = fps
 	item.Start = 0
 	item.Current = rl.GetTime()

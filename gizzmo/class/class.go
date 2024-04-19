@@ -14,6 +14,7 @@ const (
 	LifeGrid
 	Player
 	CellsOrg
+	Pane
 	ClassEnd
 )
 

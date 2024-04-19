@@ -32,6 +32,6 @@ func NewEllipse(rgba color.RGBA, width float32, height float32, depth float32) *
 
 func (ell *Ellipse) Draw(v rl.Vector4) {
 	rl.DrawEllipse(int32(v.X), int32(v.Y),
-		ell.Content.Dimensions.X, ell.Content.Dimensions.Y,
+		ell.Content.Dimensions.X/v.Z, ell.Content.Dimensions.Y/v.Z,
 		ell.Content.Color)
 }

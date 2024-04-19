@@ -23,7 +23,7 @@ func (gs *Game) Run() {
 
 	gs.createPalette()
 
-	rl.InitWindow(content.Width, content.Height, gs.Content.Title)
+	rl.InitWindow(int32(content.Width), int32(content.Height), gs.Content.Title)
 	rl.SetTraceLogLevel(rl.LogWarning)
 
 	for _, txt := range gs.Content.textureList {

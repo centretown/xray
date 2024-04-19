@@ -105,8 +105,8 @@ func link(data *gizzmodb.Data, parent model.Parent, records []*model.Record) {
 // makeLink constructs concrete classes from a database record
 func makeLink(record *model.Record) (recorder model.Recorder) {
 	fmt.Println("MakeLink", *record)
-	cat := class.Class(record.Classn)
-	switch cat {
+	cls := class.Class(record.Classn)
+	switch cls {
 	case class.Game:
 		return NewGameFromRecord(record)
 	case class.Texture:
@@ -123,7 +123,6 @@ func makeLink(record *model.Record) (recorder model.Recorder) {
 		return NewLifeGridFromRecord(record)
 	}
 
-	err := fmt.Errorf("unknown Class %d(%s)", cat, cat)
-	log.Fatal(err)
+	log.Fatal(fmt.Errorf("unknown Class %d(%s)", cls, cls))
 	return nil
 }

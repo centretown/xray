@@ -16,7 +16,7 @@ func main() {
 
 func build_life01(game *gizzmo.Game) {
 	viewPort := game.GetViewPort()
-	cells := gizzmo.NewCellsOrg(viewPort.Width, viewPort.Height, 12)
+	cells := gizzmo.NewCellsOrg(int32(viewPort.Width), int32(viewPort.Height), 12)
 	game.AddDrawer(cells)
 	game.Content.FrameRate = 20
 	game.Content.FixedSize = true

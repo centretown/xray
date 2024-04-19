@@ -45,20 +45,35 @@ func (tex *Texture) Load() *Texture {
 	if res.Err == nil {
 		tex.Content.Custom.texture2D = rl.LoadTexture(tex.Content.Custom.Resource.Path)
 		fmt.Println("TEXTURE LOADed")
+		tex.Content.Dimensions.X = float32(tex.Content.Custom.texture2D.Width)
+		tex.Content.Dimensions.Y = float32(tex.Content.Custom.texture2D.Height)
 	}
 	return tex
 }
 
 func (tex *Texture) Unload() { rl.UnloadTexture(tex.Content.Custom.texture2D) }
 
+//   Generate GPU mipmaps for a texture
+// void GenTextureMipmaps(Texture2D *texture);
+
+// Set texture scaling filter mode
+// void SetTextureFilter(Texture2D texture, int filter);
+
+// void SetTextureWrap(Texture2D texture, int wrap);
+
 func (tex *Texture) Draw(v rl.Vector4) {
-	x, y, rotation := v.X, v.Y, v.W
+	x, y, z, rotation := v.X, v.Y, v.Z, v.W
+	// x, y, rotation := v.X, v.Y, v.W
+	// fmt.Println("z", z, tex.Content.Dimensions.Z)
+
+	scale := z / tex.Content.Dimensions.Z
+
 	width, height := float32(tex.Content.Custom.texture2D.Width),
 		float32(tex.Content.Custom.texture2D.Height)
 	source := rl.Rectangle{X: 0, Y: 0, Width: width, Height: height}
-	destination := rl.Rectangle{X: x, Y: y, Width: width, Height: height}
-	origin := rl.Vector2{X: width / 2, Y: height / 2}
-
+	destination := rl.Rectangle{X: x, Y: y, Width: scale * width, Height: scale * height}
+	origin := rl.Vector2{X: scale * width / 2, Y: scale * height / 2}
 	rl.DrawTexturePro(tex.Content.Custom.texture2D, source, destination, origin,
 		rotation, White)
+
 }

@@ -34,7 +34,7 @@ type TrackerItem struct {
 }
 
 type Tracker struct {
-	model.RecorderG[TrackerItem]
+	model.RecorderClass[TrackerItem]
 }
 
 func NewTrackerFromRecord(record *model.Record) *Tracker {

@@ -10,12 +10,11 @@ import (
 type ShapeItem[T any] struct {
 	Color      color.RGBA
 	Dimensions rl.Vector4
-	Depth      float32
 	Custom     T
 }
 
 type Shape[T any] struct {
-	model.RecorderG[ShapeItem[T]]
+	model.RecorderClass[ShapeItem[T]]
 }
 
 func ShapeFromRecord[T any](sh *Shape[T], record *model.Record) {
@@ -29,7 +28,7 @@ func InitShape[T any](sh *Shape[T], name string, classn int32,
 	sh.Content.Color = color
 	sh.Content.Dimensions.X = width
 	sh.Content.Dimensions.Y = height
-	sh.Content.Depth = depth
+	sh.Content.Dimensions.Z = depth
 	var _ model.Recorder = sh
 	var _ HasDepth = sh
 }
@@ -37,7 +36,7 @@ func InitShape[T any](sh *Shape[T], name string, classn int32,
 func (sh *Shape[T]) Refresh(float64, rl.Vector4, ...func(any)) {}
 
 func (sh *Shape[T]) Bounds() rl.Vector4 {
-	return rl.Vector4{X: 0, Y: 0, Z: sh.Content.Depth}
+	return rl.Vector4{X: 0, Y: 0, Z: sh.Content.Dimensions.Z}
 }
 
-func (sh *Shape[T]) GetDepth() float32 { return sh.Content.Depth }
+func (sh *Shape[T]) GetDepth() float32 { return sh.Content.Dimensions.Z }

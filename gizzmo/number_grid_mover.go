@@ -26,7 +26,7 @@ type GridMoverItem[T check.NumberType] struct {
 }
 
 type GridMover[T check.NumberType] struct {
-	model.RecorderG[GridMoverItem[T]]
+	model.RecorderClass[GridMoverItem[T]]
 }
 
 func NewGridMover[T check.NumberType](bounds rl.Vector4, pixelRateX float64) *GridMover[T] {

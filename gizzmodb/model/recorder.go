@@ -18,7 +18,7 @@ type Parent interface {
 	Children() []Recorder
 }
 
-type RecorderG[T any] struct {
+type RecorderClass[T any] struct {
 	Record  Record
 	Content T
 }
@@ -27,11 +27,11 @@ func InitRecorder[T any](gd Recorder, name string, classn int32) {
 	InitRecord(gd.GetRecord(), name, classn, gd.GetItem(), JSON)
 }
 
-func (rr *RecorderG[T]) GetRecord() *Record {
+func (rr *RecorderClass[T]) GetRecord() *Record {
 	return &rr.Record
 }
 
-func (rr *RecorderG[T]) GetItem() any {
+func (rr *RecorderClass[T]) GetItem() any {
 	return &rr.Content
 }
 

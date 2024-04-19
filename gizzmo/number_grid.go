@@ -28,7 +28,7 @@ type NumberGridItem[T check.NumberType] struct {
 }
 
 type NumberGrid[T check.NumberType] struct {
-	model.RecorderG[NumberGridItem[T]]
+	model.RecorderClass[NumberGridItem[T]]
 }
 
 func NewGrid[T check.NumberType](bounds rl.Vector4,

@@ -39,11 +39,13 @@ func (gs *Game) DrawStatus() {
 }
 
 func (gs *Game) Refresh(current float64) {
-	viewPort := gs.SetViewPortFromWindow()
+	viewPort := gs.SetViewPort(float32(rl.GetRenderWidth()),
+		float32(rl.GetRenderHeight()))
+
 	for _, mover := range gs.Content.movers {
 		mover.Refresh(current, rl.Vector4{
-			X: float32(viewPort.Width),
-			Y: float32(viewPort.Height)})
+			X: viewPort.Width,
+			Y: viewPort.Height})
 	}
 	for _, drawer := range gs.Content.drawers {
 		drawer.Refresh(current, rl.Vector4{
@@ -52,19 +54,14 @@ func (gs *Game) Refresh(current float64) {
 	}
 }
 
-func (gs *Game) SetViewPortFromWindow() rl.RectangleInt32 {
-	return gs.SetViewPort(int32(rl.GetRenderWidth()),
-		int32(rl.GetRenderHeight()))
-}
-
-func (gs *Game) SetViewPort(rw, rh int32) rl.RectangleInt32 {
+func (gs *Game) SetViewPort(rw, rh float32) rl.Rectangle {
 	gs.Content.Width = rw
 	gs.Content.Height = rh
 	return gs.GetViewPort()
 }
 
-func (gs *Game) GetViewPort() rl.RectangleInt32 {
-	return rl.RectangleInt32{
+func (gs *Game) GetViewPort() rl.Rectangle {
+	return rl.Rectangle{
 		X:      0,
 		Y:      0,
 		Width:  gs.Content.Width,
