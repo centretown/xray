@@ -16,6 +16,7 @@ const (
 	CAPTURE_GIF
 	CAPTURE_PNG
 	PAUSED
+	CAPTURE_MP4
 	PAD_STATES
 )
 
@@ -29,8 +30,8 @@ func (gs *Game) ProcessInput() {
 		}
 	}
 
-	for _, ch := range gs.Children() {
-		t, ok := ch.(Inputer)
+	for _, child := range gs.Children() {
+		t, ok := child.(Inputer)
 		if ok {
 			t.Input()
 		}
@@ -77,16 +78,16 @@ func (gs *Game) CheckPad(i int32) {
 			}
 
 		case CAPTURE_GIF:
-			down = item.gamepad.IsGamepadButtonDown(i, gpads.RL_MiddleLeft)
-			if down && item.Capturing {
-				gs.EndGIFCapture()
-			} else if down {
-				gs.BeginGIFCapture()
-			}
+		// 	down = item.gamepad.IsGamepadButtonDown(i, gpads.RL_MiddleLeft)
+		// 	if down && item.Capturing {
+		// 		gs.EndCapture()
+		// 	} else if down {
+		// 		gs.BeginCapture("gif")
+		// 	}
 
 		case CAPTURE_PNG:
 			if item.gamepad.IsGamepadButtonDown(i, gpads.RL_MiddleRight) {
-				capture.CapturePNG("", rl.LoadImageFromScreen().ToImage())
+				capture.CapturePNG(rl.LoadImageFromScreen().ToImage())
 			}
 		case PAUSED:
 			if item.gamepad.IsGamepadButtonDown(i, gpads.RL_RightFaceLeft) {
@@ -96,6 +97,13 @@ func (gs *Game) CheckPad(i int32) {
 				}
 			}
 
+		case CAPTURE_MP4:
+			down = item.gamepad.IsGamepadButtonDown(i, gpads.RL_MiddleLeft)
+			if down && item.Capturing {
+				gs.EndCapture()
+			} else if down {
+				gs.BeginCapture("mp4")
+			}
 		}
 	}
 }

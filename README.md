@@ -1,12 +1,23 @@
 # xray
-Experiments with go and raylib.
+Experiments with a simple data driven game engine based on raylib.
 
-## 2d
-Experiments with go and raylib 2d animation.
+## gizzmo
+Game tools.
 
-## 3d
-Experiments with go and raylib 3d.
+## gizzmodb
+Simple database and model.
 
-## [try.As](./try/README.md)
+## builder
+Build tool.
+
+## runner
+Run tool.
+
+## custom
+Testing samples gander and life02. Gander is a variation of "bounce".
+
+## [check.As](./check/README.md)
 How to write an if statement in go? Experiments in branchless go programming.
 
+## 3d
+Early experiments with go and raylib 3d and gamepad.

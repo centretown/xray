@@ -8,9 +8,10 @@ import (
 )
 
 type ShapeItem[T any] struct {
-	Color         color.RGBA
-	Dimensions    rl.Vector4
-	ScaleToScreen bool
+	Color           color.RGBA
+	Dimensions      rl.Vector4
+	ScaleToScreen   bool
+	KeepAspectRatio bool
 
 	Custom T
 }

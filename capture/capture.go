@@ -10,23 +10,21 @@ import (
 	"io"
 	"log"
 	"os"
-	"path/filepath"
-	"time"
 
 	"github.com/ericpauley/go-quantize/quantize"
 	"github.com/google/uuid"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
-func NextFileName(ext, path string) string {
+func NextFileName(ext string) string {
 	var namePrefix = "capture"
 	id := uuid.New()
 	name := fmt.Sprintf("%s_%s.%s", namePrefix, id.String(), ext)
-	return filepath.Join(path, name)
+	return name
 }
 
-func createFile(ext string, path string) (io.WriteCloser, error) {
-	fname := NextFileName(ext, path)
+func createFile(ext string) (io.WriteCloser, error) {
+	fname := NextFileName(ext)
 
 	w, err := os.Create(fname)
 	if err != nil {
@@ -44,8 +42,8 @@ func CaptureMPG() {
 	}
 }
 
-func CapturePNG(path string, img image.Image) {
-	w, err := createFile("png", path)
+func CapturePNG(img image.Image) {
+	w, err := createFile("png")
 	if err != nil {
 		return
 	}
@@ -79,18 +77,8 @@ func (ch *Cheap) Draw(dst draw.Image, rect image.Rectangle, src image.Image, sp 
 	}
 }
 
-func WriteGIFFrame(w io.Writer, pic image.Image, cheap *Cheap) {
-	gif.Encode(w, pic, &gif.Options{
-		NumColors: 64,
-		Quantizer: cheap,
-		Drawer:    cheap,
-	})
-}
-
-func CaptureGIF(path string, done <-chan int,
-	img <-chan image.Image,
-	pal color.Palette,
-	delay int,
+func CaptureGIF(done <-chan int, img <-chan *image.RGBA,
+	pal color.Palette, delay int,
 	colorMap map[color.Color]uint8) {
 
 	log.Println("Capturing...")
@@ -104,12 +92,12 @@ func CaptureGIF(path string, done <-chan int,
 
 		case <-done:
 			log.Println("Writing...")
-			WriteGIF(path, pics, pal, colorMap, delay)
+			WriteGIF(pics, pal, colorMap, delay)
 			log.Println("Done.")
 			return
 
 		default:
-			time.Sleep(time.Millisecond)
+			// time.Sleep(time.Millisecond)
 		}
 	}
 }
@@ -131,7 +119,7 @@ func PackImages(imgs []image.Image) (combined image.Image) {
 // vf – MP4 videos using H.264 need to have a dimensions that are divisible by 2. This option ensures that’s the case.
 // Source: http://rigor.com/blog/2015/12/optimizing-animated-gifs-with-html5-video
 
-func WriteGIF(path string, pics []image.Image, pal color.Palette,
+func WriteGIF(pics []image.Image, pal color.Palette,
 	colorMap map[color.Color]uint8, delay int) {
 
 	imageCount := len(pics)
@@ -153,7 +141,7 @@ func WriteGIF(path string, pics []image.Image, pal color.Palette,
 		images[i] = img
 	}
 
-	w, err := createFile("gif", path)
+	w, err := createFile("gif")
 	if err != nil {
 		return
 	}

@@ -18,4 +18,7 @@ yacx
 textgen
 *.txt
 cexamples
+video/input
+video/output
+video/sample_data
 

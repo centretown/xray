@@ -41,11 +41,12 @@ func NewTexture(viewPort rl.Rectangle, path string, depth float32) *Texture {
 
 func (tex *Texture) Load() *Texture {
 	fmt.Println("LOAD TEXTURE")
-	res := &tex.Content.Custom.Resource
+	custom := &tex.Content.Custom
+	res := &custom.Resource
 	if res.Err == nil {
-		tex.Content.Custom.texture2D = rl.LoadTexture(tex.Content.Custom.Resource.Path)
-		tex.Content.Dimensions.X = float32(tex.Content.Custom.texture2D.Width)
-		tex.Content.Dimensions.Y = float32(tex.Content.Custom.texture2D.Height)
+		custom.texture2D = rl.LoadTexture(tex.Content.Custom.Resource.Path)
+		tex.Content.Dimensions.X = float32(custom.texture2D.Width)
+		tex.Content.Dimensions.Y = float32(custom.texture2D.Height)
 		fmt.Println("TEXTURE LOADed", tex.Content.Dimensions,
 			tex.Content.Dimensions)
 	}

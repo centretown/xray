@@ -29,11 +29,13 @@ func (gs *Game) Run() {
 	for _, txt := range gs.Content.textureList {
 		txt.Load()
 	}
+	content.screen = rl.LoadRenderTexture(int32(content.Width), int32(content.Height))
 
 	defer func() {
 		for _, txt := range gs.Content.textureList {
 			txt.Unload()
 		}
+		rl.UnloadRenderTexture(gs.Content.screen)
 		gs.data.Close()
 		rl.CloseWindow()
 	}()
@@ -50,13 +52,17 @@ func (gs *Game) Run() {
 		content.Current = rl.GetTime()
 
 		if rl.IsWindowResized() {
+			rl.UnloadRenderTexture(gs.Content.screen)
+			content.screen = rl.LoadRenderTexture(int32(rl.GetRenderWidth()),
+				int32(rl.GetRenderHeight()))
 			gs.Refresh(content.Current)
 		}
 
 		rl.BeginDrawing()
+		rl.BeginTextureMode(gs.Content.screen)
 		rl.ClearBackground(content.BackGround)
 
-		// iterate from deepest to least shallowest
+		// iterate from deepest to shallowest
 		depthList = gs.SortDepthList()
 		for i := len(depthList) - 1; i >= 0; i-- {
 			drawer = depthList[i].Drawer
@@ -71,12 +77,33 @@ func (gs *Game) Run() {
 
 		gs.DrawStatus()
 
+		rl.EndTextureMode()
+		//I'm pretty sure you can give the
+		// source rect or the dest rect a negative height and it will flip it.
+
+		rl.DrawTexturePro(gs.Content.screen.Texture,
+
+			rl.Rectangle{X: 0, Y: 0,
+				Width:  gs.Content.Width,
+				Height: -gs.Content.Height,
+			},
+			rl.Rectangle{X: 0, Y: 0,
+				Width:  gs.Content.Width,
+				Height: gs.Content.Height,
+			},
+			rl.Vector2{
+				X: 0,
+				Y: 0,
+				// X: gs.Content.Width / 2,
+				// Y: gs.Content.Height / 2,
+			},
+			1, White)
 		rl.EndDrawing()
 
 		gs.ProcessInput()
 
 		if content.Capturing {
-			gs.gifCapture()
+			gs.screenCapture()
 		}
 	}
 }

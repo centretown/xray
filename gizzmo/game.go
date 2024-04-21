@@ -2,7 +2,6 @@ package gizzmo
 
 import (
 	"fmt"
-	"image"
 	"image/color"
 	"math/rand"
 	"time"
@@ -35,6 +34,7 @@ type GameItem struct {
 
 	Width     float32
 	Height    float32
+	Depth     float32
 	FixedSize bool
 
 	CaptureCount    int
@@ -50,12 +50,13 @@ type GameItem struct {
 	palette  color.Palette
 	colorMap map[color.Color]uint8
 
+	screen          rl.RenderTexture2D
 	nextInput       float64
 	previousCapture float64
 
 	// capture go routine channels
 	stopChan chan int
-	scrChan  chan image.Image
+	scrChan  chan *rl.Image
 
 	// note: movers are also drawers
 	movers      []Mover      // movers as loaded
@@ -102,13 +103,14 @@ func (gs *Game) NewGameSetup(width, height, fps int32) {
 func (gs *Game) setup() {
 	item := &gs.Content
 	item.stopChan = make(chan int)
-	item.scrChan = make(chan image.Image)
+	item.scrChan = make(chan *rl.Image)
 	item.gamepad = gpads.NewGPads()
 	item.movers = make([]Mover, 0)
 	item.drawers = make([]Drawer, 0)
 	item.inputters = make([]Inputer, 0)
 	item.depthList = make([]DeepDrawer, 0)
 	item.textureList = make([]*Texture, 0)
+
 }
 
 func (gs *Game) SetPad(pad pad.PadG)             { gs.Content.gamepad = pad }

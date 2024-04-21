@@ -3,5 +3,15 @@ package gizzmo
 import rl "github.com/gen2brain/raylib-go/raylib"
 
 type ViewPort struct {
-	Rectangle rl.Rectangle
+	Width  float32
+	Height float32
+	Depth  float32
+	Spin   float32
+}
+
+func (vp *ViewPort) FromVector4(v rl.Vector4) {
+	vp.Width = v.X
+	vp.Height = v.Y
+	vp.Depth = v.Z
+	vp.Spin = v.W
 }
