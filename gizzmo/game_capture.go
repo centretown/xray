@@ -1,10 +1,11 @@
 package gizzmo
 
 import (
+	"image"
 	"log"
 
+	rl "github.com/centretown/raylib-go/raylib"
 	"github.com/centretown/xray/capture"
-	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 // func (gs *Game) CanCapture() bool {
@@ -22,40 +23,48 @@ func (gs *Game) BeginCapture(mode string) {
 		log.Println("already capturing...")
 		return
 	}
-	item.CaptureCount = item.CaptureStart
-	item.Capturing = true
-	fps := rl.GetFPS()
-	log.Println("Capturing...", fps)
 
-	if mode == "gif" {
-		if fps >= 50 {
-			rl.SetTargetFPS(50)
-			item.CaptureDelay = 2
-		} else {
-			rl.SetTargetFPS(25)
-			item.CaptureDelay = 4
-		}
+	// if mode == "gif" {
+	// 	if fps >= 50 {
+	// 		rl.SetTargetFPS(50)
+	// 		item.CaptureDelay = 2
+	// 	} else {
+	// 		rl.SetTargetFPS(25)
+	// 		item.CaptureDelay = 4
+	// 	}
 
-		// go capture.CaptureGIF(item.stopChan, item.scrChan, item.palette,
-		// 	item.CaptureDelay, item.colorMap)
-	} else if mode == "mp4" {
-		log.Println("BeginCapture mp4")
+	// 	// go capture.CaptureGIF(item.stopChan, item.scrChan, item.palette,
+	// 	// 	item.CaptureDelay, item.colorMap)
+	if mode == "mp4" {
+		fps := rl.GetFPS()
+		item.CaptureCount = item.CaptureStart
+		item.Capturing = true
+		log.Println("Capturing mp4...", fps)
 		go capture.CaptureVideo(item.stopChan, item.scrChan,
 			int32(gs.Content.Width), int32(gs.Content.Height), fps)
 	}
 }
 
 func (gs *Game) screenCapture() {
-	item := &gs.Content
-	if !item.Capturing {
+	content := &gs.Content
+	if !content.Capturing {
 		log.Println("not supposed to capture")
 		return
 	}
 
-	imag := rl.LoadImageFromTexture(gs.Content.screen.Texture)
-	item.scrChan <- imag
-	item.CaptureCount--
-	if item.CaptureCount < 0 {
+	tex := content.screen.Texture
+	content.captureImage = image.NewRGBA(image.Rectangle{
+		Min: image.Point{X: 0, Y: 0},
+		Max: image.Point{X: int(content.screen.Texture.Width),
+			Y: int(content.screen.Texture.Height)}})
+
+	scr := rl.LoadImageFromTexture(tex)
+	scr.ToImageEx(content.captureImage)
+	// rl.UnloadTexture(tex)
+
+	content.scrChan <- gs.Content.captureImage
+	content.CaptureCount--
+	if content.CaptureCount < 0 {
 		gs.EndCapture()
 	}
 }
@@ -70,6 +79,6 @@ func (gs *Game) EndCapture() {
 	item.CaptureCount = -1
 	item.Capturing = false
 	item.stopChan <- 1
-	// close(item.scrChan)
-	// item.scrChan = make(chan *image.RGBA)
+	close(item.scrChan)
+	item.scrChan = make(chan *image.RGBA)
 }

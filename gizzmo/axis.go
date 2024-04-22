@@ -1,8 +1,8 @@
 package gizzmo
 
 import (
+	rl "github.com/centretown/raylib-go/raylib"
 	"github.com/centretown/xray/check"
-	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 // var _ Motor = (*Axis)(nil)

@@ -1,8 +1,8 @@
 package main
 
 import (
+	rl "github.com/centretown/raylib-go/raylib"
 	"github.com/centretown/xray/gizzmo"
-	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 const (

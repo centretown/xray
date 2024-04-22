@@ -1,8 +1,8 @@
 package gizzmo
 
 import (
+	rl "github.com/centretown/raylib-go/raylib"
 	"github.com/centretown/xray/gizzmodb/model"
-	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func NewLifeMoverFromRecord(record *model.Record) model.Recorder {

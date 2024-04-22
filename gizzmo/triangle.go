@@ -5,7 +5,7 @@ package gizzmo
 
 // 	"github.com/centretown/xray/gizzmo/class"
 // 	"github.com/centretown/xray/gizzmodb/model"
-// 	rl "github.com/gen2brain/raylib-go/raylib"
+// 	rl "github.com/centretown/raylib-go/raylib"
 // )
 
 // type TriangleItem struct {

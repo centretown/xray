@@ -12,7 +12,7 @@ import (
 	_ "image/gif"
 	_ "image/png"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/centretown/raylib-go/raylib"
 )
 
 func main() {

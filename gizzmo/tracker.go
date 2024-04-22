@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log"
 
+	rl "github.com/centretown/raylib-go/raylib"
 	"github.com/centretown/xray/check"
 	"github.com/centretown/xray/gizzmo/class"
 	"github.com/centretown/xray/gizzmodb/model"
-	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 var _ Mover = (*Tracker)(nil)

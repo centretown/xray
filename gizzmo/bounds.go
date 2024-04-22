@@ -1,6 +1,6 @@
 package gizzmo
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import rl "github.com/centretown/raylib-go/raylib"
 
 type Bounds struct {
 	Width    rl.Vector2

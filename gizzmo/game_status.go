@@ -5,7 +5,7 @@ import (
 	"image/color"
 	"log"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/centretown/raylib-go/raylib"
 	"gopkg.in/yaml.v3"
 )
 

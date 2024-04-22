@@ -2,6 +2,7 @@ package gizzmo
 
 import (
 	"fmt"
+	"image"
 	"image/color"
 	"math/rand"
 	"time"
@@ -11,8 +12,8 @@ import (
 
 	"github.com/centretown/gpads/gpads"
 	"github.com/centretown/gpads/pad"
+	rl "github.com/centretown/raylib-go/raylib"
 	"github.com/centretown/xray/gizzmo/class"
-	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 var _ = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -51,12 +52,13 @@ type GameItem struct {
 	colorMap map[color.Color]uint8
 
 	screen          rl.RenderTexture2D
+	captureImage    *image.RGBA
 	nextInput       float64
 	previousCapture float64
 
 	// capture go routine channels
 	stopChan chan int
-	scrChan  chan *rl.Image
+	scrChan  chan *image.RGBA
 
 	// note: movers are also drawers
 	movers      []Mover      // movers as loaded
@@ -103,14 +105,13 @@ func (gs *Game) NewGameSetup(width, height, fps int32) {
 func (gs *Game) setup() {
 	item := &gs.Content
 	item.stopChan = make(chan int)
-	item.scrChan = make(chan *rl.Image)
+	item.scrChan = make(chan *image.RGBA)
 	item.gamepad = gpads.NewGPads()
 	item.movers = make([]Mover, 0)
 	item.drawers = make([]Drawer, 0)
 	item.inputters = make([]Inputer, 0)
 	item.depthList = make([]DeepDrawer, 0)
 	item.textureList = make([]*Texture, 0)
-
 }
 
 func (gs *Game) SetPad(pad pad.PadG)             { gs.Content.gamepad = pad }

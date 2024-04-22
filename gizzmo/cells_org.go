@@ -4,9 +4,9 @@ import (
 	"image/color"
 	"math/rand"
 
+	rl "github.com/centretown/raylib-go/raylib"
 	"github.com/centretown/xray/gizzmo/class"
 	"github.com/centretown/xray/gizzmodb/model"
-	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type CellOrg struct {

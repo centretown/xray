@@ -5,10 +5,10 @@ import (
 	"image/color"
 	"time"
 
+	rl "github.com/centretown/raylib-go/raylib"
 	"github.com/centretown/xray/check"
 	"github.com/centretown/xray/gizzmo/class"
 	"github.com/centretown/xray/gizzmodb/model"
-	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type NumberGridItem[T check.NumberType] struct {

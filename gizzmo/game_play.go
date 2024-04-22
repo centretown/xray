@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	rl "github.com/centretown/raylib-go/raylib"
 )
 
 var _ = rand.NewSource(time.Now().UnixMicro())

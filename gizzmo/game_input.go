@@ -2,9 +2,9 @@ package gizzmo
 
 import (
 	"github.com/centretown/gpads/gpads"
+	rl "github.com/centretown/raylib-go/raylib"
 	"github.com/centretown/xray/capture"
 	"github.com/centretown/xray/check"
-	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 const (
