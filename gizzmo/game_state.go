@@ -12,14 +12,13 @@ import (
 const (
 	msg_font_size = 20
 	msg_label_X   = msg_font_size + 3
-	msg_value_X   = msg_label_X + msg_font_size*10
+	msg_value_X   = msg_label_X + msg_font_size*15
 	msg_Y         = msg_font_size + 3
 )
 
 var (
 	msg_color_label = color.RGBA{255, 255, 0, 255}
 	msg_color_value = color.RGBA{0, 255, 255, 255}
-	msg_options     = &msg.Options{Sep: ":", TokenSep: " "}
 )
 
 func (gs *Game) DrawStatus() {
@@ -28,26 +27,29 @@ func (gs *Game) DrawStatus() {
 		return
 	}
 
-	monitor := rl.GetCurrentMonitor()
-	outputs := msg.Build(msg_options,
-		&msg.Token{Label: msg.Monitor, Format: "%d %dx%d %d%s",
-			Values: []any{monitor,
-				rl.GetMonitorWidth(monitor), rl.GetMonitorHeight(monitor),
-				rl.GetMonitorRefreshRate(monitor), msg.Mhz}},
-		&msg.Token{Label: msg.View, Format: "%dx%d",
+	monitorNum := rl.GetCurrentMonitor()
+	outputs := msg.Build(
+		&msg.Token{Label: msg.Monitor, Value: msg.MonitorValue,
+			Values: []any{monitorNum,
+				rl.GetMonitorWidth(monitorNum),
+				rl.GetMonitorHeight(monitorNum),
+				rl.GetMonitorRefreshRate(monitorNum)}},
+
+		&msg.Token{Label: msg.View, Value: msg.ViewValue,
 			Values: []any{rl.GetScreenWidth(), rl.GetScreenHeight()}},
-		&msg.Token{Label: msg.Duration, Format: "%.3f",
+
+		&msg.Token{Label: msg.Duration, Value: msg.DurationValue,
 			Values: []any{content.CaptureDuration}},
-		&msg.Token{Label: msg.FrameRate, Format: "%d", Values: []any{rl.GetFPS()}},
+
+		&msg.Token{Label: msg.FrameRate, Value: msg.FrameRateValue, Values: []any{rl.GetFPS()}},
 	)
 
 	y := int(msg_Y)
 	y += drawOutputs(y, outputs)
 
 	if content.capturing {
-		outputs = msg.Build(msg_options,
-			&msg.Token{Label: msg.Capturing, Format: "%d ... %d",
-				Values: []any{content.captureTotal, content.captureCount}},
+		outputs = msg.Build(&msg.Token{Label: msg.Capture, Value: msg.CaptureValue,
+			Values: []any{content.captureTotal, content.captureCount}},
 		)
 		drawOutputs(y, outputs)
 	}
