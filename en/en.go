@@ -16,6 +16,6 @@ type En struct {
 	Items [message.LastTextItem]string
 }
 
-func (en *En) Format(item message.MessageItem) string {
+func (en *En) Format(item message.Message) string {
 	return items[int(item)]
 }

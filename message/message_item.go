@@ -1,9 +1,9 @@
 package message
 
-type MessageItem int
+type Message int
 
 const (
-	MajorUsage MessageItem = iota
+	MajorUsage Message = iota
 	MinorUsage
 	KeyUsage
 	InstallUsage
@@ -16,9 +16,11 @@ const (
 	Capturing
 	Mhz
 	Counter
-	FPS
+	FrameRate
+	Captured
+	Current
 	LastTextItem
 	FirstItem = 0
 )
 
-//go:generate stringer -type=MessageItem
+//go:generate stringer -type=Message

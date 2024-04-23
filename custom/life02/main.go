@@ -34,8 +34,6 @@ func build_life02(game *gizzmo.Game) {
 		color.RGBA{R: 255, G: 255, B: 0, A: 255}, //Visited
 		color.RGBA{R: 0, G: 0, B: 255, A: 255},   //Next
 	)
-	game.AddColors(grid.Content.HorizontalColor, grid.Content.VerticalColor)
-	game.AddColors(grid.Content.StateColors...)
 
 	grid_mv := gizzmo.NewGridMover[int8](vp, 5)
 	grid_mv.AddDrawer(grid)

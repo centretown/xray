@@ -21,5 +21,4 @@ func build_life01(game *gizzmo.Game) {
 	game.Content.FrameRate = 20
 	game.Content.FixedSize = true
 	cells.Content.Colors = []color.RGBA{gizzmo.White, gizzmo.Blue, gizzmo.Green}
-	game.AddColors(cells.Content.Colors...)
 }

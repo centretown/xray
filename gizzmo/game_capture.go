@@ -7,45 +7,43 @@ import (
 	"github.com/centretown/xray/capture"
 )
 
-// func (gs *Game) CanCapture() bool {
-// 	item := &gs.Content
-// 	canCapture := item.Current >= item.previousCapture+item.CaptureInterval
-// 	moveFloat := check.As[float64](canCapture)
-// 	item.previousCapture = moveFloat*item.CaptureInterval + moveFloat*item.Current
-// 	return canCapture
-// }
-
 func (gs *Game) BeginCapture(mode string) {
 
-	item := &gs.Content
-	if item.capturing {
+	content := &gs.Content
+	if content.capturing {
 		log.Println("already capturing...")
 		return
 	}
 
 	if mode == "mp4" {
-		fps := gs.Content.FrameRate
-		item.captureCount = item.captureFrames
-		item.capturing = true
-		log.Println("Capturing mp4...", fps)
-		go capture.CaptureVideo(item.captureStop, item.captureSource,
-			int32(gs.Content.Width), int32(gs.Content.Height), int32(fps))
+		content.captureCount = 0
+		content.captureTotal = int64(content.CaptureDuration) * content.FrameRate
+		if content.captureTotal == 0 {
+			log.Fatal("content.captureTotal == 0")
+		}
+		content.capturing = true
+		content.captureEnd = content.currentTime + content.CaptureDuration
+		log.Println("Capturing mp4...", content.FrameRate)
+		go capture.CaptureVideo(content.captureStop, content.captureSource,
+			int32(content.Width), int32(content.Height), int32(content.FrameRate))
 	}
 }
 
 func (gs *Game) captureTexture() {
 	content := &gs.Content
 	if !content.capturing {
-		log.Println("not supposed to capture")
+		log.Fatalln("not supposed to be capturing")
 		return
 	}
 
-	content.captureImage = rl.LoadImageFromTexture(content.captureTexture.Texture)
-	content.captureSource <- gs.Content.captureImage
-	content.captureCount--
-	if content.captureCount < 0 {
+	if content.captureCount >= content.captureTotal {
 		gs.EndCapture()
+		return
 	}
+
+	content.captureImage = rl.LoadImageFromTexture(content.renderTexture.Texture)
+	content.captureSource <- gs.Content.captureImage
+	content.captureCount++
 }
 
 func (gs *Game) EndCapture() {
@@ -55,7 +53,6 @@ func (gs *Game) EndCapture() {
 		return
 	}
 	log.Println("EndCapture")
-	item.captureCount = -1
-	item.capturing = false
 	item.captureStop <- 1
+	item.capturing = false
 }

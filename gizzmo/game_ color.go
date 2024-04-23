@@ -14,8 +14,3 @@ var (
 	Blue    = color.RGBA{R: 0, G: 0, B: 255, A: 255}
 	Magenta = color.RGBA{R: 255, G: 0, B: 255, A: 255}
 )
-
-// AddColors to the FixedPalette
-func (gs *Game) AddColors(clrs ...color.RGBA) {
-	gs.Content.FixedPalette = append(gs.Content.FixedPalette, clrs...)
-}

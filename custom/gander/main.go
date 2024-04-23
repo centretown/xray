@@ -98,5 +98,6 @@ func build_gander(game *gizzmo.Game) {
 	door_mv.AddDrawer(door)
 	game.AddActor(door_mv, door.GetDepth())
 
-	game.Content.FrameRate = 60
+	game.Content.FrameRate = 25
+	game.Content.CaptureDuration = 30
 }

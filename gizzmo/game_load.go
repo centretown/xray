@@ -53,7 +53,9 @@ func LoadGame() (err error) {
 	recorder = makeLink(&record)
 	game, ok = recorder.(*Game)
 	if !ok {
-		log.Fatal()
+		data.Err = fmt.Errorf("%s with keys%d:%d is not game",
+			record.Class, record.Major, record.Minor)
+		return
 	}
 
 	gameRecord := game.GetRecord()
@@ -64,6 +66,9 @@ func LoadGame() (err error) {
 
 	game.data = data
 	link(game.data, game, records)
+	if data.HasErrors() {
+		return
+	}
 
 	game.Run()
 	return
@@ -74,12 +79,6 @@ func link(data *gizzmodb.Data, parent model.Parent, records []*model.Record) {
 		recorder model.Recorder
 	)
 
-	defer func() {
-		if data.HasErrors() {
-			log.Fatal(data.Err)
-		}
-	}()
-
 	for _, record := range records {
 
 		data.GetRecord(record)
@@ -88,23 +87,22 @@ func link(data *gizzmodb.Data, parent model.Parent, records []*model.Record) {
 		}
 
 		recorder = makeLink(record)
-
 		parent.LinkChild(recorder)
-
 		p, ok := recorder.(model.Parent)
 		if ok {
 			rs := data.LoadLinks(p.GetRecord())
 			if data.HasErrors() {
 				return
 			}
+
+			// dig a little deeper
 			link(data, p, rs)
 		}
 	}
 }
 
-// makeLink constructs concrete classes from a database record
+// makeLink constructs concrete structs from a database class record
 func makeLink(record *model.Record) (recorder model.Recorder) {
-	fmt.Println("MakeLink", *record)
 	cls := class.Class(record.Classn)
 	switch cls {
 	case class.Game:

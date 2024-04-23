@@ -1,7 +1,6 @@
 package gizzmo
 
 import (
-	"fmt"
 	"image/color"
 	"math/rand"
 	"time"
@@ -26,34 +25,35 @@ type GameItem struct {
 	Instructions string
 	Author       string
 
-	Start         float64
-	Current       float64
 	InputInterval float64
 	FrameRate     int64
-	FramesCounter int64
 
 	Width     float32
 	Height    float32
 	Depth     float32
 	FixedSize bool
 
-	Paused          bool
-	FixedPalette    []color.RGBA // gizzmo colors plus colors added
-	BackGround      color.RGBA   // defaults to black
-	CaptureDelay    int64
-	CaptureDuration time.Duration
+	BackGround      color.RGBA // defaults to black
+	CaptureDelay    float64
+	CaptureDuration float64
 
-	capturing      bool
-	captureTexture rl.RenderTexture2D
-	captureImage   *rl.Image
-	captureFrames  int64
-	captureCount   int64
+	built  float64
+	paused bool
+
+	currentTime   float64
+	capturing     bool
+	renderTexture rl.RenderTexture2D
+	captureImage  *rl.Image
+	captureCount  int64
+	captureTotal  int64
+	captureEnd    float64
 	// capture go routine channels
 	captureStop   chan int
 	captureSource chan *rl.Image
 
-	aspectRatio float32
-	nextInput   float64
+	aspectRatio  float32
+	nextInput    float64
+	commandState bool
 
 	// note: movers are also drawers
 	movers      []Mover      // movers as loaded
@@ -83,26 +83,27 @@ func (gs *Game) NewGameSetup(width, height, fps int32) {
 	content := &gs.Content
 	content.Width = float32(width)
 	content.Height = float32(height)
-	content.Start = 0
-	content.Current = rl.GetTime()
+	content.built = rl.GetTime()
+	content.currentTime = rl.GetTime()
 	content.InputInterval = .2
-	content.capturing = false
-	content.Paused = false
 	content.BackGround = rl.Black
-
-	content.CaptureDuration = time.Second * 15
+	content.CaptureDuration = 15
 	content.FrameRate = 30
-	content.captureFrames = int64(content.CaptureDuration) * content.FrameRate / int64(time.Second)
+	//TODO?
 	content.CaptureDelay = 4
 	gs.setup()
 }
 
 func (gs *Game) setup() {
 	content := &gs.Content
+	content.paused = false
 	content.aspectRatio = content.Width / content.Height
 	content.captureStop = make(chan int)
 	content.captureSource = make(chan *rl.Image)
+	content.capturing = false
+
 	content.gamepad = gpads.NewGPads()
+
 	content.movers = make([]Mover, 0)
 	content.drawers = make([]Drawer, 0)
 	content.inputters = make([]Inputer, 0)
@@ -132,12 +133,10 @@ func (gs *Game) Children() (children []model.Recorder) {
 func (gs *Game) LinkChild(recorder model.Recorder) {
 	mover, ok := recorder.(Mover)
 	if ok {
-		fmt.Println("Added Mover")
 		gs.Content.movers = append(gs.Content.movers, mover)
 	} else {
 		drawer, ok := recorder.(Drawer)
 		if ok {
-			fmt.Println("Added Drawer")
 			gs.Content.drawers = append(gs.Content.drawers, Drawer(drawer))
 		} else {
 			panic("Game LinkChildren bad child")

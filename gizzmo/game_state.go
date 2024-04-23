@@ -10,47 +10,56 @@ import (
 )
 
 const (
-	msg_font_size = 21
-	msg_X         = msg_font_size
-	msg_Y         = msg_font_size
-	msg_capture_Y = msg_Y + 2*msg_font_size
+	msg_font_size = 20
+	msg_label_X   = msg_font_size + 3
+	msg_value_X   = msg_label_X + msg_font_size*10
+	msg_Y         = msg_font_size + 3
 )
 
 var (
-	msg_color = color.RGBA{255, 255, 0, 255}
+	msg_color_label = color.RGBA{255, 255, 0, 255}
+	msg_color_value = color.RGBA{0, 255, 255, 255}
+	msg_options     = &msg.Options{Sep: ":", TokenSep: " "}
 )
 
 func (gs *Game) DrawStatus() {
 	content := &gs.Content
-	options := &msg.Options{Sep: ":", TokenSep: " "}
+	if !content.commandState && !content.capturing {
+		return
+	}
 
 	monitor := rl.GetCurrentMonitor()
-
-	text := msg.Message(
-		options,
-		&msg.Token{Item: msg.FPS, Format: "%d", Values: []any{rl.GetFPS()}},
-		&msg.Token{Item: msg.Monitor, Format: "%d %dx%d %d%s",
+	outputs := msg.Build(msg_options,
+		&msg.Token{Label: msg.Monitor, Format: "%d %dx%d %d%s",
 			Values: []any{monitor,
 				rl.GetMonitorWidth(monitor), rl.GetMonitorHeight(monitor),
 				rl.GetMonitorRefreshRate(monitor), msg.Mhz}},
-		&msg.Token{Item: msg.View, Format: "%dx%d",
+		&msg.Token{Label: msg.View, Format: "%dx%d",
 			Values: []any{rl.GetScreenWidth(), rl.GetScreenHeight()}},
-		&msg.Token{Item: msg.Duration, Format: "%q",
+		&msg.Token{Label: msg.Duration, Format: "%.3f",
 			Values: []any{content.CaptureDuration}},
-		&msg.Token{Item: msg.Frames, Format: "%d",
-			Values: []any{content.captureFrames}},
+		&msg.Token{Label: msg.FrameRate, Format: "%d", Values: []any{rl.GetFPS()}},
 	)
 
-	rl.DrawText(text, msg_X, msg_Y, msg_font_size, msg_color)
+	y := int(msg_Y)
+	y += drawOutputs(y, outputs)
 
 	if content.capturing {
-		// text = fmt.Sprintf("Capturing... %4d", content.captureCount)
-		text = msg.Message(options, &msg.Token{
-			Item: msg.Capturing, Format: "...%d",
-			Values: []any{content.captureCount}})
-
-		rl.DrawText(text, msg_X, msg_capture_Y, msg_font_size, msg_color)
+		outputs = msg.Build(msg_options,
+			&msg.Token{Label: msg.Capturing, Format: "%d ... %d",
+				Values: []any{content.captureTotal, content.captureCount}},
+		)
+		drawOutputs(y, outputs)
 	}
+}
+
+func drawOutputs(y int, outputs []*msg.Output) int {
+	for _, output := range outputs {
+		rl.DrawText(output.Label, int32(msg_label_X), int32(y), msg_font_size, msg_color_label)
+		rl.DrawText(output.Value, int32(msg_value_X), int32(y), msg_font_size, msg_color_value)
+		y += msg_font_size * 2
+	}
+	return y
 }
 
 func (gs *Game) Refresh(current float64) {
