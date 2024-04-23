@@ -2,7 +2,6 @@ package gizzmo
 
 import (
 	"fmt"
-	"image"
 	"image/color"
 	"math/rand"
 	"time"
@@ -30,35 +29,31 @@ type GameItem struct {
 	Start         float64
 	Current       float64
 	InputInterval float64
-	FrameRate     int32
-	FramesCounter int32
+	FrameRate     int64
+	FramesCounter int64
 
 	Width     float32
 	Height    float32
 	Depth     float32
 	FixedSize bool
 
-	CaptureCount    int
-	CaptureInterval float64
-	Capturing       bool
 	Paused          bool
-	DarkMode        bool         // defaults to true
 	FixedPalette    []color.RGBA // gizzmo colors plus colors added
 	BackGround      color.RGBA   // defaults to black
-	CaptureDelay    int
-	CaptureStart    int
+	CaptureDelay    int64
+	CaptureDuration time.Duration
 
-	palette  color.Palette
-	colorMap map[color.Color]uint8
-
-	screen          rl.RenderTexture2D
-	captureImage    *image.RGBA
-	nextInput       float64
-	previousCapture float64
-
+	capturing      bool
+	captureTexture rl.RenderTexture2D
+	captureImage   *rl.Image
+	captureFrames  int64
+	captureCount   int64
 	// capture go routine channels
-	stopChan chan int
-	scrChan  chan *image.RGBA
+	captureStop   chan int
+	captureSource chan *rl.Image
+
+	aspectRatio float32
+	nextInput   float64
 
 	// note: movers are also drawers
 	movers      []Mover      // movers as loaded
@@ -85,33 +80,34 @@ func NewGameFromRecord(record *model.Record) *Game {
 func (gs *Game) NewGameSetup(width, height, fps int32) {
 	model.InitRecorder[GameItem](gs, class.Game.String(),
 		int32(class.Game))
-	item := &gs.Content
-	item.Width = float32(width)
-	item.Height = float32(height)
-	item.FrameRate = fps
-	item.Start = 0
-	item.Current = rl.GetTime()
-	item.InputInterval = .2
-	item.CaptureCount = 0
-	item.CaptureInterval = float64(rl.GetFrameTime()) * 2
-	item.Capturing = false
-	item.Paused = false
-	item.BackGround = rl.Black
-	item.CaptureStart = 250
-	item.CaptureDelay = 4
+	content := &gs.Content
+	content.Width = float32(width)
+	content.Height = float32(height)
+	content.Start = 0
+	content.Current = rl.GetTime()
+	content.InputInterval = .2
+	content.capturing = false
+	content.Paused = false
+	content.BackGround = rl.Black
+
+	content.CaptureDuration = time.Second * 15
+	content.FrameRate = 30
+	content.captureFrames = int64(content.CaptureDuration) * content.FrameRate / int64(time.Second)
+	content.CaptureDelay = 4
 	gs.setup()
 }
 
 func (gs *Game) setup() {
-	item := &gs.Content
-	item.stopChan = make(chan int)
-	item.scrChan = make(chan *image.RGBA)
-	item.gamepad = gpads.NewGPads()
-	item.movers = make([]Mover, 0)
-	item.drawers = make([]Drawer, 0)
-	item.inputters = make([]Inputer, 0)
-	item.depthList = make([]DeepDrawer, 0)
-	item.textureList = make([]*Texture, 0)
+	content := &gs.Content
+	content.aspectRatio = content.Width / content.Height
+	content.captureStop = make(chan int)
+	content.captureSource = make(chan *rl.Image)
+	content.gamepad = gpads.NewGPads()
+	content.movers = make([]Mover, 0)
+	content.drawers = make([]Drawer, 0)
+	content.inputters = make([]Inputer, 0)
+	content.depthList = make([]DeepDrawer, 0)
+	content.textureList = make([]*Texture, 0)
 }
 
 func (gs *Game) SetPad(pad pad.PadG)             { gs.Content.gamepad = pad }

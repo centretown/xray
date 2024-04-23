@@ -16,8 +16,7 @@ func main() {
 }
 
 func build_gander(game *gizzmo.Game) {
-	vf := game.SetViewPort(960, 500)
-	// vf := viewPort.ToFloat32()
+	vf := game.SetViewPort(1920, 1080)
 	vp := rl.Vector4{
 		X: vf.Width,
 		Y: vf.Height,
@@ -99,5 +98,5 @@ func build_gander(game *gizzmo.Game) {
 	door_mv.AddDrawer(door)
 	game.AddActor(door_mv, door.GetDepth())
 
-	game.Content.FrameRate = 30
+	game.Content.FrameRate = 60
 }

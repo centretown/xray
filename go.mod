@@ -4,7 +4,7 @@ go 1.22.0
 
 require (
 	github.com/centretown/gpads v0.0.0-20240407230358-021ea85cec36
-	github.com/centretown/raylib-go/raylib v0.0.0-20240422003442-21b964521a7d
+	github.com/centretown/raylib-go/raylib v0.0.0-20240422103600-a71986eecf6d
 	github.com/dave/jennifer v1.7.0
 	github.com/ericpauley/go-quantize v0.0.0-20200331213906-ae555eb2afa4
 	github.com/gen2brain/raylib-go/raylib v0.0.0-20240421191056-278df68f40bb
@@ -28,3 +28,5 @@ require (
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
 )
+
+replace github.com/centretown/raylib-go/raylib v0.0.0-20240422103600-a71986eecf6d => /home/dave/src/raylib-go/raylib

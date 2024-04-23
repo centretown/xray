@@ -10,31 +10,34 @@ import (
 )
 
 const (
-	msg_height = 80
-	min_width  = 200
-	min_height = 280
+	msg_font_size = 21
+	msg_X         = msg_font_size
+	msg_Y         = msg_font_size
+	msg_capture_Y = msg_Y + 2*msg_font_size
+)
+
+var (
+	msg_color = color.RGBA{255, 255, 0, 255}
 )
 
 func (gs *Game) DrawStatus() {
 	item := &gs.Content
-	mb := gs.GetMessageBox()
-	rl.DrawLine(mb.X, mb.Y, mb.Width, mb.Y, color.RGBA{255, 0, 0, 255})
 
 	monitor := rl.GetCurrentMonitor()
+	width, height := int32(rl.GetScreenWidth()), int32(rl.GetScreenHeight())
 
-	text := fmt.Sprintf("FPS:%3d, Monitor:%1d (%4d/%4d %3d), View: %4dx%4d, Capture Count:%4d",
+	text := fmt.Sprintf("FPS:%3d, Monitor:%1d (%4d/%4d %3d), View: %4dx%4d, Capture Duration:%4d Frames: ",
 		rl.GetFPS(),
 		monitor, rl.GetMonitorWidth(monitor),
 		rl.GetMonitorHeight(monitor), rl.GetMonitorRefreshRate(monitor),
-		rl.GetScreenWidth(), rl.GetScreenHeight(),
-		item.CaptureStart)
+		width, height,
+		item.captureFrames)
 
-	yellow := color.RGBA{255, 255, 0, 255}
-	rl.DrawText(text, mb.X, mb.Y+mb.Height-38, 21, yellow)
+	rl.DrawText(text, msg_X, msg_Y, msg_font_size, msg_color)
 
-	if item.Capturing {
-		rl.DrawText(fmt.Sprintf("Capturing... %4d", item.CaptureCount),
-			mb.X, mb.Y+mb.Height-70, 21, yellow)
+	if item.capturing {
+		text = fmt.Sprintf("Capturing... %4d", item.captureCount)
+		rl.DrawText(text, msg_X, msg_capture_Y, msg_font_size, msg_color)
 	}
 }
 
@@ -65,18 +68,8 @@ func (gs *Game) GetViewPort() rl.Rectangle {
 		X:      0,
 		Y:      0,
 		Width:  gs.Content.Width,
-		Height: gs.Content.Height - msg_height,
+		Height: gs.Content.Height,
 	}
-}
-
-func (gs *Game) GetMessageBox() (rect rl.RectangleInt32) {
-	rw := int32(rl.GetRenderWidth())
-	rh := int32(rl.GetRenderHeight())
-	rect.X = 0
-	rect.Width = rw
-	rect.Y = rh - msg_height
-	rect.Height = msg_height
-	return
 }
 
 func (game *Game) Dump() {

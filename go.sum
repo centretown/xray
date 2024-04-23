@@ -4,8 +4,6 @@ github.com/aws/aws-sdk-go v1.38.20 h1:QbzNx/tdfATbdKfubBpkt84OM6oBkxQZRw6+bW2Gye
 github.com/aws/aws-sdk-go v1.38.20/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zKMmprdro=
 github.com/centretown/gpads v0.0.0-20240407230358-021ea85cec36 h1:lCWd2mVNbZx1dgTMlk3wbRkbinKbNCT5+LVE+bBTUiA=
 github.com/centretown/gpads v0.0.0-20240407230358-021ea85cec36/go.mod h1:CuOki+cHwsOu+HmoIfaCSIzwQnd8DM45cHpQDvbsEaI=
-github.com/centretown/raylib-go/raylib v0.0.0-20240422003442-21b964521a7d h1:X0o3gg6OZ95veSVHXR2kXUg9JOugly4mqS34OUHt8+E=
-github.com/centretown/raylib-go/raylib v0.0.0-20240422003442-21b964521a7d/go.mod h1:N2Y2aNAZYPKee6dwXfPS0+BrHpW96+DE2KAfxoico3E=
 github.com/dave/jennifer v1.7.0 h1:uRbSBH9UTS64yXbh4FrMHfgfY762RD+C7bUPKODpSJE=
 github.com/dave/jennifer v1.7.0/go.mod h1:nXbxhEmQfOZhWml3D1cDK5M1FLnMSozpbFN/m3RmGZc=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

@@ -21,29 +21,20 @@ func (gs *Game) Run() {
 	)
 	content.FixedPalette = append(content.FixedPalette, content.BackGround)
 
-	gs.createPalette()
-
 	rl.InitWindow(int32(content.Width), int32(content.Height), gs.Content.Title)
 	rl.SetTraceLogLevel(rl.LogWarning)
 
 	for _, txt := range gs.Content.textureList {
 		txt.Load()
 	}
-	content.screen = rl.LoadRenderTexture(int32(content.Width), int32(content.Height))
+	content.captureTexture = rl.LoadRenderTexture(int32(content.Width), int32(content.Height))
 
-	defer func() {
-		for _, txt := range gs.Content.textureList {
-			txt.Unload()
-		}
-		rl.UnloadRenderTexture(gs.Content.screen)
-		gs.data.Close()
-		rl.CloseWindow()
-	}()
+	defer gs.unload()
 
 	if !content.FixedSize {
 		rl.SetWindowState(rl.FlagWindowResizable)
 	}
-	rl.SetTargetFPS(content.FrameRate)
+	rl.SetTargetFPS(int32(content.FrameRate))
 	content.Current = rl.GetTime()
 	gs.Refresh(content.Current)
 
@@ -52,14 +43,16 @@ func (gs *Game) Run() {
 		content.Current = rl.GetTime()
 
 		if rl.IsWindowResized() {
-			rl.UnloadRenderTexture(gs.Content.screen)
-			content.screen = rl.LoadRenderTexture(int32(rl.GetRenderWidth()),
+			rl.UnloadRenderTexture(gs.Content.captureTexture)
+			// var height = int32(float32(rl.GetRenderWidth()) / content.aspectRatio)
+			content.captureTexture = rl.LoadRenderTexture(
+				int32(rl.GetRenderWidth()),
 				int32(rl.GetRenderHeight()))
 			gs.Refresh(content.Current)
 		}
 
 		rl.BeginDrawing()
-		rl.BeginTextureMode(gs.Content.screen)
+		rl.BeginTextureMode(content.captureTexture)
 		rl.ClearBackground(content.BackGround)
 
 		// iterate from deepest to shallowest
@@ -75,17 +68,15 @@ func (gs *Game) Run() {
 			}
 		}
 
-		gs.DrawStatus()
-
 		rl.EndTextureMode()
 		//I'm pretty sure you can give the
 		// source rect or the dest rect a negative height and it will flip it.
-
-		rl.DrawTexturePro(gs.Content.screen.Texture,
+		tex := gs.Content.captureTexture.Texture
+		rl.DrawTexturePro(tex,
 
 			rl.Rectangle{X: 0, Y: 0,
-				Width:  gs.Content.Width,
-				Height: -gs.Content.Height,
+				Width:  float32(tex.Width),
+				Height: float32(tex.Height),
 			},
 			rl.Rectangle{X: 0, Y: 0,
 				Width:  gs.Content.Width,
@@ -98,12 +89,25 @@ func (gs *Game) Run() {
 				// Y: gs.Content.Height / 2,
 			},
 			1, White)
+
+		gs.DrawStatus()
+
 		rl.EndDrawing()
 
 		gs.ProcessInput()
 
-		if content.Capturing {
-			gs.screenCapture()
+		if content.capturing {
+			gs.captureTexture()
 		}
 	}
+}
+
+func (gs *Game) unload() {
+	for _, txt := range gs.Content.textureList {
+		txt.Unload()
+	}
+	rl.UnloadRenderTexture(gs.Content.captureTexture)
+	gs.data.Close()
+	rl.CloseWindow()
+
 }

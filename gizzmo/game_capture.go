@@ -1,7 +1,6 @@
 package gizzmo
 
 import (
-	"image"
 	"log"
 
 	rl "github.com/centretown/raylib-go/raylib"
@@ -19,66 +18,44 @@ import (
 func (gs *Game) BeginCapture(mode string) {
 
 	item := &gs.Content
-	if item.Capturing {
+	if item.capturing {
 		log.Println("already capturing...")
 		return
 	}
 
-	// if mode == "gif" {
-	// 	if fps >= 50 {
-	// 		rl.SetTargetFPS(50)
-	// 		item.CaptureDelay = 2
-	// 	} else {
-	// 		rl.SetTargetFPS(25)
-	// 		item.CaptureDelay = 4
-	// 	}
-
-	// 	// go capture.CaptureGIF(item.stopChan, item.scrChan, item.palette,
-	// 	// 	item.CaptureDelay, item.colorMap)
 	if mode == "mp4" {
-		fps := rl.GetFPS()
-		item.CaptureCount = item.CaptureStart
-		item.Capturing = true
+		fps := gs.Content.FrameRate
+		item.captureCount = item.captureFrames
+		item.capturing = true
 		log.Println("Capturing mp4...", fps)
-		go capture.CaptureVideo(item.stopChan, item.scrChan,
-			int32(gs.Content.Width), int32(gs.Content.Height), fps)
+		go capture.CaptureVideo(item.captureStop, item.captureSource,
+			int32(gs.Content.Width), int32(gs.Content.Height), int32(fps))
 	}
 }
 
-func (gs *Game) screenCapture() {
+func (gs *Game) captureTexture() {
 	content := &gs.Content
-	if !content.Capturing {
+	if !content.capturing {
 		log.Println("not supposed to capture")
 		return
 	}
 
-	tex := content.screen.Texture
-	content.captureImage = image.NewRGBA(image.Rectangle{
-		Min: image.Point{X: 0, Y: 0},
-		Max: image.Point{X: int(content.screen.Texture.Width),
-			Y: int(content.screen.Texture.Height)}})
-
-	scr := rl.LoadImageFromTexture(tex)
-	scr.ToImageEx(content.captureImage)
-	// rl.UnloadTexture(tex)
-
-	content.scrChan <- gs.Content.captureImage
-	content.CaptureCount--
-	if content.CaptureCount < 0 {
+	content.captureImage = rl.LoadImageFromTexture(content.captureTexture.Texture)
+	content.captureSource <- gs.Content.captureImage
+	content.captureCount--
+	if content.captureCount < 0 {
 		gs.EndCapture()
 	}
 }
 
 func (gs *Game) EndCapture() {
 	item := &gs.Content
-	if !item.Capturing {
+	if !item.capturing {
 		log.Println("nothing to end. not capturing!")
 		return
 	}
 	log.Println("EndCapture")
-	item.CaptureCount = -1
-	item.Capturing = false
-	item.stopChan <- 1
-	close(item.scrChan)
-	item.scrChan = make(chan *image.RGBA)
+	item.captureCount = -1
+	item.capturing = false
+	item.captureStop <- 1
 }
