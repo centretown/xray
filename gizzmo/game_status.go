@@ -1,11 +1,11 @@
 package gizzmo
 
 import (
-	"fmt"
 	"image/color"
 	"log"
 
 	rl "github.com/centretown/raylib-go/raylib"
+	msg "github.com/centretown/xray/message"
 	"gopkg.in/yaml.v3"
 )
 
@@ -21,22 +21,34 @@ var (
 )
 
 func (gs *Game) DrawStatus() {
-	item := &gs.Content
+	content := &gs.Content
+	options := &msg.Options{Sep: ":", TokenSep: " "}
 
 	monitor := rl.GetCurrentMonitor()
-	width, height := int32(rl.GetScreenWidth()), int32(rl.GetScreenHeight())
 
-	text := fmt.Sprintf("FPS:%3d, Monitor:%1d (%4d/%4d %3d), View: %4dx%4d, Capture Duration:%4d Frames: ",
-		rl.GetFPS(),
-		monitor, rl.GetMonitorWidth(monitor),
-		rl.GetMonitorHeight(monitor), rl.GetMonitorRefreshRate(monitor),
-		width, height,
-		item.captureFrames)
+	text := msg.Message(
+		options,
+		&msg.Token{Item: msg.FPS, Format: "%d", Values: []any{rl.GetFPS()}},
+		&msg.Token{Item: msg.Monitor, Format: "%d %dx%d %d%s",
+			Values: []any{monitor,
+				rl.GetMonitorWidth(monitor), rl.GetMonitorHeight(monitor),
+				rl.GetMonitorRefreshRate(monitor), msg.Mhz}},
+		&msg.Token{Item: msg.View, Format: "%dx%d",
+			Values: []any{rl.GetScreenWidth(), rl.GetScreenHeight()}},
+		&msg.Token{Item: msg.Duration, Format: "%q",
+			Values: []any{content.CaptureDuration}},
+		&msg.Token{Item: msg.Frames, Format: "%d",
+			Values: []any{content.captureFrames}},
+	)
 
 	rl.DrawText(text, msg_X, msg_Y, msg_font_size, msg_color)
 
-	if item.capturing {
-		text = fmt.Sprintf("Capturing... %4d", item.captureCount)
+	if content.capturing {
+		// text = fmt.Sprintf("Capturing... %4d", content.captureCount)
+		text = msg.Message(options, &msg.Token{
+			Item: msg.Capturing, Format: "...%d",
+			Values: []any{content.captureCount}})
+
 		rl.DrawText(text, msg_X, msg_capture_Y, msg_font_size, msg_color)
 	}
 }

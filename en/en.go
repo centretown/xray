@@ -1,6 +1,6 @@
 package en
 
-import "github.com/centretown/xray/text"
+import "github.com/centretown/xray/message"
 
 var items = []string{
 	"major version number",    // majorUsage
@@ -13,9 +13,9 @@ var items = []string{
 // var _ text.Texter = (*En)(nil)
 
 type En struct {
-	Items [text.LastTextItem]string
+	Items [message.LastTextItem]string
 }
 
-func (en *En) Format(item text.TextItem) string {
+func (en *En) Format(item message.MessageItem) string {
 	return items[int(item)]
 }
