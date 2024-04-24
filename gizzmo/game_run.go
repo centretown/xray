@@ -21,6 +21,7 @@ func (gs *Game) Run() {
 	)
 	rl.InitWindow(int32(content.Width), int32(content.Height), gs.Content.Title)
 	rl.SetTraceLogLevel(rl.LogWarning)
+	gs.BuildTokens()
 
 	for _, txt := range gs.Content.textureList {
 		txt.Load()
@@ -30,7 +31,7 @@ func (gs *Game) Run() {
 	defer gs.unload()
 
 	if !content.FixedSize {
-		rl.SetWindowState(rl.FlagWindowResizable)
+		rl.SetWindowState(rl.FlagWindowResizable | rl.FlagBorderlessWindowedMode)
 	}
 	rl.SetTargetFPS(int32(content.FrameRate))
 	content.currentTime = rl.GetTime()
@@ -39,18 +40,18 @@ func (gs *Game) Run() {
 	for !rl.WindowShouldClose() {
 
 		content.currentTime = rl.GetTime()
-
 		if rl.IsWindowResized() {
 			rl.UnloadRenderTexture(gs.Content.renderTexture)
-			// var height = int32(float32(rl.GetRenderWidth()) / content.aspectRatio)
+			content.Width = float32(rl.GetRenderWidth())
+			content.Height = float32(rl.GetRenderHeight())
+
 			content.renderTexture = rl.LoadRenderTexture(
-				int32(rl.GetRenderWidth()),
-				int32(rl.GetRenderHeight()))
+				int32(content.Width),
+				int32(content.Height))
 			gs.Refresh(content.currentTime)
 		}
 
 		rl.BeginDrawing()
-
 		rl.BeginTextureMode(content.renderTexture)
 		rl.ClearBackground(content.BackGround)
 		// deepest to shallowest
@@ -83,7 +84,6 @@ func (gs *Game) Run() {
 			}, 1, White)
 
 		gs.DrawStatus()
-
 		rl.EndDrawing()
 
 		gs.ProcessInput()

@@ -1,18 +1,17 @@
 package message
 
-type Message int
+const (
+	Monitor   = "labels::monitor"
+	View      = "labels::view"
+	Duration  = "labels::duration"
+	FrameRate = "labels::framerate"
+	Capture   = "labels::capture"
+)
 
 const (
-	Monitor        = "messages::monitor"
 	MonitorValue   = "values::monitor"
-	View           = "messages::view"
 	ViewValue      = "values::view"
-	Duration       = "messages::duration"
 	DurationValue  = "values::duration"
-	FrameRate      = "messages::framerate"
 	FrameRateValue = "values::framerate"
-	Capture        = "messages::capture"
 	CaptureValue   = "values::capture"
-	LastTextItem
-	FirstItem = 0
 )

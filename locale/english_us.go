@@ -5,7 +5,7 @@ var Locale_en_US = `
 
 [plurals]
 
-[messages]
+[labels]
 
 monitor = Monitor 
 

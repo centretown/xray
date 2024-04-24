@@ -7,6 +7,7 @@ import (
 
 	"github.com/centretown/xray/gizzmodb"
 	"github.com/centretown/xray/gizzmodb/model"
+	msg "github.com/centretown/xray/message"
 
 	"github.com/centretown/gpads/gpads"
 	"github.com/centretown/gpads/pad"
@@ -28,17 +29,30 @@ type GameItem struct {
 	InputInterval float64
 	FrameRate     int64
 
-	Width     float32
-	Height    float32
-	Depth     float32
-	FixedSize bool
+	Width  float32
+	Height float32
+	Depth  float32
+
+	FixedWidth  float32
+	FixedHeight float32
+	FixedDepth  float32
+	FixedSize   bool
 
 	BackGround      color.RGBA // defaults to black
 	CaptureDelay    float64
 	CaptureDuration float64
 
-	built  float64
-	paused bool
+	built              float64
+	paused             bool
+	fullscreen         bool
+	screenstate        ResizeState
+	monitorNum         int
+	monitorWidth       int
+	monitorHeight      int
+	monitorRefreshRate int
+	currentFrameRate   int64
+	screenWidth        int64
+	screenHeight       int64
 
 	currentTime   float64
 	capturing     bool
@@ -51,9 +65,12 @@ type GameItem struct {
 	captureStop   chan int
 	captureSource chan *rl.Image
 
-	aspectRatio  float32
-	nextInput    float64
-	commandState bool
+	aspectRatio   float32
+	nextInput     float64
+	commandState  bool
+	tokens        *msg.TokenList
+	captureTokens *msg.TokenList
+	currentToken  int
 
 	// note: movers are also drawers
 	movers      []Mover      // movers as loaded
@@ -81,8 +98,8 @@ func (gs *Game) NewGameSetup(width, height, fps int32) {
 	model.InitRecorder[GameItem](gs, class.Game.String(),
 		int32(class.Game))
 	content := &gs.Content
-	content.Width = float32(width)
-	content.Height = float32(height)
+	content.FixedWidth, content.Width = float32(width), float32(width)
+	content.FixedHeight, content.Height = float32(height), float32(height)
 	content.built = rl.GetTime()
 	content.currentTime = rl.GetTime()
 	content.InputInterval = .2
@@ -101,6 +118,7 @@ func (gs *Game) setup() {
 	content.captureStop = make(chan int)
 	content.captureSource = make(chan *rl.Image)
 	content.capturing = false
+	content.screenstate = RESIZE_NORMAL
 
 	content.gamepad = gpads.NewGPads()
 

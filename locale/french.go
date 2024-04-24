@@ -11,7 +11,7 @@ var Locale_fr = `
 # locale_fr.ini
 [plurals]
 
-[messages]
+[labels]
 
 monitor = Moniteur
 
