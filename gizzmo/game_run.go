@@ -21,7 +21,7 @@ func (gs *Game) Run() {
 	)
 	rl.InitWindow(int32(content.Width), int32(content.Height), gs.Content.Title)
 	rl.SetTraceLogLevel(rl.LogWarning)
-	gs.BuildTokens()
+	gs.BuildNotes()
 
 	for _, txt := range gs.Content.textureList {
 		txt.Load()

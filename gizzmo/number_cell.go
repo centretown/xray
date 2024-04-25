@@ -1,12 +1,12 @@
 package gizzmo
 
-import "github.com/centretown/xray/check"
+import "github.com/centretown/xray/numbers"
 
-type NumberCell[T check.NumberType] struct {
+type NumberCell[T numbers.NumberType] struct {
 	States []T
 }
 
-func NewNumberCell[T check.NumberType](states int) *NumberCell[T] {
+func NewNumberCell[T numbers.NumberType](states int) *NumberCell[T] {
 
 	nc := &NumberCell[T]{
 		States: make([]T, states),

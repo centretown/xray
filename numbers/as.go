@@ -18,7 +18,7 @@
 //
 // See issue 6011.
 // The As function is inlined.
-package check
+package numbers
 
 import "golang.org/x/exp/constraints"
 
@@ -43,9 +43,9 @@ func AsOr[T NumberType](condition bool, trueVal, falseVal T) T {
 	return falseVal + (trueVal-falseVal)*As[T](condition)
 }
 
-func Is[T NumberType](value T) bool {
+func IsNone[T NumberType](value T) bool {
 	var none T
-	return value != none
+	return value == none
 }
 
 func Or[T any](condition bool, vals [2]T) T {

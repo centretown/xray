@@ -6,12 +6,12 @@ import (
 	"time"
 
 	rl "github.com/centretown/raylib-go/raylib"
-	"github.com/centretown/xray/check"
 	"github.com/centretown/xray/gizzmo/class"
 	"github.com/centretown/xray/gizzmodb/model"
+	"github.com/centretown/xray/numbers"
 )
 
-type NumberGridItem[T check.NumberType] struct {
+type NumberGridItem[T numbers.NumberType] struct {
 	Cols            int32
 	Rows            int32
 	CellWidth       int32
@@ -27,11 +27,11 @@ type NumberGridItem[T check.NumberType] struct {
 	bounds     rl.Vector4
 }
 
-type NumberGrid[T check.NumberType] struct {
+type NumberGrid[T numbers.NumberType] struct {
 	model.RecorderClass[NumberGridItem[T]]
 }
 
-func NewGrid[T check.NumberType](bounds rl.Vector4,
+func NewGrid[T numbers.NumberType](bounds rl.Vector4,
 	columns, rows int32, horizontalColor color.RGBA, verticalColor color.RGBA,
 	colors ...color.RGBA) *NumberGrid[T] {
 

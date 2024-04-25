@@ -5,9 +5,9 @@ import (
 	"log"
 
 	rl "github.com/centretown/raylib-go/raylib"
-	"github.com/centretown/xray/check"
 	"github.com/centretown/xray/gizzmo/class"
 	"github.com/centretown/xray/gizzmodb/model"
+	"github.com/centretown/xray/numbers"
 )
 
 var _ Mover = (*Tracker)(nil)
@@ -94,7 +94,7 @@ func (tr *Tracker) Move(can_move bool, now float64) {
 		W: mv.Rotation,
 	})
 
-	m := check.As[float64](can_move)
+	m := numbers.As[float64](can_move)
 	y.Move(now, mv.PixelRateY*m)
 	z.Move(now, mv.PixelRateZ*m)
 

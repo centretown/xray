@@ -7,7 +7,7 @@ import (
 
 	"github.com/centretown/xray/gizzmodb"
 	"github.com/centretown/xray/gizzmodb/model"
-	msg "github.com/centretown/xray/message"
+	msg "github.com/centretown/xray/notes"
 
 	"github.com/centretown/gpads/gpads"
 	"github.com/centretown/gpads/pad"
@@ -65,12 +65,12 @@ type GameItem struct {
 	captureStop   chan int
 	captureSource chan *rl.Image
 
-	aspectRatio   float32
-	nextInput     float64
-	commandState  bool
-	tokens        *msg.TokenList
-	captureTokens *msg.TokenList
-	currentToken  int
+	aspectRatio  float32
+	nextInput    float64
+	commandState bool
+	notes        *msg.Notes
+	captureNotes *msg.Notes
+	note         int
 
 	// note: movers are also drawers
 	movers      []Mover      // movers as loaded

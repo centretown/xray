@@ -6,9 +6,9 @@ import (
 	"math/rand"
 
 	rl "github.com/centretown/raylib-go/raylib"
-	"github.com/centretown/xray/check"
 	"github.com/centretown/xray/gizzmo/class"
 	"github.com/centretown/xray/gizzmodb/model"
+	"github.com/centretown/xray/numbers"
 )
 
 const (
@@ -18,18 +18,18 @@ const (
 	GRIDMOVER_COUNT
 )
 
-type GridMoverItem[T check.NumberType] struct {
+type GridMoverItem[T numbers.NumberType] struct {
 	Bounds     rl.Vector4
 	PixelRateX float64
 	Playing    bool
 	drawer     *NumberGrid[T]
 }
 
-type GridMover[T check.NumberType] struct {
+type GridMover[T numbers.NumberType] struct {
 	model.RecorderClass[GridMoverItem[T]]
 }
 
-func NewGridMover[T check.NumberType](bounds rl.Vector4, pixelRateX float64) *GridMover[T] {
+func NewGridMover[T numbers.NumberType](bounds rl.Vector4, pixelRateX float64) *GridMover[T] {
 	mv := &GridMover[T]{}
 	var _ model.Parent = mv
 	var _ Mover = mv
@@ -209,7 +209,7 @@ func (cm *GridMover[T]) Click(clickX, clickY int32) {
 
 			cell := cells[x][y]
 			value = int32(cell.Get(Alive))
-			value = check.As[int32](value == 0)
+			value = numbers.As[int32](value == 0)
 			cell.Set(Alive, T(value))
 			cell.Set(Next, T(value))
 		}

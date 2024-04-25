@@ -2,7 +2,7 @@ package gizzmo
 
 import (
 	rl "github.com/centretown/raylib-go/raylib"
-	"github.com/centretown/xray/check"
+	"github.com/centretown/xray/numbers"
 )
 
 // var _ Motor = (*Axis)(nil)
@@ -36,10 +36,10 @@ func (ax *Axis) Move(current, rate float64) float32 {
 		outside  = less || more
 	)
 
-	ax.LastUpdate += delta * check.As[float64](deltaPos != 0)
-	ax.Direction *= check.As[float32](!outside) - check.As[float32](outside)
-	ax.Position = check.As[float32](more)*(ax.Extent.Y-float32(deltaPos)) +
-		check.As[float32](less)*(ax.Extent.X+float32(deltaPos)) +
-		check.As[float32](!outside)*newPos
+	ax.LastUpdate += delta * numbers.As[float64](deltaPos != 0)
+	ax.Direction *= numbers.As[float32](!outside) - numbers.As[float32](outside)
+	ax.Position = numbers.As[float32](more)*(ax.Extent.Y-float32(deltaPos)) +
+		numbers.As[float32](less)*(ax.Extent.X+float32(deltaPos)) +
+		numbers.As[float32](!outside)*newPos
 	return ax.Position
 }

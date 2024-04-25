@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/centretown/xray/check"
+	"github.com/centretown/xray/numbers"
 
 	"github.com/centretown/gpads/gpads"
 	"github.com/holoplot/go-evdev"
@@ -25,9 +25,9 @@ func Example(gpad *gpads.GPad) {
 			// flag gets set only button was up and is now down
 			// if b2i returns 1 and is shifted left button positions
 			// if b2i returns 0 nothing happens
-			gpad.PressedOnce |= check.As[uint64](!wasDown && isDown) << button
+			gpad.PressedOnce |= numbers.As[uint64](!wasDown && isDown) << button
 			// flag gets set only button was down and is now up
-			gpad.ReleasedOnce |= check.As[uint64](wasDown && !isDown) << button
+			gpad.ReleasedOnce |= numbers.As[uint64](wasDown && !isDown) << button
 			gpad.ButtonState[button] = isDown
 		}
 	}

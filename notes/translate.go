@@ -1,4 +1,4 @@
-package message
+package notes
 
 import (
 	"log"
@@ -8,18 +8,24 @@ import (
 	"unknwon.dev/i18n"
 )
 
-var Locale *i18n.Locale
+var Current *i18n.Locale
 
-func init() {
+func Initialize() {
 	var err error
 	s := i18n.NewStore()
-	Locale, err = s.AddLocale("en-US", "English",
+	Current, err = s.AddLocale("en-US", "English",
 		[]byte(locale.Locale_en_US_Values),
 		[]byte(locale.Locale_en_US),
+		[]byte(locale.Locale_en_US_Flags),
 		[]byte(locale.Locale_fr_Values),
 		[]byte(locale.Locale_fr),
+		[]byte(locale.Locale_fr_Flags),
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func Translate(key string, args ...interface{}) string {
+	return Current.Translate(key, args)
 }

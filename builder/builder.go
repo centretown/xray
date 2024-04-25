@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/centretown/xray/access"
-	"github.com/centretown/xray/flagset"
+	"github.com/centretown/xray/flags"
 	"github.com/centretown/xray/gizzmo"
 	"github.com/centretown/xray/gizzmodb"
 	"github.com/centretown/xray/gizzmodb/model"
@@ -20,7 +20,7 @@ var (
 )
 
 func init() {
-	flagset.Setup("install", "quick")
+	flags.Setup("install", "quick")
 }
 
 func Build(custom func(*gizzmo.Game)) (*gizzmo.Game, bool, error) {
@@ -28,7 +28,7 @@ func Build(custom func(*gizzmo.Game)) (*gizzmo.Game, bool, error) {
 	flag.Parse()
 
 	var (
-		flags               = &flagset.Flags
+		flags               = &flags.Flags
 		databasePath string = ""
 		inMemory            = false
 		install             = false
@@ -52,7 +52,7 @@ func Build(custom func(*gizzmo.Game)) (*gizzmo.Game, bool, error) {
 	return game, install, err
 }
 
-func create(databasePath string, cmd *flagset.FlagSet,
+func create(databasePath string, cmd *flags.FlagSet,
 	custom func(*gizzmo.Game),
 	memory bool, install bool) (game *gizzmo.Game, err error) {
 
