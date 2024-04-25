@@ -7,6 +7,8 @@ import (
 
 	"github.com/centretown/xray/gizzmodb"
 	"github.com/centretown/xray/gizzmodb/model"
+	"github.com/centretown/xray/layout"
+	"github.com/centretown/xray/notes"
 	msg "github.com/centretown/xray/notes"
 
 	"github.com/centretown/gpads/gpads"
@@ -65,12 +67,16 @@ type GameItem struct {
 	captureStop   chan int
 	captureSource chan *rl.Image
 
-	aspectRatio  float32
-	nextInput    float64
-	commandState bool
-	notes        *msg.Notes
-	captureNotes *msg.Notes
-	note         int
+	aspectRatio   float32
+	nextInput     float64
+	commandState  bool
+	notes         *msg.Notes
+	captureNotes  *msg.Notes
+	layout        *layout.Layout
+	languages     *notes.LanguageList
+	language      *notes.LanguageItem
+	languageIndex int
+	note          int
 
 	// note: movers are also drawers
 	movers      []Mover      // movers as loaded
@@ -120,6 +126,7 @@ func (gs *Game) setup() {
 	content.capturing = false
 	content.screenstate = RESIZE_NORMAL
 
+	content.layout = layout.NewLayout(20)
 	content.gamepad = gpads.NewGPads()
 
 	content.movers = make([]Mover, 0)

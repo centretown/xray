@@ -7,6 +7,8 @@ const (
 	Duration  = "labels::duration"
 	FrameRate = "labels::framerate"
 	Capture   = "labels::capture"
+	Language  = "labels::language"
+	FontSize  = "labels::fontsize"
 )
 
 // values
@@ -16,23 +18,27 @@ const (
 	DurationValue  = "values::duration"
 	FrameRateValue = "values::framerate"
 	CaptureValue   = "values::capture"
+	LanguageValue  = "values::language"
+	StringValue    = "values::string"
+	IntegerValue   = "values::integer"
+	FloatValue     = "values::float"
 )
 
 // flags
 const (
-	MajorFlag    = "options::major"
+	Major        = "options::major"
 	MajorShort   = "options::majorshort"
 	MajorUsage   = "options::majorusage"
-	MinorFlag    = "options::minor"
+	Minor        = "options::minor"
 	MinorShort   = "options::minorshort"
 	MinorUsage   = "options::minorusage"
-	KeyFlag      = "options::key"
+	Key          = "options::key"
 	KeyShort     = "options::keyshort"
 	KeyUsage     = "options::keyusage"
-	InstallFlag  = "options::install"
+	Install      = "options::install"
 	InstallShort = "options::installshort"
 	InstallUsage = "options::installusage"
-	QuickFlag    = "options::quick"
+	Quick        = "options::quick"
 	QuickShort   = "options::quickshort"
 	QuickUsage   = "options::quickusage"
 )

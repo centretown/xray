@@ -23,6 +23,10 @@ duration = Durée de capture
 framerate = Fréquence d'images
 
 capture = Capturer...
+
+language = Langue
+
+fontsize = Taille de Police
 `
 
 var Locale_fr_Flags = `

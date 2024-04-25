@@ -4,7 +4,6 @@ import (
 	"flag"
 	"log"
 
-	"github.com/centretown/xray/notes"
 	"gopkg.in/yaml.v3"
 )
 
@@ -27,26 +26,25 @@ func (cmdl *FlagSet) Dump() {
 var Flags FlagSet
 
 func Setup(options ...string) {
-	notes.Initialize()
 
 	var (
-		majorUsage   = notes.Current.Translate(notes.MajorUsage)
-		minorUsage   = notes.Current.Translate(notes.MinorUsage)
-		keyUsage     = notes.Current.Translate(notes.KeyUsage)
-		installUsage = notes.Current.Translate(notes.InstallUsage)
-		quickUsage   = notes.Current.Translate(notes.QuickUsage)
+		majorUsage   = "major version number"
+		minorUsage   = "minor version number"
+		keyUsage     = "uuid key"
+		installUsage = "install build to folder"
+		quickUsage   = "quick build and run in temporary memory database"
 
-		flagMajor   = notes.Current.Translate(notes.MajorFlag)
-		flagMinor   = notes.Current.Translate(notes.MinorFlag)
-		flagKey     = notes.Current.Translate(notes.KeyFlag)
-		flagInstall = notes.Current.Translate(notes.InstallFlag)
-		flagQuick   = notes.Current.Translate(notes.QuickFlag)
+		flagMajor   = "major"
+		flagMinor   = "minor"
+		flagKey     = "key"
+		flagInstall = "install"
+		flagQuick   = "quick"
 
-		flagM = notes.Current.Translate(notes.MajorShort)
-		flagN = notes.Current.Translate(notes.MinorShort)
-		flagK = notes.Current.Translate(notes.KeyShort)
-		flagI = notes.Current.Translate(notes.InstallShort)
-		flagQ = notes.Current.Translate(notes.QuickShort)
+		flagM = "m"
+		flagN = "n"
+		flagK = "k"
+		flagI = "i"
+		flagQ = "q"
 	)
 
 	sameAs := func(s string) string {

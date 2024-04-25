@@ -12,12 +12,14 @@
 //		return i
 //	}
 //
-// To ths:
+// To this:
 //
 //	asm: MOVZX AL, AX
 //
 // See issue 6011.
-// The As function is inlined.
+// The As function also inlines to this.
+//
+//	asm: MOVZX AL, AX
 package numbers
 
 import "golang.org/x/exp/constraints"
@@ -43,7 +45,7 @@ func AsOr[T NumberType](condition bool, trueVal, falseVal T) T {
 	return falseVal + (trueVal-falseVal)*As[T](condition)
 }
 
-func IsNone[T NumberType](value T) bool {
+func IsNil[T NumberType](value T) bool {
 	var none T
 	return value == none
 }

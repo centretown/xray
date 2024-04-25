@@ -44,7 +44,7 @@ func (gs *Game) CheckPad(padNum int32) {
 	for command := range notes.COMMANDS {
 		switch command {
 		case notes.MORE:
-			more_down = content.gamepad.IsGamepadButtonDown(padNum, gpads.RL_RightTrigger1)
+			more_down = content.gamepad.IsGamepadButtonDown(padNum, gpads.RL_RightTrigger2)
 
 		case notes.NEXT_NOTE:
 			if content.gamepad.IsGamepadButtonDown(padNum, gpads.RL_LeftFaceDown) {
