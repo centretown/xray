@@ -37,6 +37,14 @@ func (gs *Game) Run() {
 	content.currentTime = rl.GetTime()
 	gs.Refresh(content.currentTime)
 
+	var (
+		stopCh     = make(chan int)
+		repeatCh   = make(chan float64)
+		repeatRate = float64(.35)
+	)
+
+	go gs.ProcessInput(repeatRate, repeatCh, stopCh)
+
 	for !rl.WindowShouldClose() {
 
 		content.currentTime = rl.GetTime()
@@ -86,12 +94,12 @@ func (gs *Game) Run() {
 		gs.DrawStatus()
 		rl.EndDrawing()
 
-		gs.ProcessInput()
-
 		if content.capturing {
 			gs.captureTexture()
 		}
 	}
+
+	stopCh <- 1
 }
 
 func (gs *Game) unload() {

@@ -5,9 +5,8 @@ go 1.22.0
 require (
 	github.com/centretown/gpads v0.0.0-20240407230358-021ea85cec36
 	github.com/centretown/raylib-go/raylib v0.0.0-20240422103600-a71986eecf6d
-	github.com/dave/jennifer v1.7.0
 	github.com/ericpauley/go-quantize v0.0.0-20200331213906-ae555eb2afa4
-	github.com/gen2brain/raylib-go/raylib v0.0.0-20240421191056-278df68f40bb
+	github.com/gen2brain/raylib-go/raylib v0.0.0-20240424172746-f406ea403bc8
 	github.com/google/uuid v1.6.0
 	github.com/holoplot/go-evdev v0.0.0-20240306072622-217e18f17db1
 	github.com/jmoiron/sqlx v1.3.5

@@ -44,7 +44,8 @@ const (
 )
 
 const (
-	MORE = iota
+	NONE = iota
+	MORE
 	NEXT_NOTE
 	PREV_NOTE
 	INC

@@ -23,6 +23,7 @@ func (gs *Game) UpdateState(command int) {
 			content.note = 0
 		}
 		content.layout.Current = content.note
+
 	case notes.PREV_NOTE:
 		if content.note-1 >= 0 {
 			content.note--

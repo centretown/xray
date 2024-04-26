@@ -108,7 +108,7 @@ func (gs *Game) NewGameSetup(width, height, fps int32) {
 	content.FixedHeight, content.Height = float32(height), float32(height)
 	content.built = rl.GetTime()
 	content.currentTime = rl.GetTime()
-	content.InputInterval = .2
+	content.InputInterval = .15
 	content.BackGround = rl.Black
 	content.CaptureDuration = 15
 	content.FrameRate = 30
