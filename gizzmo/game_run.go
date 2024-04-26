@@ -40,7 +40,7 @@ func (gs *Game) Run() {
 	var (
 		stopCh     = make(chan int)
 		repeatCh   = make(chan float64)
-		repeatRate = float64(.35)
+		repeatRate = float64(.25)
 	)
 
 	go gs.ProcessInput(repeatRate, repeatCh, stopCh)
@@ -62,7 +62,7 @@ func (gs *Game) Run() {
 		rl.BeginDrawing()
 		rl.BeginTextureMode(content.renderTexture)
 		rl.ClearBackground(content.BackGround)
-		// deepest to shallowest
+
 		depthList = gs.SortDepthList()
 		for i := len(depthList) - 1; i >= 0; i-- {
 			drawer = depthList[i].Drawer
@@ -75,7 +75,7 @@ func (gs *Game) Run() {
 			}
 		}
 		rl.EndTextureMode()
-		// negative height will flip it, for now keep as is
+
 		tex := content.renderTexture.Texture
 		rl.DrawTexturePro(tex,
 			rl.Rectangle{X: 0, Y: 0,
@@ -94,8 +94,20 @@ func (gs *Game) Run() {
 		gs.DrawStatus()
 		rl.EndDrawing()
 
+		if !content.paused {
+			gs.Refresh(content.currentTime)
+		}
+
 		if content.capturing {
 			gs.captureTexture()
+		}
+
+		if content.beginCapturing {
+			gs.BeginCapture("mp4")
+		}
+
+		if content.endCapturing {
+			gs.EndCapture()
 		}
 	}
 

@@ -56,8 +56,12 @@ type GameItem struct {
 	screenWidth        int64
 	screenHeight       int64
 
-	currentTime   float64
-	capturing     bool
+	currentTime float64
+
+	beginCapturing bool
+	capturing      bool
+	endCapturing   bool
+
 	renderTexture rl.RenderTexture2D
 	captureImage  *rl.Image
 	captureCount  int64
@@ -68,7 +72,6 @@ type GameItem struct {
 	captureSource chan *rl.Image
 
 	aspectRatio   float32
-	nextInput     float64
 	commandState  bool
 	notes         *msg.Notes
 	captureNotes  *msg.Notes

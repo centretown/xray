@@ -15,6 +15,8 @@ func (gs *Game) BeginCapture(mode string) {
 		return
 	}
 
+	content.beginCapturing = false
+
 	if mode == "mp4" {
 		content.captureCount = 0
 		content.captureTotal = int64(content.CaptureDuration) * content.FrameRate
@@ -47,12 +49,13 @@ func (gs *Game) captureTexture() {
 }
 
 func (gs *Game) EndCapture() {
-	item := &gs.Content
-	if !item.capturing {
+	content := &gs.Content
+	if !content.capturing {
 		log.Println("nothing to end. not capturing!")
 		return
 	}
 	log.Println("EndCapture")
-	item.captureStop <- 1
-	item.capturing = false
+	content.endCapturing = false
+	content.capturing = false
+	content.captureStop <- 1
 }

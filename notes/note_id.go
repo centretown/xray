@@ -45,6 +45,7 @@ const (
 
 const (
 	NONE = iota
+	HELP
 	MORE
 	NEXT_NOTE
 	PREV_NOTE

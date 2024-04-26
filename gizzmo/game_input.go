@@ -10,8 +10,7 @@ import (
 )
 
 func (gs *Game) ProcessInput(repeatinterval float64,
-	repeatCh <-chan float64,
-	stop <-chan int) {
+	repeatCh <-chan float64, stop <-chan int) {
 
 	var (
 		content = &gs.Content
@@ -33,10 +32,10 @@ func (gs *Game) ProcessInput(repeatinterval float64,
 			return
 		case baseInterval = <-repeatCh:
 		default:
-			// fmt.Println("checkkeys")
+			thisTime = content.currentTime
+
 			command = gs.CheckKeys()
 			if command == notes.NONE {
-				// fmt.Println("checkgamepad")
 				for i := range content.gamepad.GetPadCount() {
 					command = gs.CheckPad(i)
 					if command != notes.NONE {
@@ -45,12 +44,11 @@ func (gs *Game) ProcessInput(repeatinterval float64,
 				}
 			}
 
-			thisTime = rl.GetTime()
 			if command == notes.NONE {
 				if thisTime > nextTime {
 					repeatCount = 0
 					interval = baseInterval
-					previousCommand = command
+					previousCommand = notes.NONE
 				}
 				continue
 			}
@@ -64,16 +62,16 @@ func (gs *Game) ProcessInput(repeatinterval float64,
 
 			if currentCommand != previousCommand {
 				repeatCount = 0
-				interval = baseInterval
 				previousCommand = currentCommand
+				nextTime = thisTime + interval
+				interval = baseInterval
 				continue
 			}
-
 			if repeatCount > 0 {
-				interval = baseInterval / 2
+				interval = baseInterval / float64(repeatCount)
 			}
-			repeatCount++
 			nextTime = thisTime + interval
+			repeatCount++
 		}
 	}
 
@@ -84,16 +82,12 @@ func (gs *Game) CheckPad(padNum int32) int {
 	var more_down bool
 	content.gamepad.BeginPad()
 
-	if content.gamepad.IsGamepadButtonDown(padNum, gpads.RL_MiddleRight) {
-		content.commandState = !content.commandState
-	}
-
-	if !content.commandState {
-		return notes.NONE
-	}
-
 	for command := range notes.COMMANDS {
 		switch command {
+		case notes.HELP:
+			if content.gamepad.IsGamepadButtonDown(padNum, gpads.RL_MiddleRight) {
+				return command
+			}
 		case notes.MORE:
 			more_down = content.gamepad.IsGamepadButtonDown(padNum, gpads.RL_RightTrigger2)
 
@@ -133,6 +127,11 @@ func (gs *Game) CheckKeys() int {
 
 	for command := range notes.COMMANDS {
 		switch command {
+		case notes.HELP:
+			if rl.IsKeyDown(rl.KeyF1) {
+				return command
+			}
+
 		case notes.MORE:
 			more_down = rl.IsKeyDown(rl.KeyLeftControl) ||
 				rl.IsKeyDown(rl.KeyRightControl)
