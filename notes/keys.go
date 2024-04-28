@@ -2,13 +2,13 @@ package notes
 
 // labels
 const (
-	Monitor   = "labels::monitor"
-	View      = "labels::view"
-	Duration  = "labels::duration"
-	FrameRate = "labels::framerate"
-	Capture   = "labels::capture"
-	Language  = "labels::language"
-	FontSize  = "labels::fontsize"
+	MonitorLabel   = "labels::monitor"
+	ViewLabel      = "labels::view"
+	DurationLabel  = "labels::duration"
+	FrameRateLabel = "labels::framerate"
+	CaptureLabel   = "labels::capture"
+	LanguageLabel  = "labels::language"
+	FontSizeLabel  = "labels::fontsize"
 )
 
 // values
@@ -44,16 +44,20 @@ const (
 )
 
 const (
-	NONE = iota
-	HELP
-	MORE
-	NEXT_NOTE
-	PREV_NOTE
-	INC
-	DEC
-	INC_MORE
-	DEC_MORE
-	PAUSE_PLAY
-	CAPTURE
-	COMMANDS
+	None           = "commands::none"
+	Help           = "commands::help"
+	More           = "commands::more"
+	Next           = "commands::next"
+	Previous       = "commands::previous"
+	Increment      = "commands::increment"
+	Decrement      = "commands::decrement"
+	Increment_more = "commands::increment_more"
+	Decrement_more = "commands::decrement_more"
+	Pause_play     = "commands::pause_play"
+	Share          = "commands::share"
+	Action         = "commands::action"
+	Back           = "commands::back"
+	Cancel         = "commands::cancel"
+	Out            = "commands::out"
+	Commands       = "commands::commands"
 )

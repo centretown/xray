@@ -9,7 +9,6 @@ import (
 	"github.com/centretown/xray/gizzmodb/model"
 	"github.com/centretown/xray/layout"
 	"github.com/centretown/xray/notes"
-	msg "github.com/centretown/xray/notes"
 
 	"github.com/centretown/gpads/gpads"
 	"github.com/centretown/gpads/pad"
@@ -44,17 +43,23 @@ type GameItem struct {
 	CaptureDelay    float64
 	CaptureDuration float64
 
-	built              float64
-	paused             bool
-	fullscreen         bool
-	screenstate        ResizeState
-	monitorNum         int
-	monitorWidth       int
-	monitorHeight      int
-	monitorRefreshRate int
-	currentFrameRate   int64
-	screenWidth        int64
-	screenHeight       int64
+	Layout        *layout.Layout
+	Languages     *notes.Languages
+	Language      *notes.Language
+	LanguageIndex int
+
+	Environment Environment
+
+	OptionsNotes  *notes.Notes
+	CurrentOption int
+	CaptureNotes  *notes.Notes
+	KeymapNotes   *notes.Notes
+	PadNotes      *notes.Notes
+
+	built       float64
+	paused      bool
+	fullscreen  bool
+	screenstate ResizeState
 
 	currentTime float64
 
@@ -71,15 +76,8 @@ type GameItem struct {
 	captureStop   chan int
 	captureSource chan *rl.Image
 
-	aspectRatio   float32
-	commandState  bool
-	notes         *msg.Notes
-	captureNotes  *msg.Notes
-	layout        *layout.Layout
-	languages     *notes.LanguageList
-	language      *notes.LanguageItem
-	languageIndex int
-	note          int
+	aspectRatio  float32
+	commandState bool
 
 	// note: movers are also drawers
 	movers      []Mover      // movers as loaded
@@ -129,7 +127,7 @@ func (gs *Game) setup() {
 	content.capturing = false
 	content.screenstate = RESIZE_NORMAL
 
-	content.layout = layout.NewLayout(20)
+	content.Layout = layout.NewLayout(20)
 	content.gamepad = gpads.NewGPads()
 
 	content.movers = make([]Mover, 0)

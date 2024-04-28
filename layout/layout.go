@@ -52,10 +52,10 @@ func (lay *Layout) Refresh(fontsize int32) {
 }
 
 func (lay *Layout) Layout(startY int32,
-	notes *notes.Notes, language *notes.LanguageItem,
+	notes *notes.Notes, language *notes.Language,
 	draw func(y int32,
 		label string, labelColor color.RGBA,
-		value string, valueColor color.RGBA)) {
+		value string, valueColor color.RGBA)) int32 {
 
 	var (
 		y          = startY
@@ -65,22 +65,24 @@ func (lay *Layout) Layout(startY int32,
 
 	notes.Fetch(language)
 
-	for i, note := range notes.List {
+	for i, note := range notes.Notes {
+		item := note.Item()
 		if i == lay.Current {
-			if note.CanAct() {
+			if item.CanDo {
 				labelColor, valueColor = lay.Colors.LabelInput, lay.Colors.ValueInput
 			} else {
 				labelColor, valueColor = lay.Colors.LabelCurrent, lay.Colors.ValueCurrent
 			}
 		} else {
-			if note.CanAct() {
+			if item.CanDo {
 				labelColor, valueColor = lay.Colors.LabelData, lay.Colors.ValueData
 			} else {
 				labelColor, valueColor = lay.Colors.Label, lay.Colors.Value
 			}
 		}
-		draw(y, notes.Outputs[i].Label, labelColor,
-			notes.Outputs[i].Value, valueColor)
+		draw(y, item.Output.Label, labelColor, item.Output.Value, valueColor)
 		y += lay.DeltaY
 	}
+
+	return y
 }

@@ -1,20 +1,9 @@
 package notes
 
-import (
-	"golang.org/x/exp/constraints"
-	"unknwon.dev/i18n"
-)
-
-type Note struct {
-	Label   string
-	Value   string
-	Values  []any
-	Action  func(command int)
-	Refresh func(values ...any)
-}
-
-func (nt *Note) CanAct() bool {
-	return nt.Action != nil
+type Doer interface {
+	Values() []any
+	Bind(value any)
+	Do(command COMMAND)
 }
 
 type Output struct {
@@ -22,93 +11,64 @@ type Output struct {
 	Value string
 }
 
+type NoteItem struct {
+	LabelKey  string
+	FormatKey string
+	Output    Output
+	CanDo     bool
+}
+
+type NoteG[T Doer] struct {
+	Item NoteItem
+	Doer T
+}
+
+type Note interface {
+	Doer
+	Item() *NoteItem
+}
+
 type Notes struct {
-	List    []*Note
-	Outputs []*Output
-	Length  int
+	Notes  []Note
+	Length int
 }
 
-func NewNotes(list []*Note, locale *i18n.Locale) (nts *Notes) {
-	length := len(list)
-	nts = &Notes{
-		Length:  length,
-		List:    list,
-		Outputs: make([]*Output, length),
+func NewNotes() (nts *Notes) {
+	return &Notes{
+		Notes: make([]Note, 0),
 	}
-
-	for i := range nts.List {
-		nts.Outputs[i] = &Output{}
-	}
-	return nts
 }
 
-func (nts *Notes) Fetch(language *LanguageItem) {
+func (nts *Notes) Add(note Note) {
+	nts.Notes = append(nts.Notes, note)
+}
+
+func (nts *Notes) Fetch(language *Language) {
 	var (
-		token  *Note
+		locale = language.locale
+		note   Note
 		output *Output
-		i      int
-		locale = language.Locale
+		item   *NoteItem
 	)
 
-	for i, token = range nts.List {
-		if token.Refresh != nil {
-			token.Refresh(token.Values...)
-		}
-		output = nts.Outputs[i]
-		output.Label = locale.Translate(token.Label)
-		output.Value = locale.Translate(token.Value, token.Values...)
+	for _, note = range nts.Notes {
+		item = note.Item()
+		output = &item.Output
+		output.Label = locale.Translate(item.LabelKey)
+		output.Value = locale.Translate(item.FormatKey, note.Values()...)
 	}
 }
 
 func (nts *Notes) Draw(i int, draw func(i int, label, value string)) {
 	if i < nts.Length {
-		draw(i, nts.Outputs[i].Label, nts.Outputs[i].Value)
+		output := &nts.Notes[i].Item().Output
+		draw(i, output.Label, output.Value)
 	}
 }
 
-func IncrementMore[T constraints.Integer | constraints.Float](command int, value *T) {
-	switch command {
-	case INC_MORE:
-		*value += 10
-	case INC:
-		*value++
-	case DEC_MORE:
-		if *value-10 > 0 {
-			*value -= 10
-		} else {
-			*value = 1
-		}
-	case DEC:
-		if *value-1 > 0 {
-			*value--
-		}
-	}
-}
-
-func Increment[T constraints.Integer | constraints.Float](command int, value *T) {
-	switch command {
-	case INC_MORE, INC:
-		*value++
-	case DEC_MORE, DEC:
-		if *value-1 > 0 {
-			*value--
-		}
-	}
-}
-
-func Select(command int, selection *int, length int) {
-	switch command {
-	case INC_MORE, INC:
-		if *selection+1 >= length {
-			*selection = 0
-		} else {
-			*selection++
-		}
-	case DEC_MORE, DEC:
-		if *selection-1 >= 0 {
-			*selection--
-		} else {
-			*selection = length - 1
-		}
+func (nts *Notes) DrawAll(draw func(i int, label, value string)) {
+	for i := range nts.Notes {
+		output := &nts.Notes[i].Item().Output
+		draw(i, output.Label, output.Value)
 	}
 }

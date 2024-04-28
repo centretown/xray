@@ -10,50 +10,29 @@ import (
 )
 
 func (gs *Game) DrawStatus() {
-	gs.UpdateNotes()
-	content := &gs.Content
+	gs.RefreshEnvironment()
+	var (
+		content = &gs.Content
+		row     = content.Layout.FontSize
+	)
 
-	if !content.commandState && !content.capturing {
-		return
+	if content.commandState {
+		row += gs.drawOutputs(row, content.OptionsNotes)
 	}
 
-	row := content.layout.FontSize
-	row += gs.drawOutputs(row, content.notes)
-
 	if content.capturing {
-		gs.drawOutputs(row, content.captureNotes)
+		gs.drawOutputs(row, content.CaptureNotes)
 	}
 }
 
 func (gs *Game) drawOutputs(row int32, notes *notes.Notes) int32 {
-
-	var (
-		layout = gs.Content.layout
-	)
-
-	layout.Layout(row, notes, gs.Content.language,
+	var layout = gs.Content.Layout
+	return layout.Layout(row, notes, gs.Content.Language,
 		func(y int32, label string, labelColor color.RGBA,
 			value string, valueColor color.RGBA) {
 			rl.DrawText(label, int32(layout.LabelX), int32(y), layout.FontSize, labelColor)
 			rl.DrawText(value, int32(layout.ValueX), int32(y), layout.FontSize, valueColor)
 		})
-	return row
-}
-
-func (gs *Game) Refresh(current float64) {
-	viewPort := gs.SetViewPort(float32(rl.GetRenderWidth()),
-		float32(rl.GetRenderHeight()))
-
-	for _, mover := range gs.Content.movers {
-		mover.Refresh(current, rl.Vector4{
-			X: viewPort.Width,
-			Y: viewPort.Height})
-	}
-	for _, drawer := range gs.Content.drawers {
-		drawer.Refresh(current, rl.Vector4{
-			X: float32(viewPort.Width),
-			Y: float32(viewPort.Height)})
-	}
 }
 
 func (gs *Game) SetViewPort(rw, rh float32) rl.Rectangle {

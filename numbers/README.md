@@ -164,3 +164,9 @@ bf64 = As[float64](f64 > 0)
 
 "Go’s optimisations are always enabled by default. You can see the compiler’s escape analysis and inlining decisions with the -gcflags=-m switch."
 
+
+## ToDo
+Dave Cheney's High Performance Go Workshop
+
+[https://dave.cheney.net/high-performance-go-workshop/gophercon-2019.html]
+

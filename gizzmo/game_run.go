@@ -40,7 +40,7 @@ func (gs *Game) Run() {
 	var (
 		stopCh     = make(chan int)
 		repeatCh   = make(chan float64)
-		repeatRate = float64(.25)
+		repeatRate = float64(.30)
 	)
 
 	go gs.ProcessInput(repeatRate, repeatCh, stopCh)
@@ -122,4 +122,20 @@ func (gs *Game) unload() {
 	gs.data.Close()
 	rl.CloseWindow()
 
+}
+
+func (gs *Game) Refresh(current float64) {
+	viewPort := gs.SetViewPort(float32(rl.GetRenderWidth()),
+		float32(rl.GetRenderHeight()))
+
+	for _, mover := range gs.Content.movers {
+		mover.Refresh(current, rl.Vector4{
+			X: viewPort.Width,
+			Y: viewPort.Height})
+	}
+	for _, drawer := range gs.Content.drawers {
+		drawer.Refresh(current, rl.Vector4{
+			X: float32(viewPort.Width),
+			Y: float32(viewPort.Height)})
+	}
 }

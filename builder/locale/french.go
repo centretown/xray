@@ -1,12 +1,5 @@
 package locale
 
-var Locale_fr_Values = `
-# locale_fr.ini
-
-[values]
-
-`
-
 var Locale_fr = `
 # locale_fr.ini
 
@@ -27,13 +20,8 @@ capture = Capturer...
 language = Langue
 
 fontsize = Taille de Police
-`
-
-var Locale_fr_Flags = `
-# locale_fr.ini
 
 [options]
-[optionss]
 
 major = major
 
@@ -70,4 +58,41 @@ quick = rapide
 quickshort = q
 
 quickusage = construction rapide et exécution dans la base de données de mémoire temporaire
+
+[commands]
+
+none = none
+
+help = help
+
+more = more
+
+next = next
+
+previous = previous
+
+increment = increment
+
+decrement = decrement
+
+increment_more = increment more
+
+decrement_more = decrement more
+
+pause_play = pause/play
+
+share = share
+
+action = action
+
+back = back
+
+cancel = cancel
+
+out = out
+
+commands = commands
+
+[values]
+
 `

@@ -20,7 +20,7 @@ type Resource struct {
 	Size   int64
 	Width  int32
 	Height int32
-	Err    error `json:"-"`
+	Err    error `json:"-" yaml:"-"`
 }
 
 func InitResource(res *Resource, path string, classn int32) {

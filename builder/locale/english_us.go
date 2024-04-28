@@ -20,10 +20,6 @@ capture = Capturing...
 language = Language
 
 fontsize = Font Size
-`
-
-var Locale_en_US_Values = `
-# locale_en-US.ini
 
 [values]
 
@@ -46,10 +42,6 @@ string = %[1]s
 integer = %[1]d
 
 float = %.0[1]f
-`
-
-var Locale_en_US_Flags = `
-# locale_en-US.ini
 
 [options]
 
@@ -82,4 +74,38 @@ quick = quick
 quickshort = q
 
 quickusage = quick build and run in temporary memory database
+
+[commands]
+
+none = none
+
+help = help
+
+more = more
+
+next = next
+
+previous = previous
+
+increment = increment
+
+decrement = decrement
+
+increment_more = increment more
+
+decrement_more = decrement more
+
+pause_play = pause/play
+
+share = share
+
+action = action
+
+back = back
+
+cancel = cancel
+
+out = out
+
+commands = commands
 `
