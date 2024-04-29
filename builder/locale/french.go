@@ -53,12 +53,6 @@ quickshort = q
 
 quickusage = construction rapide et exécution dans la base de données de mémoire temporaire
 
-quick = rapide
-
-quickshort = q
-
-quickusage = construction rapide et exécution dans la base de données de mémoire temporaire
-
 [commands]
 
 none = none

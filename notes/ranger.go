@@ -41,14 +41,22 @@ func (rngr *Ranger[T]) Item() *NoteItem {
 	return &rngr.NoteItem
 }
 
-func (rngr *Ranger[T]) Do(command COMMAND) {
+func (rngr *Ranger[T]) Do(command COMMAND, args ...any) {
 	var (
-		current = *rngr.current
-		next    T
+		current   = *rngr.current
+		next      T
+		selection = rngr.min
 	)
 	current = numbers.AsOr(current < rngr.min, rngr.min, current)
-	current = numbers.AsOr(current >= rngr.max, rngr.max, current)
+	current = numbers.AsOr(current >= rngr.max, rngr.max-1, current)
+
 	switch command {
+	case SET:
+		if len(args) > 0 {
+			selection = args[0].(T)
+		}
+		current = numbers.AsOr(selection >= rngr.min && selection < rngr.max,
+			selection, rngr.min)
 	case INCREMENT_MORE:
 		next = current + rngr.more
 		current = numbers.AsOr(next < rngr.max, next, rngr.max-1)

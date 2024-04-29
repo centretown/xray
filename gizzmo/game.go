@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/centretown/xray/entries"
 	"github.com/centretown/xray/gizzmodb"
 	"github.com/centretown/xray/gizzmodb/model"
 	"github.com/centretown/xray/layout"
@@ -44,11 +45,13 @@ type GameItem struct {
 	CaptureDuration float64
 
 	Layout        *layout.Layout
-	Languages     *notes.Languages
+	Languages     notes.Languages
 	Language      *notes.Language
 	LanguageIndex int
 
-	Environment Environment
+	Monitor  entries.Monitor
+	Screen   entries.Screen
+	FontSize float64
 
 	OptionsNotes  *notes.Notes
 	CurrentOption int
@@ -61,7 +64,8 @@ type GameItem struct {
 	fullscreen  bool
 	screenstate ResizeState
 
-	currentTime float64
+	currentTime      float64
+	CurrentFrameRate int64
 
 	beginCapturing bool
 	capturing      bool

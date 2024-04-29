@@ -3,7 +3,7 @@ package notes
 type Doer interface {
 	Values() []any
 	Bind(value any)
-	Do(command COMMAND)
+	Do(command COMMAND, args ...any)
 }
 
 type Output struct {
@@ -16,11 +16,6 @@ type NoteItem struct {
 	FormatKey string
 	Output    Output
 	CanDo     bool
-}
-
-type NoteG[T Doer] struct {
-	Item NoteItem
-	Doer T
 }
 
 type Note interface {
@@ -39,8 +34,8 @@ func NewNotes() (nts *Notes) {
 	}
 }
 
-func (nts *Notes) Add(note Note) {
-	nts.Notes = append(nts.Notes, note)
+func (nts *Notes) Add(notes ...Note) {
+	nts.Notes = append(nts.Notes, notes...)
 }
 
 func (nts *Notes) Fetch(language *Language) {

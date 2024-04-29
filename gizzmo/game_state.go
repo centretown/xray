@@ -61,14 +61,14 @@ func (gs *Game) updateState(command notes.COMMAND) {
 
 // main thread only
 func (gs *Game) RefreshEnvironment() {
-	env := &gs.Content.Environment
-	mon := &env.Monitor
+	content := &gs.Content
+	mon := &content.Monitor
 	mon.Num = rl.GetCurrentMonitor()
 	mon.Width = rl.GetMonitorWidth(mon.Num)
 	mon.Height = rl.GetMonitorHeight(mon.Num)
 	mon.RefreshRate = rl.GetMonitorRefreshRate(mon.Num)
-	env.CurrentFrameRate = int64(rl.GetFPS())
-	scr := &env.Screen
+	content.CurrentFrameRate = int64(rl.GetFPS())
+	scr := &content.Screen
 	scr.Width = int64(rl.GetScreenWidth())
 	scr.Height = int64(rl.GetScreenHeight())
 }

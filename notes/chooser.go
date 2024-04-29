@@ -35,9 +35,18 @@ func (cho *Chooser[T]) Item() *NoteItem {
 	return &cho.NoteItem
 }
 
-func (cho *Chooser[T]) Do(command COMMAND) {
-	length := len(*cho.List)
+func (cho *Chooser[T]) Do(command COMMAND, args ...any) {
+	var (
+		length    = len(*cho.List)
+		selection int
+	)
+
 	switch command {
+	case SET:
+		if len(args) > 0 {
+			selection = args[0].(int)
+		}
+		cho.Current = numbers.AsOr(selection >= 0 && selection < length, selection, 0)
 	case INCREMENT_MORE, INCREMENT:
 		cho.Current = numbers.AsOr(cho.Current+1 < length, cho.Current+1, 0)
 	case DECREMENT_MORE, DECREMENT:

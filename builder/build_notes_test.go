@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/centretown/xray/entries"
+	"github.com/centretown/xray/gizzmo"
 	"github.com/centretown/xray/notes"
 	"github.com/centretown/xray/numbers"
 )
@@ -14,35 +16,48 @@ const (
 )
 
 func TestNotes(t *testing.T) {
-	var (
-		languages   = NewLanguageList()
-		fontSize    float64
-		monitorItem notes.MonitorItem
-		viewItem    notes.ViewItem
-	)
+	gs := &gizzmo.Game{}
+	BuildNotes(gs)
 
-	nts := notes.NewNotes()
-	langChooser := notes.NewChooser(notes.LanguageLabel, notes.StringValue, &languages.List)
-	nts.Add(langChooser)
-	testLanguageChooser(t, nts, languages, langChooser)
+	content := &gs.Content
 
-	fontRanger := notes.NewRanger(notes.FontSizeLabel, notes.FloatValue, &fontSize, 8, 100, 10)
-	nts.Add(fontRanger)
-	testRanger(t, nts, languages, fontRanger)
+	langEntry := content.CaptureNotes.Notes[0].(*notes.Chooser[*notes.Language])
+	testLanguageChooser(t, content.CaptureNotes, &content.Languages, langEntry)
 
-	monitor := notes.NewMonitor(notes.MonitorLabel, notes.MonitorValue, &monitorItem)
-	nts.Add(monitor)
-	testMonitor(t, nts, languages, monitor)
+	fontEntry := content.CaptureNotes.Notes[1].(*notes.Ranger[float64])
+	testRanger(t, content.CaptureNotes, &content.Languages, fontEntry)
 
-	screen := notes.NewScreen(notes.ViewLabel, notes.ViewValue, &viewItem)
-	nts.Add(screen)
-	testScreen(t, nts, languages, screen)
+	monitor := content.CaptureNotes.Notes[2].(*entries.MonitorEntry)
+	testMonitor(t, content.CaptureNotes, &content.Languages, monitor)
+
+	screen := content.CaptureNotes.Notes[3].(*entries.ScreenEntry)
+	testScreen(t, content.CaptureNotes, &content.Languages, screen)
 
 	draw := func(i int, label, value string) {
 		t.Log(label, value)
 	}
 
-	t.Log("DRAW ALL")
+	nts := content.CaptureNotes
+	languages := &content.Languages
+
+	t.Log("")
+	t.Log("DRAW ALL en_US map")
+	nts.Fetch(languages.Items["en_US"])
+	nts.DrawAll(draw)
+
+	t.Log("")
+	t.Log("DRAW ALL fr map")
+	nts.Fetch(languages.Items["fr"])
+	nts.DrawAll(draw)
+
+	t.Log("")
+	t.Log("DRAW ALL en_US list")
+	nts.Fetch(languages.List[testEnglish])
+	nts.DrawAll(draw)
+
+	t.Log("")
+	t.Log("DRAW ALL fr list")
+	nts.Fetch(languages.List[testFrench])
 	nts.DrawAll(draw)
 }
 
@@ -111,7 +126,7 @@ func testRanger[T numbers.NumberType](t *testing.T, nts *notes.Notes, languages 
 }
 
 func testMonitor(t *testing.T, nts *notes.Notes, languages *notes.Languages,
-	mon *notes.Monitor) {
+	mon *entries.MonitorEntry) {
 
 	item := mon.Item()
 	output := &item.Output
@@ -142,7 +157,7 @@ func testMonitor(t *testing.T, nts *notes.Notes, languages *notes.Languages,
 }
 
 func testScreen(t *testing.T, nts *notes.Notes, languages *notes.Languages,
-	scr *notes.View) {
+	scr *entries.ScreenEntry) {
 	custom := scr.Custom
 	custom.Width = 1920
 	custom.Height = 1080
