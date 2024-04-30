@@ -1,7 +1,5 @@
 package notes
 
-import "log"
-
 type Composite[T any] struct {
 	NoteItem
 	Custom *T
@@ -23,10 +21,4 @@ func InitComposite[T any](
 
 func (cmp *Composite[T]) Item() *NoteItem {
 	return &cmp.NoteItem
-}
-
-func (cmp *Composite[T]) Bind(value any) {
-	if err := bind(cmp.Custom, value); err != nil {
-		log.Fatal(err)
-	}
 }

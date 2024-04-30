@@ -2,7 +2,6 @@ package notes
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/centretown/xray/numbers"
 )
@@ -56,10 +55,4 @@ func (cho *Chooser[T]) Do(command COMMAND, args ...any) {
 
 func (cho *Chooser[T]) Values() []any {
 	return []any{(*cho.List)[cho.Current].String()}
-}
-
-func (cho *Chooser[T]) Bind(value any) {
-	if err := bind(cho.List, value); err != nil {
-		log.Fatal(err)
-	}
 }

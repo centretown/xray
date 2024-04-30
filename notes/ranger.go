@@ -1,8 +1,6 @@
 package notes
 
 import (
-	"log"
-
 	"github.com/centretown/xray/numbers"
 )
 
@@ -75,10 +73,4 @@ func (rngr *Ranger[T]) Do(command COMMAND, args ...any) {
 
 func (rngr *Ranger[T]) Values() []any {
 	return []any{*rngr.current}
-}
-
-func (rngr *Ranger[T]) Bind(value any) {
-	if err := bind(rngr.current, value); err != nil {
-		log.Fatal(err)
-	}
 }
