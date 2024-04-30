@@ -7,31 +7,58 @@ import (
 	"github.com/centretown/xray/notes"
 )
 
-func BuildNotes(gs *gizzmo.Game) {
+const (
+	LANG_BASE     = 0
+	LANG_ENG_BASE = 0
+	LANG_FR_BASE  = 1
+)
+
+func BuildGameNotes(gs *gizzmo.Game) {
+
 	content := &gs.Content
-	lang := &content.Languages
-	lang.List = []*notes.Language{
+	languages := &content.Languages
+	languages.FallbackCode = "en_US"
+	languages.FallbackTitle = "English (US)"
+	languages.FallbackSource = []byte(locale.Locale_en_US)
+
+	languages.List = []*notes.Language{
 		{
-			Code:   "en_US",
-			Title:  "English",
-			Source: nil,
+			Code:  "en_US",
+			Title: "English (US)",
 		},
 		{
 			Code:   "fr",
 			Title:  "Français",
 			Source: []byte(locale.Locale_fr),
 		},
+		{
+			Code:   "fr_CA",
+			Title:  "Français (CA)",
+			Base:   []byte(locale.Locale_fr),
+			Source: []byte(locale.Locale_fr_CA),
+		},
+		{
+			Code:   "en_CA",
+			Title:  "English (CA)",
+			Source: []byte(locale.Locale_en_CA),
+		},
 	}
-	lang.Source = []byte(locale.Locale_en_US)
-	lang.Items = make(map[string]*notes.Language)
+	languages.Items = make(map[string]*notes.Language)
 
 	InitLanguageList(&content.Languages)
-	content.LanguageIndex = 1
-	content.Language = content.Languages.List[content.LanguageIndex]
+	chooser := notes.NewLanguageChooser(languages)
+	content.Language = content.Languages.List[content.LanguageCurrent]
 
-	content.CaptureNotes = notes.NewNotes()
-	buildOptionsNotes(gs)
-	buildCaptureNotes(gs)
+	content.Options = notes.NewNotes(chooser)
+	content.Options.Add(
+		chooser,
+		entries.NewFontEntry(&content.Fontsize),
+		entries.NewMonitorEntry(&content.Monitor),
+		entries.NewScreenEntry(&content.Screen))
+
+	content.Capture = notes.NewNotes(chooser)
+	content.Capture.Add()
+
 	buildKeyNotes(gs)
 	buildPadNotes(gs)
 }
@@ -39,19 +66,10 @@ func BuildNotes(gs *gizzmo.Game) {
 const (
 	NONE = iota
 	LANGUAGE
-	FONTSIZE
+	FOntsIZE
 )
 
-func buildOptionsNotes(gs *gizzmo.Game) {
-	content := &gs.Content
-	content.CaptureNotes.Add(
-		entries.NewLanguageEntry(&content.Languages),
-		entries.NewFontEntry(&content.FontSize),
-		entries.NewMonitorEntry(&content.Monitor),
-		entries.NewScreenView(&content.Screen))
-}
-
-func buildCaptureNotes(gs *gizzmo.Game) {
+func buildCaptureNotes(gs *gizzmo.Game, chooser *notes.LanguageChooser) {
 	// content := &gs.Content
 	// list := make([]*notes.Note, 0)
 	// list = append(list,

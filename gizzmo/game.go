@@ -44,20 +44,21 @@ type GameItem struct {
 	CaptureDelay    float64
 	CaptureDuration float64
 
-	Layout        *layout.Layout
-	Languages     notes.Languages
-	Language      *notes.Language
-	LanguageIndex int
+	Layout *layout.Layout
+
+	LanguageCurrent int
+	Languages       notes.Languages
+	Language        *notes.Language
 
 	Monitor  entries.Monitor
 	Screen   entries.Screen
-	FontSize float64
+	Fontsize float64
 
-	OptionsNotes  *notes.Notes
-	CurrentOption int
-	CaptureNotes  *notes.Notes
-	KeymapNotes   *notes.Notes
-	PadNotes      *notes.Notes
+	OptionCurrent int
+	Options       *notes.Notebook
+	Capture       *notes.Notebook
+	KeyMap        *notes.Notebook
+	PadMap        *notes.Notebook
 
 	built       float64
 	paused      bool

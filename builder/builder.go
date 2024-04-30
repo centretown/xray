@@ -92,7 +92,7 @@ func create(databasePath string, cmd *flags.FlagSet,
 
 	custom(game)
 
-	BuildNotes(game)
+	BuildGameNotes(game)
 
 	game.Save(data)
 	if data.HasErrors() {

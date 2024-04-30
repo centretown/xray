@@ -2,7 +2,7 @@ package notes
 
 type Doer interface {
 	Values() []any
-	Bind(value any)
+	// Bind(value any)
 	Do(command COMMAND, args ...any)
 }
 
@@ -23,47 +23,50 @@ type Note interface {
 	Item() *NoteItem
 }
 
-type Notes struct {
-	Notes  []Note
-	Length int
+type Notebook struct {
+	Language *LanguageChooser
+	Notes    []Note
+	Length   int
 }
 
-func NewNotes() (nts *Notes) {
-	return &Notes{
-		Notes: make([]Note, 0),
+func NewNotes(languageChooser *LanguageChooser) (ntbk *Notebook) {
+	return &Notebook{
+		Notes:    make([]Note, 0),
+		Language: languageChooser,
 	}
 }
 
-func (nts *Notes) Add(notes ...Note) {
-	nts.Notes = append(nts.Notes, notes...)
+func (ntbk *Notebook) Add(notes ...Note) {
+	ntbk.Notes = append(ntbk.Notes, notes...)
 }
 
-func (nts *Notes) Fetch(language *Language) {
+func (ntbk *Notebook) Fetch() {
 	var (
-		locale = language.locale
-		note   Note
-		output *Output
-		item   *NoteItem
+		language *Language = ntbk.Language.Current()
+		locale             = language.locale
+		note     Note
+		output   *Output
+		item     *NoteItem
 	)
 
-	for _, note = range nts.Notes {
+	for _, note = range ntbk.Notes {
 		item = note.Item()
 		output = &item.Output
-		output.Label = locale.Translate(item.LabelKey)
-		output.Value = locale.Translate(item.FormatKey, note.Values()...)
+		output.Label = locale.TranslateWithFallback(language.fallback, item.LabelKey)
+		output.Value = locale.TranslateWithFallback(language.fallback, item.FormatKey, note.Values()...)
 	}
 }
 
-func (nts *Notes) Draw(i int, draw func(i int, label, value string)) {
-	if i < nts.Length {
-		output := &nts.Notes[i].Item().Output
+func (ntbk *Notebook) Draw(i int, draw func(i int, label, value string)) {
+	if i < ntbk.Length {
+		output := &ntbk.Notes[i].Item().Output
 		draw(i, output.Label, output.Value)
 	}
 }
 
-func (nts *Notes) DrawAll(draw func(i int, label, value string)) {
-	for i := range nts.Notes {
-		output := &nts.Notes[i].Item().Output
+func (ntbk *Notebook) DrawAll(draw func(i int, label, value string)) {
+	for i := range ntbk.Notes {
+		output := &ntbk.Notes[i].Item().Output
 		draw(i, output.Label, output.Value)
 	}
 }

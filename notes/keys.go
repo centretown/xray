@@ -8,7 +8,7 @@ const (
 	FrameRateLabel = "labels::framerate"
 	CaptureLabel   = "labels::capture"
 	LanguageLabel  = "labels::language"
-	FontSizeLabel  = "labels::fontsize"
+	FontsizeLabel  = "labels::fontsize"
 )
 
 // values

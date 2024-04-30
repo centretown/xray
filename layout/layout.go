@@ -29,7 +29,7 @@ type ColorSet struct {
 }
 
 type Layout struct {
-	FontSize int32
+	Fontsize int32
 	LabelX   int32
 	ValueX   int32
 	DeltaY   int32
@@ -45,14 +45,14 @@ func NewLayout(fontsize int32) *Layout {
 }
 
 func (lay *Layout) Refresh(fontsize int32) {
-	lay.FontSize = fontsize
+	lay.Fontsize = fontsize
 	lay.LabelX = fontsize + 3
-	lay.ValueX = lay.LabelX + lay.FontSize*15
-	lay.DeltaY = lay.FontSize * 2
+	lay.ValueX = lay.LabelX + lay.Fontsize*15
+	lay.DeltaY = lay.Fontsize * 2
 }
 
 func (lay *Layout) Layout(startY int32,
-	notes *notes.Notes, language *notes.Language,
+	notes *notes.Notebook, language *notes.Language,
 	draw func(y int32,
 		label string, labelColor color.RGBA,
 		value string, valueColor color.RGBA)) int32 {
@@ -63,7 +63,7 @@ func (lay *Layout) Layout(startY int32,
 		valueColor color.RGBA
 	)
 
-	notes.Fetch(language)
+	notes.Fetch()
 
 	for i, note := range notes.Notes {
 		item := note.Item()

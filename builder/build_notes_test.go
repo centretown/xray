@@ -1,7 +1,6 @@
 package builder
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/centretown/xray/entries"
@@ -11,64 +10,65 @@ import (
 )
 
 const (
-	testEnglish = iota
+	testEnglishUS = iota
 	testFrench
+	testFrenchCA
+	testEnglishCA
 )
 
 func TestNotes(t *testing.T) {
 	gs := &gizzmo.Game{}
-	BuildNotes(gs)
+	BuildGameNotes(gs)
 
 	content := &gs.Content
 
-	langEntry := content.CaptureNotes.Notes[0].(*notes.Chooser[*notes.Language])
-	testLanguageChooser(t, content.CaptureNotes, &content.Languages, langEntry)
+	chooser := content.Options.Notes[0].(*notes.LanguageChooser)
+	testLanguageChooser(t, content.Options, chooser)
 
-	fontEntry := content.CaptureNotes.Notes[1].(*notes.Ranger[float64])
-	testRanger(t, content.CaptureNotes, &content.Languages, fontEntry)
+	fontEntry := content.Options.Notes[1].(*notes.Ranger[float64])
+	testRanger(t, content.Options, fontEntry)
 
-	monitor := content.CaptureNotes.Notes[2].(*entries.MonitorEntry)
-	testMonitor(t, content.CaptureNotes, &content.Languages, monitor)
+	monitor := content.Options.Notes[2].(*entries.MonitorEntry)
+	testMonitor(t, content.Options, monitor)
 
-	screen := content.CaptureNotes.Notes[3].(*entries.ScreenEntry)
-	testScreen(t, content.CaptureNotes, &content.Languages, screen)
+	screen := content.Options.Notes[3].(*entries.ScreenEntry)
+	testScreen(t, content.Options, screen)
+
+	ntbk := content.Options
 
 	draw := func(i int, label, value string) {
+		ntbk.Fetch()
 		t.Log(label, value)
 	}
 
-	nts := content.CaptureNotes
-	languages := &content.Languages
-
 	t.Log("")
 	t.Log("DRAW ALL en_US map")
-	nts.Fetch(languages.Items["en_US"])
-	nts.DrawAll(draw)
+	chooser.Do(notes.SET, 0)
+	ntbk.DrawAll(draw)
 
 	t.Log("")
 	t.Log("DRAW ALL fr map")
-	nts.Fetch(languages.Items["fr"])
-	nts.DrawAll(draw)
+	chooser.Do(notes.SET, 1)
+	ntbk.DrawAll(draw)
 
 	t.Log("")
-	t.Log("DRAW ALL en_US list")
-	nts.Fetch(languages.List[testEnglish])
-	nts.DrawAll(draw)
+	t.Log("DRAW ALL fr_CA map")
+	chooser.Do(notes.SET, 2)
+	ntbk.DrawAll(draw)
 
 	t.Log("")
-	t.Log("DRAW ALL fr list")
-	nts.Fetch(languages.List[testFrench])
-	nts.DrawAll(draw)
+	t.Log("DRAW ALL en_CA map")
+	chooser.Do(notes.SET, 3)
+	ntbk.DrawAll(draw)
 }
 
-func testLanguageChooser[T fmt.Stringer](t *testing.T, nts *notes.Notes, languages *notes.Languages,
-	cho *notes.Chooser[T]) {
+func testLanguageChooser(t *testing.T, ntbk *notes.Notebook, chooser *notes.LanguageChooser) {
 
-	item := cho.Item()
+	item := chooser.Item()
 	output := &item.Output
 
 	testChooser := func(label string, want string) {
-		nts.Fetch(languages.List[cho.Current])
+		ntbk.Fetch()
 		t.Log(output.Label, output.Value)
 		if output.Label != label {
 			t.Fatalf("want: %s got %s", label, output.Label)
@@ -78,24 +78,26 @@ func testLanguageChooser[T fmt.Stringer](t *testing.T, nts *notes.Notes, languag
 		}
 	}
 
-	// only two languages better to have at least 3
+	chooser.Do(notes.SET, 1)
+	testChooser("Langue", "Français")
 
-	testChooser("Language", "English")
-	cho.Do(notes.INCREMENT)
-	testChooser("Langue", "Français")
-	cho.Do(notes.DECREMENT)
-	testChooser("Language", "English")
-	cho.Do(notes.DECREMENT)
-	testChooser("Langue", "Français")
+	chooser.Do(notes.SET, 0)
+	testChooser("Language", "English (US)")
+
+	chooser.Do(notes.SET, 2)
+	testChooser("Langue", "Français (CA)")
+
+	chooser.Do(notes.SET, 3)
+	testChooser("Language", "English (CA)")
+
 }
 
-func testRanger[T numbers.NumberType](t *testing.T, nts *notes.Notes, languages *notes.Languages,
-	rngr *notes.Ranger[T]) {
+func testRanger[T numbers.NumberType](t *testing.T, ntbk *notes.Notebook, rngr *notes.Ranger[T]) {
 
 	item := rngr.Item()
 	output := &item.Output
-	test := func(label string, want string, lang int) {
-		nts.Fetch(languages.List[lang])
+	test := func(label string, want string) {
+		ntbk.Fetch()
 
 		t.Log(output.Label, output.Value)
 		if label != "" {
@@ -108,32 +110,46 @@ func testRanger[T numbers.NumberType](t *testing.T, nts *notes.Notes, languages 
 		}
 	}
 
+	ntbk.Language.Do(notes.SET, testEnglishUS)
+	rngr.Do(notes.SET, 8.0)
+	test("Font Size", "8")
+	rngr.Do(notes.SET, 25.0)
+	test("Font Size", "25")
+	rngr.Do(notes.SET, 101.0)
+	test("Font Size", "8")
+
+	rngr.Do(notes.SET, 8.0)
 	rngr.Do(notes.INCREMENT)
-	test("Font Size", "9", testEnglish)
+	test("Font Size", "9")
+
+	ntbk.Language.Do(notes.SET, testFrench)
 	rngr.Do(notes.DECREMENT)
-	test("Taille de Police", "8", testFrench)
+	test("Taille de Police", "8")
 	rngr.Do(notes.INCREMENT)
 	rngr.Do(notes.INCREMENT)
 	rngr.Do(notes.INCREMENT)
 	rngr.Do(notes.INCREMENT)
 	rngr.Do(notes.INCREMENT)
-	test("Taille de Police", "13", testFrench)
+
+	ntbk.Language.Do(notes.SET, testFrenchCA)
+	test("Taille de Police", "13")
 	rngr.Do(notes.INCREMENT_MORE)
-	test("Taille de Police", "23", testFrench)
-	test("Font Size", "23", testEnglish)
+	test("Taille de Police", "23")
+
+	ntbk.Language.Do(notes.SET, testEnglishCA)
+	test("Font Size", "23")
 	rngr.Do(notes.DECREMENT_MORE)
-	test("Font Size", "13", testEnglish)
+	test("Font Size", "13")
 }
 
-func testMonitor(t *testing.T, nts *notes.Notes, languages *notes.Languages,
-	mon *entries.MonitorEntry) {
+func testMonitor(t *testing.T, ntbk *notes.Notebook, mon *entries.MonitorEntry) {
 
 	item := mon.Item()
 	output := &item.Output
 
-	test_monitor := func(label string, want string, lang int) {
+	test_monitor := func(label string, want string) {
 
-		nts.Fetch(languages.List[lang])
+		ntbk.Fetch()
 		t.Log(output.Label, output.Value)
 		if label != "" {
 			if output.Label != label {
@@ -145,21 +161,23 @@ func testMonitor(t *testing.T, nts *notes.Notes, languages *notes.Languages,
 		}
 	}
 
-	test_monitor("Moniteur", "0 0x0 0 Mhz", testFrench)
+	ntbk.Language.Do(notes.SET, testFrench)
+	test_monitor("Moniteur", "0 0x0 0 Mhz")
 	custom := mon.Custom
 	custom.Num = 1
 	custom.Width = 2560
 	custom.Height = 1440
 	custom.RefreshRate = 60
-	test_monitor("Monitor", "1 2560x1440 60 Mhz", testEnglish)
-	test_monitor("Moniteur", "1 2560x1440 60 Mhz", testFrench)
+	ntbk.Language.Do(notes.SET, testEnglishUS)
+	test_monitor("Monitor", "1 2560x1440 60 Mhz")
+	ntbk.Language.Do(notes.SET, testFrenchCA)
+	test_monitor("Moniteur", "1 2560x1440 60 Mhz")
 
 }
 
-func testScreen(t *testing.T, nts *notes.Notes, languages *notes.Languages,
-	scr *entries.ScreenEntry) {
+func testScreen(t *testing.T, ntbk *notes.Notebook, scr *entries.ScreenEntry) {
 	custom := scr.Custom
 	custom.Width = 1920
 	custom.Height = 1080
-	nts.Fetch(languages.List[testEnglish])
+	ntbk.Fetch()
 }

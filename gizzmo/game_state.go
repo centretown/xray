@@ -19,7 +19,7 @@ func (gs *Game) BuildNotes() {
 func (gs *Game) updateState(command notes.COMMAND) {
 	var (
 		content = &gs.Content
-		length  = content.OptionsNotes.Length
+		length  = content.Options.Length
 		// note    *notes.Note
 	)
 
@@ -28,20 +28,20 @@ func (gs *Game) updateState(command notes.COMMAND) {
 		content.commandState = !content.commandState
 
 	case notes.NEXT:
-		if content.CurrentOption+1 < length {
-			content.CurrentOption++
+		if content.OptionCurrent+1 < length {
+			content.OptionCurrent++
 		} else {
-			content.CurrentOption = 0
+			content.OptionCurrent = 0
 		}
-		content.Layout.Current = content.CurrentOption
+		content.Layout.Current = content.OptionCurrent
 
 	case notes.PREVIOUS:
-		if content.CurrentOption-1 >= 0 {
-			content.CurrentOption--
+		if content.OptionCurrent-1 >= 0 {
+			content.OptionCurrent--
 		} else {
-			content.CurrentOption = length - 1
+			content.OptionCurrent = length - 1
 		}
-		content.Layout.Current = content.CurrentOption
+		content.Layout.Current = content.OptionCurrent
 
 	// case notes.INCREMENT, notes.INCREMENT_MORE, notes.DECREMENT, notes.DECREMENT_MORE:
 	// 	note = content.OptionsNotes.Notes[content.CurrentOption]

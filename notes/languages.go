@@ -7,10 +7,12 @@ import (
 )
 
 type Language struct {
-	Code   string
-	Title  string
-	Source []byte
-	locale *i18n.Locale
+	Code     string
+	Title    string
+	Base     []byte
+	Source   []byte
+	locale   *i18n.Locale
+	fallback *i18n.Locale
 }
 
 func (lg *Language) String() string {
@@ -22,27 +24,38 @@ func (lg *Language) Locale() *i18n.Locale {
 }
 
 type Languages struct {
-	Source []byte
-	Items  map[string]*Language
-	List   []*Language
-	store  *i18n.Store
+	Items          map[string]*Language
+	List           []*Language
+	FallbackCode   string
+	FallbackTitle  string
+	FallbackSource []byte
+	fallback       *i18n.Locale
+	store          *i18n.Store
 }
 
 func InitLanguages(lgs *Languages) {
-	lgs.store = i18n.NewStore()
-}
-
-func (lgs *Languages) AddSources(lang *Language, sources []byte, other []byte) {
 	var err error
-	if other == nil {
-		lang.locale, err = lgs.store.AddLocale(lang.Code,
-			lang.Title, sources)
-	} else {
-		lang.locale, err = lgs.store.AddLocale(lang.Code,
-			lang.Title, sources, other)
-	}
-
+	lgs.store = i18n.NewStore()
+	lgs.fallback, err = lgs.store.AddLocale(lgs.FallbackCode,
+		lgs.FallbackTitle, lgs.FallbackSource)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func (lgs *Languages) AddSources(lang *Language) {
+	var err error
+	if lang.Base != nil {
+		lang.locale, err = lgs.store.AddLocale(lang.Code,
+			lang.Title, lang.Source, lang.Base)
+	} else if lang.Source != nil {
+		lang.locale, err = lgs.store.AddLocale(lang.Code,
+			lang.Title, lang.Source)
+	} else {
+		lang.locale = lgs.fallback
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+	lang.fallback = lgs.fallback
 }

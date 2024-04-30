@@ -11,7 +11,7 @@ type ScreenEntry struct {
 	notes.Composite[Screen]
 }
 
-func NewScreenView(view *Screen) *ScreenEntry {
+func NewScreenEntry(view *Screen) *ScreenEntry {
 	scr := &ScreenEntry{}
 	notes.InitComposite(&scr.Composite, notes.ViewLabel, notes.ViewValue, view)
 	var _ notes.Note = scr

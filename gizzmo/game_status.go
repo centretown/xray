@@ -13,25 +13,25 @@ func (gs *Game) DrawStatus() {
 	gs.RefreshEnvironment()
 	var (
 		content = &gs.Content
-		row     = content.Layout.FontSize
+		row     = content.Layout.Fontsize
 	)
 
 	if content.commandState {
-		row += gs.drawOutputs(row, content.OptionsNotes)
+		row += gs.drawOutputs(row, content.Options)
 	}
 
 	if content.capturing {
-		gs.drawOutputs(row, content.CaptureNotes)
+		gs.drawOutputs(row, content.Capture)
 	}
 }
 
-func (gs *Game) drawOutputs(row int32, notes *notes.Notes) int32 {
+func (gs *Game) drawOutputs(row int32, notes *notes.Notebook) int32 {
 	var layout = gs.Content.Layout
 	return layout.Layout(row, notes, gs.Content.Language,
 		func(y int32, label string, labelColor color.RGBA,
 			value string, valueColor color.RGBA) {
-			rl.DrawText(label, int32(layout.LabelX), int32(y), layout.FontSize, labelColor)
-			rl.DrawText(value, int32(layout.ValueX), int32(y), layout.FontSize, valueColor)
+			rl.DrawText(label, int32(layout.LabelX), int32(y), layout.Fontsize, labelColor)
+			rl.DrawText(value, int32(layout.ValueX), int32(y), layout.Fontsize, valueColor)
 		})
 }
 
