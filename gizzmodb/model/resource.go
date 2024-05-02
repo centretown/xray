@@ -23,7 +23,7 @@ type Resource struct {
 	Err    error `json:"-" yaml:"-"`
 }
 
-func InitResource(res *Resource, path string, classn int32) {
+func SetupResource(res *Resource, path string, classn int32) {
 	var (
 		info fs.FileInfo
 		err  error

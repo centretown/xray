@@ -13,7 +13,7 @@ type ScreenEntry struct {
 
 func NewScreenEntry(view *Screen) *ScreenEntry {
 	scr := &ScreenEntry{}
-	notes.InitComposite(&scr.Composite, notes.ViewLabel, notes.ViewValue, view)
+	notes.SetupComposite(&scr.Composite, notes.ViewLabel, notes.ViewValue, view)
 	var _ notes.Note = scr
 	return scr
 }

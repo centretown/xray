@@ -123,7 +123,7 @@ func create_mem_game(t *testing.T) {
 
 	for _, path := range paths {
 		var resource = model.Resource{}
-		model.InitResource(&resource, path, 0)
+		model.SetupResource(&resource, path, 0)
 		if resource.Err != nil {
 			t.Fatal(gd.Err)
 		}

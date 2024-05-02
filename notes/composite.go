@@ -8,7 +8,7 @@ type Composite[T any] struct {
 // To complete Note interface
 // Do and Values functions are required
 // cmp.CanDo = false
-func InitComposite[T any](
+func SetupComposite[T any](
 	cmp *Composite[T],
 	label string,
 	format string,

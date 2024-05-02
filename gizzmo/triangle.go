@@ -20,7 +20,7 @@ package gizzmo
 // func NewTriangle(rgba color.RGBA, v1, v2, v3 rl.Vector2) *Triangle {
 // 	tri := &Triangle{}
 
-// 	InitShape[TriangleItem](&tri.Shape, class.Ellipse.String(),
+// 	SetupShape[TriangleItem](&tri.Shape, class.Ellipse.String(),
 // 		int32(class.Ellipse), rgba, width, height)
 
 // 	var _ model.Recorder = tri

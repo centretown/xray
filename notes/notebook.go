@@ -6,7 +6,7 @@ type Notebook struct {
 	Length   int
 }
 
-func NewNotes(languageChooser *LanguageChooser) (ntbk *Notebook) {
+func NewNotebook(languageChooser *LanguageChooser) (ntbk *Notebook) {
 	return &Notebook{
 		Notes:    make([]Note, 0),
 		Language: languageChooser,

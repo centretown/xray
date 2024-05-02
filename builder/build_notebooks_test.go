@@ -18,23 +18,23 @@ const (
 
 func TestNotes(t *testing.T) {
 	gs := &gizzmo.Game{}
-	BuildGameNotes(gs)
+	BuildNotebooks(gs)
 
-	content := &gs.Content
+	options := gs.Options()
 
-	chooser := content.Options.Notes[0].(*notes.LanguageChooser)
-	testLanguageChooser(t, content.Options, chooser)
+	chooser := options.Notes[0].(*notes.LanguageChooser)
+	testLanguageChooser(t, options, chooser)
 
-	fontEntry := content.Options.Notes[1].(*notes.Ranger[float64])
-	testRanger(t, content.Options, fontEntry)
+	fontEntry := options.Notes[1].(*notes.Ranger[float64])
+	testRanger(t, options, fontEntry)
 
-	monitor := content.Options.Notes[2].(*entries.MonitorEntry)
-	testMonitor(t, content.Options, monitor)
+	monitor := options.Notes[2].(*entries.MonitorEntry)
+	testMonitor(t, options, monitor)
 
-	screen := content.Options.Notes[3].(*entries.ScreenEntry)
-	testScreen(t, content.Options, screen)
+	screen := options.Notes[3].(*entries.ScreenEntry)
+	testScreen(t, options, screen)
 
-	ntbk := content.Options
+	ntbk := options
 
 	draw := func(i int, label, value string) {
 		ntbk.Fetch()

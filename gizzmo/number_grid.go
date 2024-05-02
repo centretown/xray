@@ -50,7 +50,7 @@ func NewGrid[T numbers.NumberType](bounds rl.Vector4,
 	item.StateCount = len(item.StateColors)
 
 	cs.SetupCells()
-	model.InitRecorder[NumberGrid[T]](cs, class.LifeGrid.String(),
+	model.SetupRecorder[NumberGrid[T]](cs, class.LifeGrid.String(),
 		int32(class.LifeGrid))
 	return cs
 }

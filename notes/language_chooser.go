@@ -1,30 +1,30 @@
 package notes
 
 type LanguageChooser struct {
-	Languages *Languages
-	Chooser   *Chooser[*Language]
+	languages *VocabularyItem
+	chooser   *Chooser[*Language]
 }
 
-func NewLanguageChooser(languages *Languages) *LanguageChooser {
+func NewLanguageChooser(vocabulary *VocabularyItem) *LanguageChooser {
 	lch := &LanguageChooser{
-		Languages: languages,
-		Chooser:   NewChooser(LanguageLabel, StringValue, &languages.List),
+		languages: vocabulary,
+		chooser:   NewChooser(LanguageLabel, StringValue, &vocabulary.Languages),
 	}
 	var _ Note = lch
 	return lch
 }
 
 func (lch *LanguageChooser) Item() *NoteItem {
-	return lch.Chooser.Item()
+	return lch.chooser.Item()
 }
 
 func (lch *LanguageChooser) Do(command COMMAND, args ...any) {
-	lch.Chooser.Do(command, args...)
+	lch.chooser.Do(command, args...)
 	var (
 		language = lch.Current()
 		locale   = language.locale
 		item     = lch.Item()
-		output   = &lch.Chooser.Output
+		output   = &lch.chooser.Output
 	)
 	output.Label = locale.TranslateWithFallback(language.fallback, item.LabelKey)
 	output.Value = locale.TranslateWithFallback(language.fallback, item.FormatKey,
@@ -32,9 +32,9 @@ func (lch *LanguageChooser) Do(command COMMAND, args ...any) {
 }
 
 func (lch *LanguageChooser) Values() []any {
-	return []any{(*lch.Chooser.List)[lch.Chooser.Current].String()}
+	return []any{(*lch.chooser.List)[lch.chooser.Current].String()}
 }
 
 func (lch *LanguageChooser) Current() *Language {
-	return lch.Languages.List[lch.Chooser.Current]
+	return lch.languages.Languages[lch.chooser.Current]
 }

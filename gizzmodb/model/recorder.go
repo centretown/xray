@@ -23,8 +23,8 @@ type RecorderClass[T any] struct {
 	Content T
 }
 
-func InitRecorder[T any](gd Recorder, name string, classn int32) {
-	InitRecord(gd.GetRecord(), name, classn, gd.GetItem(), JSON)
+func SetupRecorder[T any](gd Recorder, name string, classn int32) {
+	SetupRecord(gd.GetRecord(), name, classn, gd.GetItem(), JSON)
 }
 
 func (rr *RecorderClass[T]) GetRecord() *Record {

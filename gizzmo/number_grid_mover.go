@@ -37,7 +37,7 @@ func NewGridMover[T numbers.NumberType](bounds rl.Vector4, pixelRateX float64) *
 
 	mv.Content.Bounds = bounds
 	mv.Content.PixelRateX = pixelRateX
-	model.InitRecorder[GridMover[T]](mv, class.LifeMover.String(),
+	model.SetupRecorder[GridMover[T]](mv, class.LifeMover.String(),
 		int32(class.LifeMover))
 	// mv.init(true)
 	return mv

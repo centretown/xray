@@ -1,10 +1,5 @@
 package notes
 
-type Doer interface {
-	Values() []any
-	Do(command COMMAND, args ...any)
-}
-
 type Output struct {
 	Label string
 	Value string
@@ -18,6 +13,7 @@ type NoteItem struct {
 }
 
 type Note interface {
-	Doer
+	Values() []any
+	Do(command COMMAND, args ...any)
 	Item() *NoteItem
 }

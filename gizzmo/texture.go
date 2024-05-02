@@ -24,16 +24,16 @@ type Texture struct {
 func NewTextureFromRecord(record *model.Record) (tex *Texture) {
 	tex = &Texture{}
 	ShapeFromRecord(&tex.Shape, record)
-	model.InitResource(&tex.Content.Custom.Resource,
+	model.SetupResource(&tex.Content.Custom.Resource,
 		tex.Content.Custom.Resource.Path, int32(class.Texture))
 	return tex
 }
 
 func NewTexture(viewPort rl.Rectangle, path string, depth float32) *Texture {
 	tex := &Texture{}
-	InitShape[TextureItem](&tex.Shape, class.Texture.String(), int32(class.Texture),
+	SetupShape[TextureItem](&tex.Shape, class.Texture.String(), int32(class.Texture),
 		color.RGBA{}, 0, 0, depth)
-	model.InitResource(&tex.Content.Custom.Resource, path, int32(class.Texture))
+	model.SetupResource(&tex.Content.Custom.Resource, path, int32(class.Texture))
 	var _ Drawer = tex
 
 	return tex

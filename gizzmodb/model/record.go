@@ -48,7 +48,7 @@ type Record struct {
 	Updated  time.Time
 }
 
-func InitRecord(rec *Record, class string, classn int32,
+func SetupRecord(rec *Record, class string, classn int32,
 	vContent any, encoding Encoding) {
 
 	id, _ := uuid.NewV7()

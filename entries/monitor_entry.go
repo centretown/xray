@@ -15,7 +15,7 @@ type MonitorEntry struct {
 
 func NewMonitorEntry(monitor *Monitor) *MonitorEntry {
 	mon := &MonitorEntry{}
-	notes.InitComposite(&mon.Composite,
+	notes.SetupComposite(&mon.Composite,
 		notes.MonitorLabel, notes.MonitorValue,
 		monitor)
 	var _ notes.Note = mon

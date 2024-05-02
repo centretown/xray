@@ -17,17 +17,17 @@ func (gs *Game) DrawStatus() {
 	)
 
 	if content.commandState {
-		row += gs.drawOutputs(row, content.Options)
+		row += gs.drawOutputs(row, content.options)
 	}
 
 	if content.capturing {
-		gs.drawOutputs(row, content.Capture)
+		gs.drawOutputs(row, content.capture)
 	}
 }
 
 func (gs *Game) drawOutputs(row int32, notes *notes.Notebook) int32 {
 	var layout = gs.Content.Layout
-	return layout.Layout(row, notes, gs.Content.Language,
+	return layout.Layout(row, notes,
 		func(y int32, label string, labelColor color.RGBA,
 			value string, valueColor color.RGBA) {
 			rl.DrawText(label, int32(layout.LabelX), int32(y), layout.Fontsize, labelColor)

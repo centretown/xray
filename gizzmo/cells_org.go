@@ -58,7 +58,7 @@ func NewCellsOrg(width, height, squareSize int32) *CellsOrg {
 	item.Cols = width / squareSize
 	item.Rows = height / squareSize
 	item.Colors = append(item.Colors, gridColor, aliveColor, visitedColor)
-	model.InitRecorder[CellItemsOrg](&cs.RecorderClass, class.CellsOrg.String(),
+	model.SetupRecorder[CellItemsOrg](&cs.RecorderClass, class.CellsOrg.String(),
 		int32(class.CellsOrg))
 	cs.start()
 	return cs
@@ -80,11 +80,11 @@ func (cs *CellsOrg) start() {
 		}
 	}
 
-	cs.Init(true)
+	cs.Setup(true)
 	item.setup = true
 }
 
-func (cs *CellsOrg) Init(clear bool) {
+func (cs *CellsOrg) Setup(clear bool) {
 	item := &cs.Content
 
 	for x := int32(0); x <= item.Cols; x++ {
@@ -202,10 +202,10 @@ func (cs *CellsOrg) Update() {
 func (cs *CellsOrg) Input() {
 	// control
 	if rl.IsKeyPressed(rl.KeyR) {
-		cs.Init(false)
+		cs.Setup(false)
 	}
 	if rl.IsKeyPressed(rl.KeyC) {
-		cs.Init(true)
+		cs.Setup(true)
 	}
 	if rl.IsKeyDown(rl.KeyRight) && !cs.Content.Playing {
 		cs.Update()

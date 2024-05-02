@@ -52,8 +52,7 @@ func (lay *Layout) Refresh(fontsize int32) {
 }
 
 func (lay *Layout) Layout(startY int32,
-	notes *notes.Notebook, language *notes.Language,
-	draw func(y int32,
+	notes *notes.Notebook, draw func(y int32,
 		label string, labelColor color.RGBA,
 		value string, valueColor color.RGBA)) int32 {
 

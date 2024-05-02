@@ -19,9 +19,15 @@ func (gs *Game) BuildNotes() {
 func (gs *Game) updateState(command notes.COMMAND) {
 	var (
 		content = &gs.Content
-		length  = content.Options.Length
 		// note    *notes.Note
 	)
+	if content == nil {
+		panic("content nil")
+	}
+	if content.options == nil {
+		panic("content.Options nil")
+	}
+	length := content.options.Length
 
 	switch command {
 	case notes.OPTIONS:

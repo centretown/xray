@@ -4,16 +4,16 @@ import (
 	"github.com/centretown/xray/notes"
 )
 
-func InitLanguageList(languages *notes.Languages) {
+func SetupVocabulary(vocabulary *notes.VocabularyItem) {
 
-	notes.InitLanguages(languages)
+	notes.SetupVocabulary(vocabulary)
 
-	for _, lang := range languages.List {
-		languages.AddSources(lang)
+	for _, lang := range vocabulary.Languages {
+		vocabulary.AddSources(lang)
 	}
 
-	for _, lang := range languages.List {
-		languages.Items[lang.Code] = lang
+	for _, lang := range vocabulary.Languages {
+		vocabulary.LanguageMap[lang.Code] = lang
 	}
 
 }

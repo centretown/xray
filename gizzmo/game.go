@@ -27,46 +27,42 @@ type GameItem struct {
 	Rules        string
 	Instructions string
 	Author       string
-
-	InputInterval float64
-	FrameRate     int64
-
-	Width  float32
-	Height float32
-	Depth  float32
+	BuildTime    float64
 
 	FixedWidth  float32
 	FixedHeight float32
 	FixedDepth  float32
 	FixedSize   bool
+	FrameRate   int64
+	BackGround  color.RGBA // defaults to black
 
-	BackGround      color.RGBA // defaults to black
+	CurrentFrameRate int64
+	Width            float32
+	Height           float32
+	Depth            float32
+
+	InputInterval   float64
 	CaptureDelay    float64
 	CaptureDuration float64
 
 	Layout *layout.Layout
-
-	LanguageCurrent int
-	Languages       notes.Languages
-	Language        *notes.Language
 
 	Monitor  entries.Monitor
 	Screen   entries.Screen
 	Fontsize float64
 
 	OptionCurrent int
-	Options       *notes.Notebook
-	Capture       *notes.Notebook
-	KeyMap        *notes.Notebook
-	PadMap        *notes.Notebook
 
-	built       float64
+	options *notes.Notebook
+	capture *notes.Notebook
+	// keyMap  *notes.Notebook
+	// padMap  *notes.Notebook
+
 	paused      bool
 	fullscreen  bool
 	screenstate ResizeState
 
-	currentTime      float64
-	CurrentFrameRate int64
+	currentTime float64
 
 	beginCapturing bool
 	capturing      bool
@@ -107,13 +103,12 @@ func NewGameFromRecord(record *model.Record) *Game {
 }
 
 func (gs *Game) NewGameSetup(width, height, fps int32) {
-	model.InitRecorder[GameItem](gs, class.Game.String(),
+	model.SetupRecorder[GameItem](gs, class.Game.String(),
 		int32(class.Game))
 	content := &gs.Content
 	content.FixedWidth, content.Width = float32(width), float32(width)
 	content.FixedHeight, content.Height = float32(height), float32(height)
-	content.built = rl.GetTime()
-	content.currentTime = rl.GetTime()
+	content.BuildTime = rl.GetTime()
 	content.InputInterval = .15
 	content.BackGround = rl.Black
 	content.CaptureDuration = 15
@@ -121,6 +116,18 @@ func (gs *Game) NewGameSetup(width, height, fps int32) {
 	//TODO?
 	content.CaptureDelay = 4
 	gs.setup()
+}
+
+func (gs *Game) Options() (options *notes.Notebook) {
+	options = gs.Content.options
+	return
+}
+
+func (gs *Game) SetOptions(options, capture *notes.Notebook) {
+	gs.Content.options = options
+	gs.Content.capture = capture
+	// gs.Content.keyMap = keyMap
+	// gs.Content.padMap = padMap
 }
 
 func (gs *Game) setup() {
@@ -131,6 +138,7 @@ func (gs *Game) setup() {
 	content.captureSource = make(chan *rl.Image)
 	content.capturing = false
 	content.screenstate = RESIZE_NORMAL
+	content.fullscreen = false
 
 	content.Layout = layout.NewLayout(20)
 	content.gamepad = gpads.NewGPads()
@@ -140,6 +148,7 @@ func (gs *Game) setup() {
 	content.inputters = make([]Inputer, 0)
 	content.depthList = make([]DeepDrawer, 0)
 	content.textureList = make([]*Texture, 0)
+	content.currentTime = rl.GetTime()
 }
 
 func (gs *Game) SetPad(pad pad.PadG)             { gs.Content.gamepad = pad }

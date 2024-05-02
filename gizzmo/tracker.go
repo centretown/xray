@@ -65,7 +65,7 @@ func NewTracker(bounds rl.Vector4, rates rl.Vector4,
 	item.Axes[2].Setup(now, minV.Z, maxV.Z)
 	// tr.Refresh(now, item.Bounds)
 	// tr.Refresh(now, rl.Vector4{X: bounds.X, Y: bounds.Y})
-	model.InitRecorder[TrackerItem](tr,
+	model.SetupRecorder[TrackerItem](tr,
 		class.Tracker.String(), int32(class.Tracker))
 	return tr
 }

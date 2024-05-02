@@ -3,6 +3,7 @@ package builder
 import (
 	"flag"
 	"log"
+	"os"
 	"path/filepath"
 
 	"github.com/centretown/xray/access"
@@ -48,13 +49,15 @@ func Build(custom func(*gizzmo.Game)) (*gizzmo.Game, bool, error) {
 	log.Printf("memory: %v, databasePath: %s\n",
 		inMemory, databasePath)
 	flags.Dump()
-
+	os.Exit(0)
 	return game, install, err
 }
 
-func create(databasePath string, cmd *flags.FlagSet,
+func create(databasePath string,
+	cmd *flags.FlagSet,
 	custom func(*gizzmo.Game),
-	memory bool, install bool) (game *gizzmo.Game, err error) {
+	memory bool,
+	install bool) (game *gizzmo.Game, err error) {
 
 	fname := databasePath
 	if !memory {
@@ -92,12 +95,13 @@ func create(databasePath string, cmd *flags.FlagSet,
 
 	custom(game)
 
-	BuildGameNotes(game)
-
 	game.Save(data)
 	if data.HasErrors() {
+		game.Dump()
 		return
 	}
+
+	BuildNotebooks(game)
 
 	if !memory {
 		if install {

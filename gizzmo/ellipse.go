@@ -23,7 +23,7 @@ func NewEllipseFromRecord(record *model.Record) *Ellipse {
 
 func NewEllipse(rgba color.RGBA, width float32, height float32, depth float32) *Ellipse {
 	ell := &Ellipse{}
-	InitShape[EllipseItem](&ell.Shape, class.Ellipse.String(),
+	SetupShape[EllipseItem](&ell.Shape, class.Ellipse.String(),
 		int32(class.Ellipse), rgba, width, height, depth)
 	var _ model.Recorder = ell
 	var _ Drawer = ell

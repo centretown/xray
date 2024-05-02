@@ -24,7 +24,7 @@ func NewPane(rectangle rl.Rectangle) *Pane {
 	pane := &Pane{}
 	item := &pane.Content
 	item.Rectangle = rectangle
-	model.InitRecorder[Pane](pane,
+	model.SetupRecorder[Pane](pane,
 		class.Pane.String(), int32(class.Pane))
 	return pane
 }
