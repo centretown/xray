@@ -118,5 +118,6 @@ func create(databasePath string,
 
 	cmd.Dump()
 	game.Dump()
+	game.Run()
 	return
 }

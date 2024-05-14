@@ -14,16 +14,16 @@ func NewLanguageChooser(vocabulary *VocabularyItem) *LanguageChooser {
 	return lch
 }
 
-func (lch *LanguageChooser) Item() *NoteItem {
-	return lch.chooser.Item()
+func (lch *LanguageChooser) GetScribe() *Scribe {
+	return lch.chooser.GetScribe()
 }
 
-func (lch *LanguageChooser) Do(command COMMAND, args ...any) {
+func (lch *LanguageChooser) Do(command Command, args ...any) {
 	lch.chooser.Do(command, args...)
 	var (
 		language = lch.Current()
 		locale   = language.locale
-		item     = lch.Item()
+		item     = lch.GetScribe()
 		output   = &lch.chooser.Output
 	)
 	output.Label = locale.TranslateWithFallback(language.fallback, item.LabelKey)

@@ -3,17 +3,28 @@ package notes
 import (
 	"log"
 
+	"github.com/centretown/xray/class"
+	"github.com/centretown/xray/gizzmodb/model"
 	"unknwon.dev/i18n"
 )
 
 type VocabularyItem struct {
-	LanguageMap    map[string]*Language
+	// LanguageMap    map[string]*Language
 	Languages      []*Language
 	FallbackCode   string
 	FallbackTitle  string
 	FallbackSource []byte
 	fallback       *i18n.Locale
 	store          *i18n.Store
+}
+
+type Vocabulary struct {
+	model.RecorderClass[VocabularyItem]
+}
+
+func NewVocabulary() {
+	voc := &Vocabulary{}
+	model.SetupRecorder[VocabularyItem](voc, class.Vocabulary.String(), int32(class.Vocabulary))
 }
 
 func SetupVocabulary(voc *VocabularyItem) {

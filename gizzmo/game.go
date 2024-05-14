@@ -5,16 +5,15 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/centretown/xray/entries"
 	"github.com/centretown/xray/gizzmodb"
 	"github.com/centretown/xray/gizzmodb/model"
 	"github.com/centretown/xray/layout"
-	"github.com/centretown/xray/notes"
+	"github.com/centretown/xray/notebooks"
 
 	"github.com/centretown/gpads/gpads"
 	"github.com/centretown/gpads/pad"
 	rl "github.com/centretown/raylib-go/raylib"
-	"github.com/centretown/xray/gizzmo/class"
+	"github.com/centretown/xray/class"
 )
 
 var _ = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -47,14 +46,14 @@ type GameItem struct {
 
 	Layout *layout.Layout
 
-	Monitor  entries.Monitor
-	Screen   entries.Screen
-	Fontsize float64
+	// Monitor  entries.Monitor
+	// Screen   entries.Screen
+	// Fontsize float64
 
-	OptionCurrent int
+	OptionCurrent int32
 
-	options *notes.Notebook
-	capture *notes.Notebook
+	options *notebooks.OptionBook
+	capture *notebooks.CaptureBook
 	// keyMap  *notes.Notebook
 	// padMap  *notes.Notebook
 
@@ -118,12 +117,15 @@ func (gs *Game) NewGameSetup(width, height, fps int32) {
 	gs.setup()
 }
 
-func (gs *Game) Options() (options *notes.Notebook) {
+func (gs *Game) Options() (options *notebooks.OptionBook) {
 	options = gs.Content.options
 	return
 }
 
-func (gs *Game) SetOptions(options, capture *notes.Notebook) {
+func (gs *Game) AddNotebooks(
+	options *notebooks.OptionBook,
+	capture *notebooks.CaptureBook) {
+
 	gs.Content.options = options
 	gs.Content.capture = capture
 	// gs.Content.keyMap = keyMap
@@ -140,7 +142,7 @@ func (gs *Game) setup() {
 	content.screenstate = RESIZE_NORMAL
 	content.fullscreen = false
 
-	content.Layout = layout.NewLayout(20)
+	content.Layout = layout.NewLayout(20, 0)
 	content.gamepad = gpads.NewGPads()
 
 	content.movers = make([]Mover, 0)

@@ -2,7 +2,7 @@ package gizzmo
 
 import (
 	rl "github.com/centretown/raylib-go/raylib"
-	"github.com/centretown/xray/gizzmo/class"
+	"github.com/centretown/xray/class"
 	"github.com/centretown/xray/gizzmodb/model"
 )
 

@@ -1,9 +1,9 @@
 package notes
 
-type COMMAND int
+type Command int
 
 const (
-	NONE COMMAND = iota
+	NONE Command = iota
 	OPTIONS
 	MORE
 	NEXT
@@ -22,5 +22,7 @@ const (
 	CANCEL
 	OUT
 
-	COMMANDS
+	COMMAND_COUNT
 )
+
+//go:generate stringer -type=Command

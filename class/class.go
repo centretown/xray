@@ -15,6 +15,7 @@ const (
 	Player
 	CellsOrg
 	Pane
+	Vocabulary
 	ClassEnd
 )
 

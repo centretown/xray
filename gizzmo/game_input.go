@@ -19,7 +19,7 @@ func (gs *Game) ProcessInput(repeatinterval float64,
 		interval             = baseInterval
 
 		command, currentCommand,
-		previousCommand notes.COMMAND
+		previousCommand notes.Command
 		repeatCount int
 	)
 

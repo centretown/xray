@@ -87,8 +87,8 @@ func (data *Data) InsertItems(items ...model.Recorder) {
 		item.GetRecord().UpdateContent(item.GetItem())
 		if !data.HasErrors() {
 			_, data.Err = tx.NamedExec(data.Schema.InsertItem, item.GetRecord())
-			fmt.Println(data.Schema.InsertItem, item.GetRecord())
-			panic(data.Err)
+			// fmt.Println(data.Schema.InsertItem, item.GetRecord())
+			// panic(data.Err)
 		}
 		if data.HasErrors() {
 			return

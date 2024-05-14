@@ -18,12 +18,13 @@ func _() {
 	_ = x[Player-7]
 	_ = x[CellsOrg-8]
 	_ = x[Pane-9]
-	_ = x[ClassEnd-10]
+	_ = x[Vocabulary-10]
+	_ = x[ClassEnd-11]
 }
 
-const _Class_name = "ClassBeginGameEllipseTextureTrackerLifeMoverLifeGridPlayerCellsOrgPaneClassEnd"
+const _Class_name = "ClassBeginGameEllipseTextureTrackerLifeMoverLifeGridPlayerCellsOrgPaneVocabularyClassEnd"
 
-var _Class_index = [...]uint8{0, 10, 14, 21, 28, 35, 44, 52, 58, 66, 70, 78}
+var _Class_index = [...]uint8{0, 10, 14, 21, 28, 35, 44, 52, 58, 66, 70, 80, 88}
 
 func (i Class) String() string {
 	if i < 0 || i >= Class(len(_Class_index)-1) {

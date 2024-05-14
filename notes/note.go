@@ -1,19 +1,19 @@
 package notes
 
-type Output struct {
+type Scribble struct {
 	Label string
 	Value string
 }
 
-type NoteItem struct {
+type Scribe struct {
 	LabelKey  string
 	FormatKey string
-	Output    Output
+	Output    Scribble
 	CanDo     bool
 }
 
 type Note interface {
 	Values() []any
-	Do(command COMMAND, args ...any)
-	Item() *NoteItem
+	Do(command Command, args ...any)
+	GetScribe() *Scribe
 }

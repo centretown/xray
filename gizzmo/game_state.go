@@ -1,80 +1,54 @@
 package gizzmo
 
 import (
-	rl "github.com/centretown/raylib-go/raylib"
 	"github.com/centretown/xray/notes"
+
+	rl "github.com/centretown/raylib-go/raylib"
 )
 
 func (gs *Game) BuildNotes() {
-	// var (
-	// 	content = &gs.Content
-	// )
+	var (
+		content = &gs.Content
+		options = content.options
+	)
+	options.FontSize = float64(content.Layout.Fontsize)
 	// content.Languages = notes.NewLanguageList()
 	// content.LanguageIndex = 1
 	// content.Language = content.Languages.List[content.LanguageIndex]
-	// gs.RefreshEnvironment()
+	gs.RefreshEnvironment()
 }
 
 // from input thread (no raylib main thread action here)
-func (gs *Game) updateState(command notes.COMMAND) {
+func (gs *Game) updateState(command notes.Command) {
 	var (
 		content = &gs.Content
-		// note    *notes.Note
 	)
-	if content == nil {
-		panic("content nil")
-	}
-	if content.options == nil {
-		panic("content.Options nil")
-	}
-	length := content.options.Length
 
-	switch command {
-	case notes.OPTIONS:
+	if command == notes.OPTIONS {
 		content.commandState = !content.commandState
-
-	case notes.NEXT:
-		if content.OptionCurrent+1 < length {
-			content.OptionCurrent++
-		} else {
-			content.OptionCurrent = 0
-		}
-		content.Layout.Current = content.OptionCurrent
-
-	case notes.PREVIOUS:
-		if content.OptionCurrent-1 >= 0 {
-			content.OptionCurrent--
-		} else {
-			content.OptionCurrent = length - 1
-		}
-		content.Layout.Current = content.OptionCurrent
-
-	// case notes.INCREMENT, notes.INCREMENT_MORE, notes.DECREMENT, notes.DECREMENT_MORE:
-	// 	note = content.OptionsNotes.Notes[content.CurrentOption]
-	// 	if note.CanAct() {
-	// 		note.Act(command)
-	// 	}
-	case notes.SHARE:
-		if content.capturing {
-			content.endCapturing = true
-		} else {
-			content.beginCapturing = true
-		}
-	case notes.PAUSE_PLAY:
-		content.paused = !content.paused
+		return
 	}
+
+	content.options.Do(command)
+	content.Layout.Refresh(int32(content.options.FontSize),
+		content.options.Current)
+
 }
 
 // main thread only
 func (gs *Game) RefreshEnvironment() {
-	content := &gs.Content
-	mon := &content.Monitor
-	mon.Num = rl.GetCurrentMonitor()
-	mon.Width = rl.GetMonitorWidth(mon.Num)
-	mon.Height = rl.GetMonitorHeight(mon.Num)
-	mon.RefreshRate = rl.GetMonitorRefreshRate(mon.Num)
-	content.CurrentFrameRate = int64(rl.GetFPS())
-	scr := &content.Screen
+	options := gs.Content.options
+
+	num := rl.GetCurrentMonitor()
+	mon := options.GetMonitor()
+	mon.Num = num
+	mon.Width = rl.GetMonitorWidth(num)
+	mon.Height = rl.GetMonitorHeight(num)
+	mon.RefreshRate = rl.GetMonitorRefreshRate(num)
+
+	options.FrameRate = int64(rl.GetFPS())
+
+	scr := options.GetScreen()
 	scr.Width = int64(rl.GetScreenWidth())
 	scr.Height = int64(rl.GetScreenHeight())
 }

@@ -17,12 +17,12 @@ func (gs *Game) DrawStatus() {
 	)
 
 	if content.commandState {
-		row += gs.drawOutputs(row, content.options)
+		row += gs.drawOutputs(row, content.options.Notebook)
 	}
 
-	if content.capturing {
-		gs.drawOutputs(row, content.capture)
-	}
+	// if content.capturing {
+	// 	gs.drawOutputs(row, content.capture)
+	// }
 }
 
 func (gs *Game) drawOutputs(row int32, notes *notes.Notebook) int32 {

@@ -11,9 +11,4 @@ func SetupVocabulary(vocabulary *notes.VocabularyItem) {
 	for _, lang := range vocabulary.Languages {
 		vocabulary.AddSources(lang)
 	}
-
-	for _, lang := range vocabulary.Languages {
-		vocabulary.LanguageMap[lang.Code] = lang
-	}
-
 }

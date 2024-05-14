@@ -2,8 +2,8 @@ package builder
 
 import (
 	"github.com/centretown/xray/builder/locale"
-	"github.com/centretown/xray/entries"
 	"github.com/centretown/xray/gizzmo"
+	"github.com/centretown/xray/notebooks"
 	"github.com/centretown/xray/notes"
 )
 
@@ -44,32 +44,13 @@ func BuildNotebooks(game *gizzmo.Game) {
 			Source: []byte(locale.Locale_en_CA),
 		},
 	}
-	vocabulary.LanguageMap = make(map[string]*notes.Language)
 
 	SetupVocabulary(vocabulary)
 
-	chooser := notes.NewLanguageChooser(vocabulary)
-	// content.Language = content.Languages.List[content.LanguageCurrent]
-
 	var (
-		monitor     entries.Monitor
-		screen      entries.Screen
-		fontsize    float64
-		capture     entries.Capture
-		optionBook  *notes.Notebook
-		captureBook *notes.Notebook
+		chooser     = notes.NewLanguageChooser(vocabulary)
+		optionBook  = notebooks.NewOptionBook(chooser)
+		captureBook = notebooks.NewCaptureBook(chooser)
 	)
-
-	optionBook = notes.NewNotebook(chooser)
-	optionBook.Add(
-		chooser,
-		entries.NewFontEntry(&fontsize),
-		entries.NewMonitorEntry(&monitor),
-		entries.NewScreenEntry(&screen))
-
-	captureBook = notes.NewNotebook(chooser)
-	captureBook.Add(
-		entries.NewCaptureEntry(&capture),
-	)
-	game.SetOptions(optionBook, captureBook)
+	game.AddNotebooks(optionBook, captureBook)
 }

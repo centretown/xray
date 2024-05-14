@@ -10,7 +10,9 @@ rayl
 Test
 \-bnmfSave.txt
 TestSchema.txt
-capture_*
+capture_*.gif
+capture_*.png
+capture_*.mp4
 game_keys.yaml
 custom/gander/game01/game_keys.yaml
 custom/life01/life01/game_keys.yaml

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/centretown/xray/access"
-	"github.com/centretown/xray/gizzmo/class"
+	"github.com/centretown/xray/class"
 	"github.com/centretown/xray/gizzmodb"
 	"github.com/centretown/xray/gizzmodb/model"
 )
@@ -69,6 +69,8 @@ func LoadGame() (err error) {
 	if data.HasErrors() {
 		return
 	}
+
+	// game.Content.options = load
 
 	game.Run()
 	return

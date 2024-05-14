@@ -33,27 +33,28 @@ type Layout struct {
 	LabelX   int32
 	ValueX   int32
 	DeltaY   int32
-	Current  int
+	Current  int32
 	Colors   *ColorSet
 }
 
-func NewLayout(fontsize int32) *Layout {
+func NewLayout(fontsize, current int32) *Layout {
 	lay := &Layout{}
-	lay.Refresh(fontsize)
+	lay.Refresh(fontsize, current)
 	lay.Colors = &colorSet
 	return lay
 }
 
-func (lay *Layout) Refresh(fontsize int32) {
+func (lay *Layout) Refresh(fontsize, current int32) {
 	lay.Fontsize = fontsize
 	lay.LabelX = fontsize + 3
 	lay.ValueX = lay.LabelX + lay.Fontsize*15
 	lay.DeltaY = lay.Fontsize * 2
+	lay.Current = current
 }
 
 func (lay *Layout) Layout(startY int32,
-	notes *notes.Notebook, draw func(y int32,
-		label string, labelColor color.RGBA,
+	notes *notes.Notebook,
+	draw func(y int32, label string, labelColor color.RGBA,
 		value string, valueColor color.RGBA)) int32 {
 
 	var (
@@ -64,9 +65,9 @@ func (lay *Layout) Layout(startY int32,
 
 	notes.Fetch()
 
-	for i, note := range notes.Notes {
-		item := note.Item()
-		if i == lay.Current {
+	for index, note := range notes.Notes {
+		item := note.GetScribe()
+		if index == int(lay.Current) {
 			if item.CanDo {
 				labelColor, valueColor = lay.Colors.LabelInput, lay.Colors.ValueInput
 			} else {

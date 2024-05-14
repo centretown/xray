@@ -6,10 +6,10 @@ import (
 	"github.com/centretown/xray/numbers"
 )
 
-func (gs *Game) CheckKeys() notes.COMMAND {
+func (gs *Game) CheckKeys() notes.Command {
 	var more_down bool
 
-	for command := range notes.COMMANDS {
+	for command := range notes.COMMAND_COUNT {
 		switch command {
 		case notes.OPTIONS:
 			if rl.IsKeyDown(rl.KeyF1) {

@@ -7,7 +7,7 @@ import (
 )
 
 type Chooser[T fmt.Stringer] struct {
-	NoteItem
+	Scribe
 	List    *[]T
 	Current int
 }
@@ -18,7 +18,7 @@ func NewChooser[T fmt.Stringer](
 	list *[]T,
 ) *Chooser[T] {
 	cho := &Chooser[T]{
-		NoteItem: NoteItem{
+		Scribe: Scribe{
 			LabelKey:  label,
 			FormatKey: format,
 			CanDo:     true,
@@ -30,11 +30,11 @@ func NewChooser[T fmt.Stringer](
 	return cho
 }
 
-func (cho *Chooser[T]) Item() *NoteItem {
-	return &cho.NoteItem
+func (cho *Chooser[T]) GetScribe() *Scribe {
+	return &cho.Scribe
 }
 
-func (cho *Chooser[T]) Do(command COMMAND, args ...any) {
+func (cho *Chooser[T]) Do(command Command, args ...any) {
 	var (
 		length    = len(*cho.List)
 		selection int

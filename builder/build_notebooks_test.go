@@ -3,10 +3,9 @@ package builder
 import (
 	"testing"
 
-	"github.com/centretown/xray/entries"
 	"github.com/centretown/xray/gizzmo"
+	"github.com/centretown/xray/notebooks"
 	"github.com/centretown/xray/notes"
-	"github.com/centretown/xray/numbers"
 )
 
 const (
@@ -19,22 +18,23 @@ const (
 func TestNotes(t *testing.T) {
 	gs := &gizzmo.Game{}
 	BuildNotebooks(gs)
-
 	options := gs.Options()
 
-	chooser := options.Notes[0].(*notes.LanguageChooser)
-	testLanguageChooser(t, options, chooser)
+	ntbk := options.Notebook
 
-	fontEntry := options.Notes[1].(*notes.Ranger[float64])
-	testRanger(t, options, fontEntry)
+	chooser := options.LanguageChooser
+	testLanguageChooser(t, ntbk, chooser)
 
-	monitor := options.Notes[2].(*entries.MonitorEntry)
-	testMonitor(t, options, monitor)
+	fontEntry := options.FontEntry
+	testFontEntry(t, ntbk, fontEntry)
 
-	screen := options.Notes[3].(*entries.ScreenEntry)
-	testScreen(t, options, screen)
+	monitor := options.MonitorEntry
+	testMonitor(t, ntbk, monitor)
 
-	ntbk := options
+	screen := options.ScreenEntry
+	testScreen(t, ntbk, screen)
+
+	// title :=
 
 	draw := func(i int, label, value string) {
 		ntbk.Fetch()
@@ -64,7 +64,7 @@ func TestNotes(t *testing.T) {
 
 func testLanguageChooser(t *testing.T, ntbk *notes.Notebook, chooser *notes.LanguageChooser) {
 
-	item := chooser.Item()
+	item := chooser.GetScribe()
 	output := &item.Output
 
 	testChooser := func(label string, want string) {
@@ -92,9 +92,9 @@ func testLanguageChooser(t *testing.T, ntbk *notes.Notebook, chooser *notes.Lang
 
 }
 
-func testRanger[T numbers.NumberType](t *testing.T, ntbk *notes.Notebook, rngr *notes.Ranger[T]) {
+func testFontEntry(t *testing.T, ntbk *notes.Notebook, rngr *notebooks.FontEntry) {
 
-	item := rngr.Item()
+	item := rngr.GetScribe()
 	output := &item.Output
 	test := func(label string, want string) {
 		ntbk.Fetch()
@@ -142,9 +142,9 @@ func testRanger[T numbers.NumberType](t *testing.T, ntbk *notes.Notebook, rngr *
 	test("Font Size", "13")
 }
 
-func testMonitor(t *testing.T, ntbk *notes.Notebook, mon *entries.MonitorEntry) {
+func testMonitor(t *testing.T, ntbk *notes.Notebook, me *notebooks.MonitorEntry) {
 
-	item := mon.Item()
+	item := me.GetScribe()
 	output := &item.Output
 
 	test_monitor := func(label string, want string) {
@@ -163,11 +163,11 @@ func testMonitor(t *testing.T, ntbk *notes.Notebook, mon *entries.MonitorEntry) 
 
 	ntbk.Language.Do(notes.SET, testFrench)
 	test_monitor("Moniteur", "0 0x0 0 Mhz")
-	custom := mon.Custom
-	custom.Num = 1
-	custom.Width = 2560
-	custom.Height = 1440
-	custom.RefreshRate = 60
+	mon := me.Get()
+	mon.Num = 1
+	mon.Width = 2560
+	mon.Height = 1440
+	mon.RefreshRate = 60
 	ntbk.Language.Do(notes.SET, testEnglishUS)
 	test_monitor("Monitor", "1 2560x1440 60 Mhz")
 	ntbk.Language.Do(notes.SET, testFrenchCA)
@@ -175,9 +175,12 @@ func testMonitor(t *testing.T, ntbk *notes.Notebook, mon *entries.MonitorEntry) 
 
 }
 
-func testScreen(t *testing.T, ntbk *notes.Notebook, scr *entries.ScreenEntry) {
-	custom := scr.Custom
-	custom.Width = 1920
-	custom.Height = 1080
+func testScreen(t *testing.T, ntbk *notes.Notebook, se *notebooks.ScreenEntry) {
+	scr := se.Get()
+	scr.Width = 1920
+	scr.Height = 1080
 	ntbk.Fetch()
+}
+
+func testSave(t *testing.T, ntbk *notes.Notebook) {
 }

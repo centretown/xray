@@ -6,7 +6,7 @@ import (
 	"github.com/centretown/xray/numbers"
 )
 
-func (gs *Game) CheckPad(padNum int32) notes.COMMAND {
+func (gs *Game) CheckPad(padNum int32) notes.Command {
 	content := &gs.Content
 	content.gamepad.BeginPad()
 
@@ -15,7 +15,7 @@ func (gs *Game) CheckPad(padNum int32) notes.COMMAND {
 		aux_down  = content.gamepad.IsGamepadButtonDown(padNum, gpads.RL_LeftTrigger1)
 	)
 
-	for command := range notes.COMMANDS {
+	for command := range notes.COMMAND_COUNT {
 		switch command {
 		case notes.OPTIONS:
 			if content.gamepad.IsGamepadButtonDown(padNum, gpads.RL_MiddleRight) {
